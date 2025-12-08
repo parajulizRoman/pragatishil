@@ -37,7 +37,7 @@ export default function AdminDashboard() {
     }, []);
 
     const cards = [
-        { label: "Total News Articles", value: stats.newsCount, icon: Newspaper, color: "bg-blue-500", href: "/admin/news" },
+        { label: "Total News Articles", value: stats.newsCount, icon: Newspaper, color: "bg-brand-blue", href: "/admin/news" },
         { label: "Media Items", value: stats.mediaCount, icon: Image, color: "bg-purple-500", href: "/admin/media" },
         { label: "Total Members", value: stats.membersCount, icon: Users, color: "bg-brand-red", href: "#" }, // No members admin page widely exposed yet
         { label: "Site Views (Est)", value: stats.views, icon: Eye, color: "bg-orange-500", href: "#" },
