@@ -37,8 +37,26 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
                     </div>
 
                     {/* Main Title (Bilingual) */}
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 drop-shadow-xl leading-tight text-brand-blue">
-                        {t(c.hero.titleEn, c.hero.titleNe)}
+                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 drop-shadow-xl leading-tight text-slate-900">
+                        {(() => {
+                            const text = t(c.hero.titleEn, c.hero.titleNe);
+                            const words = text.split(" ");
+                            return words.map((word, i) => {
+                                const lower = word.toLowerCase().replace(/[^a-z\u0900-\u097f]/g, ""); // Keep mainly letters
+                                let colorClass = "text-slate-900"; // Default
+
+                                if (lower.includes("pragatishil") || lower.includes("प्रगतिशील")) colorClass = "text-brand-red";
+                                else if (lower.includes("loktantrik") || lower.includes("लोकतान्त्रिक")) colorClass = "text-brand-blue";
+                                else if (lower.includes("party") || lower.includes("पार्टी")) colorClass = "text-brand-red";
+                                else if (lower.includes("welcome")) colorClass = "text-slate-700"; // Make 'Welcome to' subtle if present
+
+                                return (
+                                    <span key={i} className={`${colorClass} inline-block mr-2 md:mr-3`}>
+                                        {word}
+                                    </span>
+                                );
+                            });
+                        })()}
                     </h1>
 
                     {/* Secondary Line (Bilingual) */}
