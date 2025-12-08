@@ -45,12 +45,14 @@ export default async function NewsViewPage({
                         {article.title}
                     </h1>
 
+                    {/* Featured Image */}
                     {article.image && (
-                        <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-8 shadow-md">
+                        <div className="relative h-64 md:h-96 w-full mb-8 rounded-xl overflow-hidden shadow-lg">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 src={article.image}
                                 alt={article.title}
-                                className="w-full h-full object-cover"
+                                className="object-cover w-full h-full"
                             />
                         </div>
                     )}
