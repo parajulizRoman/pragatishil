@@ -5,9 +5,9 @@ import Link from "next/link";
 export default async function NewsViewPage({
     searchParams,
 }: {
-    searchParams: Promise<{ url: string }>;
+    searchParams: { url: string };
 }) {
-    const { url } = await searchParams;
+    const { url } = searchParams;
 
     if (!url) {
         return (
