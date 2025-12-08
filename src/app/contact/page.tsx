@@ -2,6 +2,7 @@
 
 import { siteContent } from "@/config/siteContent";
 import { useState } from "react";
+import { Facebook, Twitter, Instagram, Youtube, Mail } from "lucide-react";
 
 export default function ContactPage() {
     const [submitted, setSubmitted] = useState(false);
@@ -10,6 +11,21 @@ export default function ContactPage() {
         e.preventDefault();
         setSubmitted(true);
         // In a real app, we would send data to API here.
+    };
+
+    // Map social names to icons
+    const getSocialIcon = (name: string) => {
+        const lower = name.toLowerCase();
+        if (lower.includes('facebook')) return <Facebook className="w-5 h-5" />;
+        if (lower.includes('twitter') || lower.includes('x')) return <Twitter className="w-5 h-5" />;
+        if (lower.includes('instagram')) return <Instagram className="w-5 h-5" />;
+        if (lower.includes('youtube')) return <Youtube className="w-5 h-5" />;
+        if (lower.includes('tiktok')) return (
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+            </svg>
+        );
+        return <Mail className="w-5 h-5" />; // Fallback
     };
 
     return (
@@ -41,8 +57,8 @@ export default function ContactPage() {
                             <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
                             <div className="flex gap-4">
                                 {siteContent.social.map((social) => (
-                                    <a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 hover:bg-brand-blue flex items-center justify-center transition-colors">
-                                        <span className="text-xl font-bold text-white">{social.name[0]}</span>
+                                    <a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-white/10 hover:bg-brand-blue flex items-center justify-center transition-colors text-white">
+                                        {getSocialIcon(social.name)}
                                     </a>
                                 ))}
                             </div>
