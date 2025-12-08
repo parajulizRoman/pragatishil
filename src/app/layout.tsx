@@ -16,6 +16,9 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: "Pragatishil Loktantrik Party",
   description: "Official website of Pragatishil Loktantrik Party - Nepali Soil, Our Path.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 import Navbar from "@/components/Navbar";

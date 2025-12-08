@@ -62,7 +62,6 @@ export default async function Home() {
       content={content}
       news={newsItems || []}
       videos={videos || []}
-      social={globalData?.social || []}
     />
   );
 }

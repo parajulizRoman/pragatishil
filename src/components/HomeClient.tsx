@@ -11,18 +11,15 @@ interface HomeClientProps {
     content: SiteSettings;
     news: NewsItem[];
     videos: MediaVideo[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    social: any[]; // Part of settings usually, but nice to be explicit if fetched separately
 }
 
-export default function HomeClient({ content, news, videos, social }: HomeClientProps) {
+export default function HomeClient({ content, news, videos }: HomeClientProps) {
     const { t } = useLanguage();
 
     // Fallback if fetch failed completely and content is null (shouldn't happen with getSiteSettings logic but safe)
     const c = content || fallbackContent;
     const n = news && news.length > 0 ? news : fallbackContent.news;
     const v = videos && videos.length > 0 ? videos : fallbackContent.videos;
-    const s = social && social.length > 0 ? social : fallbackContent.social;
 
     return (
         <main className="flex flex-col min-h-screen">
@@ -40,16 +37,8 @@ export default function HomeClient({ content, news, videos, social }: HomeClient
                     </div>
 
                     {/* Main Title (Bilingual) */}
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 drop-shadow-xl leading-tight">
-                        {/* Simple split for color logic */}
-                        <span className="text-brand-red">{t("Welcome to", c.hero.titleNe.split(' ')[0] || "स्वागत")}</span> {/* Approximating split logic or just using full string if needed */}
-                        {/* Actually the previous logic was hardcoded split. Let's use the full strings from CMS but we lose the color split per word unless we structure CMS data that way. 
-               For now, displaying dynamic title fully in one color or simple generic split might be safer, 
-               OR we can just render titleEn/titleNe fully. 
-               The original code hardcoded "Welcome to" + brand parts.
-               Let's respect CMS content. If CMS provides full title, use it.
-            */}
-                        <span className="text-brand-blue">{t(c.hero.titleEn, c.hero.titleNe)}</span>
+                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 drop-shadow-xl leading-tight text-brand-blue">
+                        {t(c.hero.titleEn, c.hero.titleNe)}
                     </h1>
 
                     {/* Secondary Line (Bilingual) */}
@@ -60,7 +49,6 @@ export default function HomeClient({ content, news, videos, social }: HomeClient
                     {/* English/Nepali Support Text */}
                     <div className="max-w-3xl mx-auto mb-10 text-blue-950 font-medium text-lg md:text-xl space-y-1">
                         <p>{t(c.hero.subtitleEnLine2, "")}</p>
-                        {/* Note: Original used vision.textNe as fallback for line 2? That seemed odd. using empty string if not present */}
                     </div>
 
                     {/* Buttons */}
@@ -172,16 +160,6 @@ export default function HomeClient({ content, news, videos, social }: HomeClient
                                     allowFullScreen
                                 ></iframe>
                             </div>
-                        ))}
-                    </div>
-
-                    <div className="flex flex-wrap justify-center gap-6">
-                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {s.map((social) => (
-                            <a key={social.name} href={social.url} target="_blank" rel="noopener noreferrer"
-                                className="flex items-center space-x-3 bg-slate-800/50 hover:bg-brand-blue px-8 py-4 rounded-full transition-all duration-300 border border-slate-700 hover:border-blue-500 backdrop-blur-sm">
-                                <span className="font-medium">{social.name}</span>
-                            </a>
                         ))}
                     </div>
                 </div>
