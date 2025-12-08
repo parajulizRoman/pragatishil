@@ -5,6 +5,9 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Tri-color gradient: Brand Red -> White -> Brand Blue */
+  /* Matches tailwind.config.ts 'brand.red' and 'brand.blue' */
+  --theme-gradient: linear-gradient(135deg, #E53935 0%, #FFFFFF 50%, #2563EB 100%);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -16,6 +19,42 @@
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Background handled by layout utility class 'bg-brand-tricolor' */
+  /* background: var(--theme-gradient); */
+  background-attachment: fixed;
+  /* Ensures gradient stays during scroll */
+  min-height: 100vh;
+}
+
+/* Members page cosmic background with CSS variables for mouse tracking */
+.members-bg {
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+
+  background-image:
+    /* Subtle white highlight following mouse to brighten interaction area */
+    radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.4) 0%, transparent 40%),
+    /* Use the global theme gradient directly */
+    var(--theme-gradient);
+  background-size: 100% 100%;
+  background-attachment: fixed;
+  background-color: #ffffff;
+}
+
+/* Member bubble cosmic glow */
+/* Member bubble cosmic glow - adjusted for light background */
+.member-bubble {
+  box-shadow:
+    0 0 15px rgba(255, 255, 255, 0.8),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease-out;
+  border-color: rgba(255, 255, 255, 0.9);
+}
+
+.member-bubble:hover {
+  box-shadow:
+    0 0 25px rgba(255, 255, 255, 0.9),
+    0 8px 20px rgba(0, 0, 0, 0.25);
+  transform: scale(1.05);
+  /* Slight scale up on hover */
 }

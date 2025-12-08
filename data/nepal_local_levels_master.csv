@@ -1,0 +1,754 @@
+province_id,province_name_en,province_headquarter,province_website,district_id,district_name_en,district_headquarter,district_website,local_level_id,local_level_name_en,local_level_category_id,local_level_category_label,local_level_area_sq_km,local_level_website,num_wards
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,1,Bhojpur,Bhojpur,https://www.ddcbhojpur.gov.np,2,Bhojpur Municipality,3,Municipality,159.51,http://www.bhojpurmun.gov.np/,12
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,1,Bhojpur,Bhojpur,https://www.ddcbhojpur.gov.np,1,Shadanand Municipality,3,Municipality,241.15,http://www.shadanandamun.gov.np/,14
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,1,Bhojpur,Bhojpur,https://www.ddcbhojpur.gov.np,5,Aamchok Rural Municipality,4,Rural Municipality,184.89,http://www.aamchowkmun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,1,Bhojpur,Bhojpur,https://www.ddcbhojpur.gov.np,7,Arun Rural Municipality,4,Rural Municipality,154.76,http://www.arunmun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,1,Bhojpur,Bhojpur,https://www.ddcbhojpur.gov.np,3,Hatuwagadhi Rural Municipality,4,Rural Municipality,142.61,http://www.hatuwagadhimun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,1,Bhojpur,Bhojpur,https://www.ddcbhojpur.gov.np,8,Pauwadungma Rural Municipality,4,Rural Municipality,118.86,http://www.pauwadungmamun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,1,Bhojpur,Bhojpur,https://www.ddcbhojpur.gov.np,4,Ramprasad Rai Rural Municipality,4,Rural Municipality,158.83,http://www.ramprasadraimun.gov.np/,8
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,1,Bhojpur,Bhojpur,https://www.ddcbhojpur.gov.np,9,Salpasilichho Rural Municipality,4,Rural Municipality,193.33,http://www.salpasilichhomun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,1,Bhojpur,Bhojpur,https://www.ddcbhojpur.gov.np,6,Tyamke Maiyum Rural Municipality,4,Rural Municipality,173.41,http://www.tyamkemaiyummun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,2,Dhankuta,Dhankuta,https://www.ddcdhankuta.gov.np,10,Dhankuta Municipality,3,Municipality,111,http://www.dhankutamun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,2,Dhankuta,Dhankuta,https://www.ddcdhankuta.gov.np,12,Mahalaxmi Municipality,3,Municipality,129.39,https://mahalaxmimundhankuta.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,2,Dhankuta,Dhankuta,https://www.ddcdhankuta.gov.np,11,Pakhribas Municipality,3,Municipality,144.29,https://pakhribasmun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,2,Dhankuta,Dhankuta,https://www.ddcdhankuta.gov.np,14,Chaubise Rural Municipality,4,Rural Municipality,147.6,https://choubisemun.gov.np/,8
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,2,Dhankuta,Dhankuta,https://www.ddcdhankuta.gov.np,16,Chhathar Jorpati Rural Municipality,4,Rural Municipality,102.83,https://chhatharjorpatimun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,2,Dhankuta,Dhankuta,https://www.ddcdhankuta.gov.np,15,Sahidbhumi Rural Municipality,4,Rural Municipality,99.55,https://shahidbhumimun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,2,Dhankuta,Dhankuta,https://www.ddcdhankuta.gov.np,13,Sangurigadhi Rural Municipality,4,Rural Municipality,166.44,https://sangurigadhimun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,3,Ilam,Ilam,https://www.ddcilam.gov.np,19,Deumai Municipality,3,Municipality,191.63,http://www.deumaimun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,3,Ilam,Ilam,https://www.ddcilam.gov.np,18,Ilam Municipality,3,Municipality,173.32,http://www.ilammun.gov.np/,12
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,3,Ilam,Ilam,https://www.ddcilam.gov.np,22,Mai Municipality,3,Municipality,246.11,http://www.maimun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,3,Ilam,Ilam,https://www.ddcilam.gov.np,17,Suryodaya Municipality,3,Municipality,252.52,http://www.suryodayamun.gov.np/,14
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,3,Ilam,Ilam,https://www.ddcilam.gov.np,23,Chulachuli Rural Municipality,4,Rural Municipality,108.46,http://www.chulachulimun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,3,Ilam,Ilam,https://www.ddcilam.gov.np,20,Maijogmai Rural Municipality,4,Rural Municipality,172.41,http://www.maijogmaimun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,3,Ilam,Ilam,https://www.ddcilam.gov.np,25,Mangsebung Rural Municipality,4,Rural Municipality,142.41,http://www.mansebungmun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,3,Ilam,Ilam,https://www.ddcilam.gov.np,21,Phakphokthum Rural Municipality,4,Rural Municipality,108.79,फाकफोकथुम,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,3,Ilam,Ilam,https://www.ddcilam.gov.np,24,Rong Rural Municipality,4,Rural Municipality,155.06,http://www.rongmun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,3,Ilam,Ilam,https://www.ddcilam.gov.np,26,Sandakpur Rural Municipality,4,Rural Municipality,156.01,http://www.sandakpurmun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,32,Arjundhara Municipality,3,Municipality,109.86,http://www.arjundharamun.gov.np/,11
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,30,Bhadrapur Municipality,3,Municipality,93.35,http://www.bhadrapurmun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,28,Birtamod Municipality,3,Municipality,78.24,http://www.birtamodmun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,29,Damak Municipality,3,Municipality,70.76,http://www.damakmun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,33,Gauradaha Municipality,3,Municipality,149.86,http://www.gauradahamun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,34,Kankai Municipality,3,Municipality,80.98,http://www.kankaimun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,27,Mechinagar Municipality,3,Municipality,192.85,http://www.mechinagarmun.gov.np/,15
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,31,Shivasatakshi Municipality,3,Municipality,145.87,http://www.shivasatakshimun.gov.np/,11
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,39,Barhadashi Rural Municipality,4,Rural Municipality,88.44,http://www.bahradashimun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,36,Buddha Shanti Rural Municipality,4,Rural Municipality,79.78,http://www.buddhashantimun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,40,Gaurigunj Rural Municipality,4,Rural Municipality,101.35,http://www.gaurigunjmun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,41,Haldibari Rural Municipality,4,Rural Municipality,117.34,http://www.haldibarimun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,38,Jhapa Rural Municipality,4,Rural Municipality,94.12,http://www.jhapamun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,37,Kachankawal Rural Municipality,4,Rural Municipality,109.45,http://www.kachankawalmun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,4,Jhapa,Bhadrapur,https://www.ddcjhapa.gov.np,35,Kamal Rural Municipality,4,Rural Municipality,104.57,http://www.kamalmun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,5,Khotang,Diktel,https://www.dcckhotang.gov.np,42,Diktel Rupakot Majhuwagadhi Municipality,3,Municipality,246.51,http://www.rupakotmajhuwagadhimun.gov.np/,15
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,5,Khotang,Diktel,https://www.dcckhotang.gov.np,43,Halesi Tuwachung Municipality,3,Municipality,280.17,http://www.halesituwachungmun.gov.np/,11
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,5,Khotang,Diktel,https://www.dcckhotang.gov.np,46,Aiselukharka Rural Municipality,4,Rural Municipality,125.93,http://www.aiselukharkamun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,5,Khotang,Diktel,https://www.dcckhotang.gov.np,49,Barahpokhari Rural Municipality,4,Rural Municipality,141.6,http://www.barahapokharimun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,5,Khotang,Diktel,https://www.dcckhotang.gov.np,45,Diprung Chuichumma Rural Municipality,4,Rural Municipality,136.48,http://www.diprungmun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,5,Khotang,Diktel,https://www.dcckhotang.gov.np,47,Jantedhunga Rural Municipality,4,Rural Municipality,128.62,http://www.jantedhungamun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,5,Khotang,Diktel,https://www.dcckhotang.gov.np,48,Kepilasgadhi Rural Municipality,4,Rural Municipality,191.28,http://www.kepilasgadhimun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,5,Khotang,Diktel,https://www.dcckhotang.gov.np,44,Khotehang Rural Municipality,4,Rural Municipality,164.09,http://www.khotehangmun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,5,Khotang,Diktel,https://www.dcckhotang.gov.np,50,Rawa Besi Rural Municipality,4,Rural Municipality,97.44,http://www.lamidandamun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,5,Khotang,Diktel,https://www.dcckhotang.gov.np,51,Sakela Rural Municipality,4,Rural Municipality,79.99,http://www.sakelamun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,60,Biratnagar Metropolitan City,1,Metropolitan City,77,http://www.biratnagarmun.gov.np/,19
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,53,Belbari Municipality,3,Municipality,132.79,http://www.belbarimun.gov.np/,11
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,59,Letang Municipality,3,Municipality,119.23,http://www.letangmun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,54,Pathari Shanischare Municipality,3,Municipality,79.81,http://www.patharishanishcharemun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,57,Rangeli Municipality,3,Municipality,111.78,http://www.rangelimun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,55,Ratuwamai Municipality,3,Municipality,142.15,http://www.ratuwamaimun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,58,Sunawarshi Municipality,3,Municipality,106.4,http://www.sunawarshimun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,52,Sundar Haraicha Municipality,3,Municipality,110.16,http://www.sundarharaichamun.gov.np/,12
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,56,Urlabari Municipality,3,Municipality,74.62,http://www.urlabarimun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,62,Budi Ganga Rural Municipality,4,Rural Municipality,56.41,https://budhigangamunmorang.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,64,Dhanpalthan Rural Municipality,4,Rural Municipality,70.26,http://www.dhanapalthanmun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,66,Gramthan Rural Municipality,4,Rural Municipality,71.84,http://www.gramthanmun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,61,Jahada Rural Municipality,4,Rural Municipality,62.38,http://www.jahadamun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,65,Kanepokhari Rural Municipality,4,Rural Municipality,82.83,http://www.kanepokharimun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,63,Katahari Rural Municipality,4,Rural Municipality,51.59,http://www.kataharimun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,67,Kerabari Rural Municipality,4,Rural Municipality,219.83,http://www.kerabarimun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,6,Morang,Biratnagar,https://www.ddcmorang.gov.np,68,Miklajung Rural Municipality,4,Rural Municipality,157.98,http://www.miklajungmunmorang.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,7,Okhaldhunga,Siddhicharan,https://www.dccokhaldhunga.gov.np/en,69,Siddhicharan Municipality,3,Municipality,167.88,http://www.siddhicharanmun.gov.np/,12
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,7,Okhaldhunga,Siddhicharan,https://www.dccokhaldhunga.gov.np/en,74,Champadevi Rural Municipality,4,Rural Municipality,126.91,http://www.champadevimun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,7,Okhaldhunga,Siddhicharan,https://www.dccokhaldhunga.gov.np/en,71,Chisankhugadhi Rural Municipality,4,Rural Municipality,126.91,http://www.chishankhugadhimun.gov.np/,8
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,7,Okhaldhunga,Siddhicharan,https://www.dccokhaldhunga.gov.np/en,70,Khiji Demba Rural Municipality,4,Rural Municipality,179.77,http://www.khijidembamun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,7,Okhaldhunga,Siddhicharan,https://www.dccokhaldhunga.gov.np/en,76,Likhu Rural Municipality,4,Rural Municipality,88.03,https://likhumunokhaldhunga.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,7,Okhaldhunga,Siddhicharan,https://www.dccokhaldhunga.gov.np/en,75,Manebhanjyang Rural Municipality,4,Rural Municipality,146.61,http://www.manebhanjyangmun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,7,Okhaldhunga,Siddhicharan,https://www.dccokhaldhunga.gov.np/en,72,Molung Rural Municipality,4,Rural Municipality,112,http://www.molungmun.gov.np/,8
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,7,Okhaldhunga,Siddhicharan,https://www.dccokhaldhunga.gov.np/en,73,Sunkoshi Rural Municipality,4,Rural Municipality,143.75,http://www.sunkoshimunokhaldhunga.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,8,Pachthar,Phidim,https://www.ddcpanchthar.gov.np,77,Phidim Municipality,3,Municipality,192.5,http://www.phidimmun.gov.np/,14
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,8,Pachthar,Phidim,https://www.ddcpanchthar.gov.np,80,Hilihang Rural Municipality,4,Rural Municipality,123.01,http://www.hilihangmun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,8,Pachthar,Phidim,https://www.ddcpanchthar.gov.np,83,Kummayak Rural Municipality,4,Rural Municipality,129.3,http://www.kummayakmun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,8,Pachthar,Phidim,https://www.ddcpanchthar.gov.np,78,Miklajung Rural Municipality,4,Rural Municipality,166.61,http://www.miklajungmunpanchthar.gov.np/,8
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,8,Pachthar,Phidim,https://www.ddcpanchthar.gov.np,81,Phalelung Rural Municipality,4,Rural Municipality,207.14,http://www.phalelungmun.gov.np/,8
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,8,Pachthar,Phidim,https://www.ddcpanchthar.gov.np,79,Phalgunanda Rural Municipality,4,Rural Municipality,107.53,http://www.phalgunandamun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,8,Pachthar,Phidim,https://www.ddcpanchthar.gov.np,84,Tumbewa Rural Municipality,4,Rural Municipality,117.34,http://www.tumwewamun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,8,Pachthar,Phidim,https://www.ddcpanchthar.gov.np,82,Yangwarak Rural Municipality,4,Rural Municipality,208.63,http://www.yangwarakmunpanchthar.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,9,Sankhuwasabha,Khandbari,https://www.ddcsankhuwasabha.gov.np,86,Chainpur Municipality,3,Municipality,223.69,http://www.chainpurmun.gov.np/,11
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,9,Sankhuwasabha,Khandbari,https://www.ddcsankhuwasabha.gov.np,87,Dharmadevi Municipality,3,Municipality,132.82,http://www.dharmadevimun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,9,Sankhuwasabha,Khandbari,https://www.ddcsankhuwasabha.gov.np,85,Khandbari Municipality,3,Municipality,122.78,http://www.khandbarimun.gov.np/,11
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,9,Sankhuwasabha,Khandbari,https://www.ddcsankhuwasabha.gov.np,89,Madi Municipality,3,Municipality,110.1,http://www.madimunsankhuwasabha.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,9,Sankhuwasabha,Khandbari,https://www.ddcsankhuwasabha.gov.np,88,Panchkhapan Municipality,3,Municipality,148.03,http://www.panchkhapanmun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,9,Sankhuwasabha,Khandbari,https://www.ddcsankhuwasabha.gov.np,94,BhotKhola Rural Municipality,4,Rural Municipality,639.01,http://www.bhotkholamun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,9,Sankhuwasabha,Khandbari,https://www.ddcsankhuwasabha.gov.np,93,Chichila Rural Municipality,4,Rural Municipality,88.63,http://www.chichilamun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,9,Sankhuwasabha,Khandbari,https://www.ddcsankhuwasabha.gov.np,90,Makalu Rural Municipality,4,Rural Municipality,519.45,http://www.makalumun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,9,Sankhuwasabha,Khandbari,https://www.ddcsankhuwasabha.gov.np,92,Sabhapokhari Rural Municipality,4,Rural Municipality,222.08,http://www.savapokharimun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,9,Sankhuwasabha,Khandbari,https://www.ddcsankhuwasabha.gov.np,91,Silichong Rural Municipality,4,Rural Municipality,293.26,http://www.silichongmun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,10,Solukhumbu,Salleri,https://www.ddcsolukhumbu.gov.np,95,Solu Dudhkunda Municipality,3,Municipality,538.09,http://www.solududhkundamun.gov.np/,11
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,10,Solukhumbu,Salleri,https://www.ddcsolukhumbu.gov.np,101,Khumbu PasangLhamu Rural Municipality,4,Rural Municipality,1539.11,http://www.khumbupasanglhamumun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,10,Solukhumbu,Salleri,https://www.ddcsolukhumbu.gov.np,102,Likhu Pike Rural Municipality,4,Rural Municipality,124.38,http://www.likhupikemun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,10,Solukhumbu,Salleri,https://www.ddcsolukhumbu.gov.np,99,Maha Kulung Rural Municipality,4,Rural Municipality,648.05,http://www.mahakulungmun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,10,Solukhumbu,Salleri,https://www.ddcsolukhumbu.gov.np,96,Mapya Dudhkoshi Rural Municipality,4,Rural Municipality,167.67,http://www.dudhkoshimun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,10,Solukhumbu,Salleri,https://www.ddcsolukhumbu.gov.np,97,Necha Salyan Rural Municipality,4,Rural Municipality,94.49,http://www.nechasalyanmun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,10,Solukhumbu,Salleri,https://www.ddcsolukhumbu.gov.np,100,Sotang Rural Municipality,4,Rural Municipality,103,http://www.sotangmun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,10,Solukhumbu,Salleri,https://www.ddcsolukhumbu.gov.np,98,Thulung Dudhkoshi Rural Municipality,4,Rural Municipality,144.6,http://www.thulungdudhkoshimun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,108,Dharan Sub-Metropolitan City,2,Sub-Metropolitan City,192.32,http://www.dharan.gov.np/,20
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,107,Itahari Sub-Metropolitan City,2,Sub-Metropolitan City,93.78,http://www.itaharimun.gov.np/,20
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,103,BarahaKshetra Municipality,3,Municipality,222.09,http://www.barahamun.gov.np/,11
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,105,Duhabi Municipality,3,Municipality,76.67,http://www.duhabimun.gov.np/,12
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,104,Inaruwa Municipality,3,Municipality,77.92,http://www.inaruwamun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,106,Ramdhuni Municipality,3,Municipality,91.69,http://www.ramdhunimun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,114,Barju Rural Municipality,4,Rural Municipality,69.43,http://www.barjumun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,111,Bhokraha Narsingh Rural Municipality,4,Rural Municipality,63.37,http://www.bhokrahamun.gov.np/,8
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,112,Dewangunj Rural Municipality,4,Rural Municipality,53.56,http://www.dewanganjmun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,113,Gadhi Rural Municipality,4,Rural Municipality,67.7,http://www.gadhimun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,110,Harinagar Rural Municipality,4,Rural Municipality,52.29,http://www.harinagaramun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,11,Sunsari,Inaruwa,https://www.ddcsunsari.gov.np,109,Koshi Rural Municipality,4,Rural Municipality,75.98,http://www.koshimun.gov.np/,8
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,12,Taplejung,Taplejung,https://www.ddctaplejung.gov.np,115,Phungling Municipality,3,Municipality,125.57,http://www.phunglingmun.gov.np/,11
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,12,Taplejung,Taplejung,https://www.ddctaplejung.gov.np,117,Aathrai Triveni Rural Municipality,4,Rural Municipality,88.83,http://www.aathraitribenimun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,12,Taplejung,Taplejung,https://www.ddctaplejung.gov.np,122,Maiwa Khola Rural Municipality,4,Rural Municipality,138,http://www.maiwakholamun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,12,Taplejung,Taplejung,https://www.ddctaplejung.gov.np,119,Meringden Rural Municipality,4,Rural Municipality,210.33,http://www.meringdenmun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,12,Taplejung,Taplejung,https://www.ddctaplejung.gov.np,123,Mikwa Khola Rural Municipality,4,Rural Municipality,442.96,http://www.mikwakholamun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,12,Taplejung,Taplejung,https://www.ddctaplejung.gov.np,118,Pathibhara Yangwarak Rural Municipality,4,Rural Municipality,93.76,http://www.yangwarakmuntaplejung.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,12,Taplejung,Taplejung,https://www.ddctaplejung.gov.np,121,Phaktanglung Rural Municipality,4,Rural Municipality,1858.51,http://www.phaktanglungmun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,12,Taplejung,Taplejung,https://www.ddctaplejung.gov.np,120,Sidingwa Rural Municipality,4,Rural Municipality,206,http://www.sidingbamun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,12,Taplejung,Taplejung,https://www.ddctaplejung.gov.np,116,Sirijangha Rural Municipality,4,Rural Municipality,481.09,http://www.sirijanghamun.gov.np/,8
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,13,Terhathum,Myanglung,https://www.ddctehrathum.gov.np,125,Laligurans Municipality,3,Municipality,90.27,http://www.laliguransmun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,13,Terhathum,Myanglung,https://www.ddctehrathum.gov.np,124,Myanglung Municipality,3,Municipality,100.21,http://www.myanglungmun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,13,Terhathum,Myanglung,https://www.ddctehrathum.gov.np,126,Aathrai Rural Municipality,4,Rural Municipality,167.07,http://www.aathraimun.gov.np/,7
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,13,Terhathum,Myanglung,https://www.ddctehrathum.gov.np,128,Chhathar Rural Municipality,4,Rural Municipality,133.93,http://www.chhatharmun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,13,Terhathum,Myanglung,https://www.ddctehrathum.gov.np,129,Menchayayem Rural Municipality,4,Rural Municipality,70.09,http://www.menchhayayemmun.gov.np/,6
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,13,Terhathum,Myanglung,https://www.ddctehrathum.gov.np,127,Phedap Rural Municipality,4,Rural Municipality,110.83,http://www.phedapmun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,14,Udayapur,Gaighat,https://www.ddcudayapur.gov.np,133,Belaka Municipality,3,Municipality,344.73,http://www.belakamun.gov.np/,9
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,14,Udayapur,Gaighat,https://www.ddcudayapur.gov.np,132,Chaudandigadhi Municipality,3,Municipality,283.78,http://www.chaudandigadhimun.gov.np/,10
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,14,Udayapur,Gaighat,https://www.ddcudayapur.gov.np,131,Katari Municipality,3,Municipality,424.89,http://www.katarimun.gov.np/,14
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,14,Udayapur,Gaighat,https://www.ddcudayapur.gov.np,130,Triyuga Municipality,3,Municipality,547.43,http://www.triyugamun.gov.np/,16
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,14,Udayapur,Gaighat,https://www.ddcudayapur.gov.np,137,Limchungbung Rural Municipality,4,Rural Municipality,106.8,http://www.sunkoshimunudayapur.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,14,Udayapur,Gaighat,https://www.ddcudayapur.gov.np,135,Rautamai Rural Municipality,4,Rural Municipality,204.08,http://www.rautamaimun.gov.np/,8
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,14,Udayapur,Gaighat,https://www.ddcudayapur.gov.np,136,Tapli Rural Municipality,4,Rural Municipality,119.11,http://www.taplimun.gov.np/,5
+1,Koshi Province,Biratnagar,https://koshi.gov.np/,14,Udayapur,Gaighat,https://www.ddcudayapur.gov.np,134,Udayapurgadhi Rural Municipality,4,Rural Municipality,269.51,http://www.udayapurgadhimun.gov.np/,8
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,138,Birgunj Metropolitan City,1,Metropolitan City,132.07,http://www.birgunjmun.gov.np/,32
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,139,Bahudarmai Municipality,3,Municipality,31.55,http://www.bahudarmaimun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,140,Parsagadhi Municipality,3,Municipality,99.69,http://www.parsagadhimun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,141,Pokhariya Municipality,3,Municipality,32.47,http://www.pokhariyamun.gov.np/,10
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,142,Bindabasini Rural Municipality,4,Rural Municipality,26.04,http://www.bindabasinimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,144,Chhipaharmai Rural Municipality,4,Rural Municipality,24.9,http://www.chhipaharmaimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,143,Dhobini Rural Municipality,4,Rural Municipality,24.41,http://www.dhobinimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,145,Jagarnathpur Rural Municipality,4,Rural Municipality,45.29,http://www.jagarnathpurmun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,146,Jirabhawani Rural Municipality,4,Rural Municipality,55.39,http://www.jirabhawanimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,147,Kalikamai Rural Municipality,4,Rural Municipality,24.33,http://www.kalikamaimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,148,Pakaha Mainpur Rural Municipality,4,Rural Municipality,21.26,http://www.pakahamainpurmun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,149,Paterwa Sugauli Rural Municipality,4,Rural Municipality,64.29,http://www.paterwasugaulimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,150,Sakhuwa Prasauni Rural Municipality,4,Rural Municipality,74.27,http://www.sakhuwaprasaunimun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,15,Parsa,Birgunj,https://dccparsa.gov.np/,151,Thori Rural Municipality,4,Rural Municipality,128.67,http://www.thorimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,153,Jitpur Simara Sub-Metropolitan City,2,Sub-Metropolitan City,312.18,http://www.jeetpursimaramun.gov.np/,24
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,152,Kalaiya Sub-Metropolitan City,2,Sub-Metropolitan City,108.94,http://www.kalaiyamun.gov.np/,27
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,154,Kolhabi Municipality,3,Municipality,157.4,http://www.kolhabimun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,156,Mahagadhimai Municipality,3,Municipality,55.32,http://www.mahagadimaimun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,155,Nijgadh Municipality,3,Municipality,289.43,http://www.nijgadhmun.gov.np/,13
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,158,Pacharauta Municipality,3,Municipality,44.01,http://www.pachrautamun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,157,Simaraungadh Municipality,3,Municipality,42.65,http://www.simraungadhmun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,162,Adarsh Kotwal Rural Municipality,4,Rural Municipality,36.25,http://www.aadarshakotwalmun.gov.np/,8
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,166,Baragadhi Rural Municipality,4,Rural Municipality,39.29,http://www.baragadhimun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,160,Bishrampur Rural Municipality,4,Rural Municipality,19.81,http://www.bishrampurmun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,164,Devtal Rural Municipality,4,Rural Municipality,23.31,http://www.devtalmun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,163,Karaiyamai Rural Municipality,4,Rural Municipality,47.69,http://www.karaiyamaimun.gov.np/,8
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,165,Parwanipur Rural Municipality,4,Rural Municipality,15.48,http://www.parwanipurmun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,159,Pheta Rural Municipality,4,Rural Municipality,23.65,http://www.phetamun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,161,Prasauni Rural Municipality,4,Rural Municipality,20.24,http://www.prasaunimun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,16,Bara,Kalaiya,https://dccbara.gov.np/,167,Suwarna Rural Municipality,4,Rural Municipality,36.84,http://www.suwarnamun.gov.np/,8
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,168,Baudhimai Municipality,3,Municipality,35.343,http://www.baudhimaimun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,169,Brindaban Municipality,3,Municipality,95.4,http://www.brindawanmun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,170,Chandrapur Municipality,3,Municipality,249.96,http://www.chandrapurmun.gov.np/,10
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,171,Dewahi Gonahi Municipality,3,Municipality,33.99,http://www.dewahigonahimun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,172,Gadhimai Municipality,3,Municipality,49.44,http://www.gadhimaimun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,174,Gaur Municipality,3,Municipality,21.53,http://www.gaurmun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,175,Gujara Municipality,3,Municipality,150.33,http://www.gujaramun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,173,Guruda Municipality,3,Municipality,44.46,http://www.garudamun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,176,Ishanath Municipality,3,Municipality,35.17,http://www.ishnathmun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,177,Katahariya Municipality,3,Municipality,40.69,http://www.katahariyamun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,178,Madhav Narayan Municipality,3,Municipality,48.53,http://www.madhavnarayanmun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,179,Maulapur Municipality,3,Municipality,34.75,http://www.maulapurmun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,180,Paroha Municipality,3,Municipality,37.45,http://www.parohamun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,181,Phatuwa Bijayapur Municipality,3,Municipality,65.24,http://www.phatuwabijaypurmun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,182,Rajdevi Municipality,3,Municipality,28.21,http://www.rajdevimun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,183,Rajpur Municipality,3,Municipality,31.41,https://rajpurmunrautahat.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,184,Durga Bhagwati Rural Municipality,4,Rural Municipality,19.8,http://www.durgabhagawatimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,17,Rautahat,Gaur,https://dccrautahat.gov.np/,185,Yamunamai Rural Municipality,4,Rural Municipality,16.7,http://www.yamunamaimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,186,Bagmati Municipality,3,Municipality,101.18,http://www.bagmatimunsarlahi.gov.np/,12
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,187,Balara Municipality,3,Municipality,48.55,http://www.balramun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,188,Barahathwa Municipality,3,Municipality,107.05,http://www.barhathwamun.gov.np/,18
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,189,Godaita Municipality,3,Municipality,48.62,http://www.godaitamun.gov.np/,12
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,191,Haripur Municipality,3,Municipality,66.86,http://www.haripurmun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,192,Haripurwa Municipality,3,Municipality,30.5,http://www.haripurwamun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,190,Hariwan Municipality,3,Municipality,86.12,http://www.harionmun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,193,Ishowrpur Municipality,3,Municipality,163.83,http://www.ishworpurmun.gov.np/,15
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,194,Kabilasi Municipality,3,Municipality,48.11,http://www.kawilasimun.gov.np/,10
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,195,Lalbandi Municipality,3,Municipality,238.5,http://www.lalbandimun.gov.np/,17
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,196,Malangawa Municipality,3,Municipality,30.44,http://www.malangwamun.gov.np/,12
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,197,Basbariya Rural Municipality,4,Rural Municipality,29.42,http://www.basbariyamun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,198,Bisnu Rural Municipality,4,Rural Municipality,28.09,http://www.bishnumun.gov.np/,8
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,199,Brahampuri Rural Municipality,4,Rural Municipality,33.89,http://www.brahmapurimun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,200,Chakraghatta Rural Municipality,4,Rural Municipality,25.14,http://www.chakraghattamun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,201,Chandranagar Rural Municipality,4,Rural Municipality,47.5,http://www.chandranagarmun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,202,Dhankaul Rural Municipality,4,Rural Municipality,45.94,http://www.dhankaulmun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,203,Kaudena Rural Municipality,4,Rural Municipality,25.33,http://www.kaudenamun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,204,Parsa Rural Municipality,4,Rural Municipality,23.12,http://www.parsamun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,18,Sarlahi,Malangawa,https://dccsarlahi.gov.np/,205,Ramnagar Rural Municipality,4,Rural Municipality,26.44,http://www.ramnagarmun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,207,Dhangadhimai Municipality,3,Municipality,159.51,http://www.dhangadhimaimun.gov.np/,14
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,209,Golbazar Municipality,3,Municipality,111.94,http://www.golbazarmun.gov.np/,13
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,211,Kalyanpur Municipality,3,Municipality,76.81,http://www.kalyanpurmun.gov.np/,12
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,212,Karjanha Municipality,3,Municipality,76.84,http://www.karjanhamun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,206,Lahan Municipality,3,Municipality,167.17,http://www.lahanmun.gov.np/,24
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,210,Mirchaiya Municipality,3,Municipality,91.97,http://www.mirchaiyamun.gov.np/,12
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,208,Siraha Municipality,3,Municipality,94.2,http://www.sirahamun.gov.np/,22
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,213,Sukhipur Municipality,3,Municipality,54.78,http://www.sukhipurmun.gov.np/,10
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,221,Arnama Rural Municipality,4,Rural Municipality,37.76,http://www.anarmamun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,215,Aurahi Rural Municipality,4,Rural Municipality,35.87,http://www.aurahimunsiraha.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,217,Bariyarpatti Rural Municipality,4,Rural Municipality,37.72,http://www.bariyapattimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,214,Bhagwanpur Rural Municipality,4,Rural Municipality,33.03,http://www.bhagwanpurmun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,216,Bishnupur Rural Municipality,4,Rural Municipality,26.34,http://www.bishnupurmunsiraha.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,218,Lakshmipur Patari Rural Municipality,4,Rural Municipality,42.33,http://www.laxmipurpatarimun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,219,Naraha Rural Municipality,4,Rural Municipality,29.28,http://www.narahamun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,222,Navarajpur Rural Municipality,4,Rural Municipality,32.18,http://www.nawarajpurmun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,19,Siraha,Siraha,https://dccsiraha.gov.np/,220,SakhuwanankarKatti Rural Municipality,4,Rural Municipality,32.84,http://www.sakhuwanankarkattimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,223,Janakpurdham Sub-Metropolitan City,2,Sub-Metropolitan City,91.97,http://www.janakpurmun.gov.np/,25
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,228,Bideha Municipality,3,Municipality,45.51,http://www.bidehamun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,224,Chhireshwarnath Municipality,3,Municipality,50.85,http://www.kshireshwornathmun.gov.np/,10
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,226,Dhanushadham Municipality,3,Municipality,91.64,http://www.dhanushadhammun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,225,Ganeshman Charnath Municipality,3,Municipality,244.31,http://www.ganeshmancharnathmun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,234,Hansapur Municipality,3,Municipality,48.71,http://www.hansapurmun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,232,Kamala Municipality,3,Municipality,65.85,http://www.kamalamun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,229,Mithila Municipality,3,Municipality,187.93,http://www.mithilamun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,233,MithilaBihari Municipality,3,Municipality,37.6,http://www.mithilabiharimun.gov.np/,10
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,227,Nagarain Municipality,3,Municipality,39,http://www.nagrainmun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,231,Sabaila Municipality,3,Municipality,64.47,http://www.sabailamun.gov.np/,13
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,230,Sahidnagar Municipality,3,Municipality,57.37,http://www.shahidnagarmun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,239,Aaurahi Rural Municipality,4,Rural Municipality,25.56,http://www.aurahimundhanusha.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,236,Bateshwar Rural Municipality,4,Rural Municipality,31.66,http://www.bateshwormun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,240,Dhanauji Rural Municipality,4,Rural Municipality,22,http://www.dhanaujimun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,235,Janaknandani Rural Municipality,4,Rural Municipality,27.62,http://www.janaknandinimun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,238,Lakshminya Rural Municipality,4,Rural Municipality,30.66,http://www.laxminiyamun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,20,Dhanusha,Janakpur,https://dccdhanusha.gov.np/,237,Mukhiyapatti Musharniya Rural Municipality,4,Rural Municipality,26.84,http://www.mukhiyapattimusaharmiyamun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,241,Bodebarsain Municipality,3,Municipality,58.93,http://www.bodebarsainmun.gov.np/,10
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,242,Dakneshwori Municipality,3,Municipality,69.11,http://www.dakneshworimun.gov.np/,10
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,243,Hanumannagar Kankalini Municipality,3,Municipality,118.19,http://www.hanumannagarkankalinimun.gov.np/,14
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,244,Kanchanrup Municipality,3,Municipality,117.34,http://www.kanchanrupmun.gov.np/,12
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,245,Khadak Municipality,3,Municipality,96.77,http://www.khadakmun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,249,Rajbiraj Municipality,3,Municipality,55,http://www.rajbirajmun.gov.np/,16
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,247,Saptakoshi Municipality,3,Municipality,60.25,http://www.saptakoshimun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,246,Shambhunath Municipality,3,Municipality,108.71,http://www.shambhunathmun.gov.np/,12
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,248,Surunga Municipality,3,Municipality,107.04,http://www.surungamun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,250,Agnisaira Krishnasavaran Rural Municipality,4,Rural Municipality,103.08,http://www.agnisairkrishnasawaranmun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,251,Balan-Bihul Rural Municipality,4,Rural Municipality,33.04,http://www.balanbihulmun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,253,Bishnupur Rural Municipality,4,Rural Municipality,37,http://www.bishnupurmunsaptari.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,254,Chhinnamasta Rural Municipality,4,Rural Municipality,38.71,http://www.chhinnamastamun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,255,Mahadeva Rural Municipality,4,Rural Municipality,34.97,http://www.mahadevamun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,252,Rajgadh Rural Municipality,4,Rural Municipality,47.9,http://www.rajgadhmun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,256,Rupani Rural Municipality,4,Rural Municipality,56.08,http://www.rupanimun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,257,Tilathi Koiladi Rural Municipality,4,Rural Municipality,32.91,http://www.tilathikoiladimun.gov.np/,8
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,21,Saptari,Rajbiraj,https://dccsaptari.gov.np/,258,Tirhut Rural Municipality,4,Rural Municipality,37.81,http://www.tirahutmun.gov.np/,5
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,259,Aaurahi Municipality,3,Municipality,35.76,http://www.aurahimunmahottari.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,260,Balawa Municipality,3,Municipality,44.07,http://www.balwamun.gov.np/,11
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,261,Bardibas Municipality,3,Municipality,315.57,http://www.bardibasmun.gov.np/,14
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,262,Bhangaha Municipality,3,Municipality,77.21,http://www.bhagahamun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,263,Gaushala Municipality,3,Municipality,144.73,http://www.gaushalamun.gov.np/,12
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,264,Jaleshor Municipality,3,Municipality,44.26,http://www.jaleshwormun.gov.np/,12
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,265,Loharpatti Municipality,3,Municipality,50.06,http://www.loharpattimun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,266,Manara Shiswa Municipality,3,Municipality,49.73,http://www.manrashiswamun.gov.np/,10
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,267,Matihani Municipality,3,Municipality,29.02,http://www.matihanimun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,268,Ramgopalpur Municipality,3,Municipality,39.54,http://www.ramgopalpurmun.gov.np/,9
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,269,Ekdara Rural Municipality,4,Rural Municipality,24,http://www.ekdaramun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,270,Mahottari Rural Municipality,4,Rural Municipality,28.08,http://www.mahottarimun.gov.np/,6
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,271,Pipara Rural Municipality,4,Rural Municipality,39.98,http://www.pipramun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,272,Samsi Rural Municipality,4,Rural Municipality,21.57,http://www.samsimun.gov.np/,7
+2,Madhesh Province,Janakpur,https://madhesh.gov.np/,22,Mahottari,Jaleshwar,https://dccmahottari.gov.np/,273,Sonama Rural Municipality,4,Rural Municipality,57.77,http://www.sonmamun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,23,Bhaktapur,Bhaktapur,https://dccbhaktapur.gov.np/,274,Bhaktapur Municipality,3,Municipality,6.89,http://www.bhaktapurmun.gov.np/,10
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,23,Bhaktapur,Bhaktapur,https://dccbhaktapur.gov.np/,275,Changunarayan Municipality,3,Municipality,62.98,http://www.changunarayanmun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,23,Bhaktapur,Bhaktapur,https://dccbhaktapur.gov.np/,277,Madhyapur Thimi Municipality,3,Municipality,11.47,http://www.madhyapurthimimun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,23,Bhaktapur,Bhaktapur,https://dccbhaktapur.gov.np/,276,Suryabinayak Municipality,3,Municipality,42.45,http://www.suryabinayakmun.gov.np/,10
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,24,Chitwan,Bharatpur,https://dccchitwan.gov.np/,278,Bharatpur Metropolitan City,1,Metropolitan City,432.95,http://www.bharatpurmun.gov.np/,29
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,24,Chitwan,Bharatpur,https://dccchitwan.gov.np/,279,Kalika Municipality,3,Municipality,149.08,http://www.kalikamunchitwan.gov.np/,11
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,24,Chitwan,Bharatpur,https://dccchitwan.gov.np/,280,Khairhani Municipality,3,Municipality,85.55,http://www.khairhanimun.gov.np/,13
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,24,Chitwan,Bharatpur,https://dccchitwan.gov.np/,281,Madi Municipality,3,Municipality,218.24,http://www.madimunchitwan.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,24,Chitwan,Bharatpur,https://dccchitwan.gov.np/,283,Rapti Municipality,3,Municipality,212.31,http://www.raptimunchitwan.gov.np/,13
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,24,Chitwan,Bharatpur,https://dccchitwan.gov.np/,282,Ratnagar Municipality,3,Municipality,68.68,http://www.ratnanagarmun.gov.np/,16
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,24,Chitwan,Bharatpur,https://dccchitwan.gov.np/,284,Ichchhakamana Rural Municipality,4,Rural Municipality,166.73,http://www.ichchhakamanamun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,285,Dhunibeshi Municipality,3,Municipality,96.3,http://www.dhunibeshimun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,286,Nilkantha Municipality,3,Municipality,197.7,http://www.neelakanthamun.gov.np/,14
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,294,Benighat Rorang Rural Municipality,4,Rural Municipality,206.52,http://www.benighatrorangmun.gov.np/,10
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,288,Gajuri Rural Municipality,4,Rural Municipality,138.66,http://www.gajurimun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,289,Galchhi Rural Municipality,4,Rural Municipality,129.08,http://www.galchhimun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,290,Gangajamuna Rural Municipality,4,Rural Municipality,152.72,http://www.gangajamunamun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,291,Jwalamukhi Rural Municipality,4,Rural Municipality,114.04,http://www.jwalamukhimun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,287,Khaniyabas Rural Municipality,4,Rural Municipality,120.8,http://www.khaniyabasmun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,293,Netrawati Dabjong Rural Municipality,4,Rural Municipality,181.78,http://www.netrawatimun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,295,Rubi Valley Rural Municipality,4,Rural Municipality,401.85,http://www.rubivalleymun.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,296,Siddhalek Rural Municipality,4,Rural Municipality,106.09,http://www.siddhalekmun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,292,Thakre Rural Municipality,4,Rural Municipality,96.41,http://www.thakremun.gov.np/,11
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,25,Dhading,Nilkantha,https://dccdhading.gov.np/,297,Tripurasundari Rural Municipality,4,Rural Municipality,271.23,http://www.tripurasundarimundhading.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,26,Dolakha,Bhimeshwar,https://dccdolakha.gov.np/,298,Bhimeswor Municipality,3,Municipality,132.5,http://www.bhimeshwormun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,26,Dolakha,Bhimeshwar,https://dccdolakha.gov.np/,299,Jiri Municipality,3,Municipality,211.27,http://www.jirimun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,26,Dolakha,Bhimeshwar,https://dccdolakha.gov.np/,304,Baiteshowr Rural Municipality,4,Rural Municipality,80.41,http://www.baiteshwormun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,26,Dolakha,Bhimeshwar,https://dccdolakha.gov.np/,302,Bigu Rural Municipality,4,Rural Municipality,663.2,http://www.bigumun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,26,Dolakha,Bhimeshwar,https://dccdolakha.gov.np/,303,Gaurishankar Rural Municipality,4,Rural Municipality,681.39,http://www.gaurishankarmun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,26,Dolakha,Bhimeshwar,https://dccdolakha.gov.np/,300,Kalinchok Rural Municipality,4,Rural Municipality,132.49,http://www.kalinchowkmun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,26,Dolakha,Bhimeshwar,https://dccdolakha.gov.np/,301,Melung Rural Municipality,4,Rural Municipality,86.54,http://www.melungmun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,26,Dolakha,Bhimeshwar,https://dccdolakha.gov.np/,305,Sailung Rural Municipality,4,Rural Municipality,128.67,http://www.shailungmun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,26,Dolakha,Bhimeshwar,https://dccdolakha.gov.np/,306,Tamakoshi Rural Municipality,4,Rural Municipality,153.06,http://www.tamakoshimun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,307,Kathmandu Metropolitan City,1,Metropolitan City,49.45,http://www.kathmandu.gov.np/,32
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,316,Budhalikantha Municipality,3,Municipality,34.8,http://www.budhanilkanthamun.gov.np/,13
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,311,Chandragiri Municipality,3,Municipality,43.92,http://www.chandragirimun.gov.np/,15
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,314,Dakshinkali Municipality,3,Municipality,42.68,http://www.dakshinkalimun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,308,Gokarneshwar Municipality,3,Municipality,58.5,http://www.gokarneshwormun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,310,Kageshwari-Manohara Municipality,3,Municipality,27.38,http://www.kageshworimanoharamun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,309,Kirtipur Municipality,3,Municipality,14.76,http://www.kirtipurmun.gov.np/,10
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,315,Nagarjun Municipality,3,Municipality,29.85,http://www.nagarjunmun.gov.np/,10
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,317,Shankharapur Municipality,3,Municipality,60.21,http://www.shankharapurmun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,313,Tarakeshwar Municipality,3,Municipality,54.95,http://www.tarakeshwormunkathmandu.gov.np/,11
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,27,Kathmandu,Kathmandu,https://dccktm.gov.np/,312,Tokha Municipality,3,Municipality,17.11,http://www.tokhamun.gov.np/,11
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,322,Banepa Municipality,3,Municipality,55,http://www.banepamun.gov.np/,14
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,318,Dhulikhel Municipality,3,Municipality,55,http://www.dhulikhelmun.gov.np/,12
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,323,Mandandeupur Municipality,3,Municipality,89,http://www.mandandeupurmun.gov.np/,12
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,319,Namobuddha Municipality,3,Municipality,102,http://www.namobuddhamun.gov.np/,11
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,320,Panauti Municipality,3,Municipality,118,http://www.panautimun.gov.np/,12
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,321,Panchkhal Municipality,3,Municipality,103,http://www.panchkhalmun.gov.np/,13
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,327,Bethanchok Rural Municipality,4,Rural Municipality,101,http://www.bethanchowkmun.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,328,Bhumlu Rural Municipality,4,Rural Municipality,91,http://www.bhumlumun.gov.np/,10
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,325,Chauri Deurali Rural Municipality,4,Rural Municipality,98,http://www.chaurideuralimun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,324,Khani Khola Rural Municipality,4,Rural Municipality,132,http://www.khanikholamun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,329,Mahabharat Rural Municipality,4,Rural Municipality,186,http://www.mahabharatmun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,330,Roshi Rural Municipality,4,Rural Municipality,176,http://www.roshimun.gov.np/,12
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,28,Kavrepalanchok,Dhulikhel,https://dcckavre.gov.np/,326,Temal Rural Municipality,4,Rural Municipality,89,http://www.temalmun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,29,Lalitpur,Lalitpur,https://dcclalitpur.gov.np/,331,Lalitpur Metropolitan City,1,Metropolitan City,36.12,http://www.lalitpurmun.gov.np/,29
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,29,Lalitpur,Lalitpur,https://dcclalitpur.gov.np/,333,Godawari Municipality,3,Municipality,96.11,http://www.godawarimunlalitpur.gov.np/,14
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,29,Lalitpur,Lalitpur,https://dcclalitpur.gov.np/,332,Mahalaxmi Municipality,3,Municipality,26.51,http://www.mahalaxmimunlalitpur.gov.np/,10
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,29,Lalitpur,Lalitpur,https://dcclalitpur.gov.np/,335,Bagmati Rural Municipality,4,Rural Municipality,111.49,http://www.bagmatimunlalitpur.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,29,Lalitpur,Lalitpur,https://dcclalitpur.gov.np/,334,Konjyosom Rural Municipality,4,Rural Municipality,44.16,http://www.konjyosommun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,29,Lalitpur,Lalitpur,https://dcclalitpur.gov.np/,336,Mahankal Rural Municipality,4,Rural Municipality,82.44,http://www.mahankalmun.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,30,Makwanpur,Hetauda,https://dccmakwanpur.gov.np/,337,Hetauda Sub-Metropolitan City,2,Sub-Metropolitan City,261.59,http://www.hetaudamun.gov.np/,19
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,30,Makwanpur,Hetauda,https://dccmakwanpur.gov.np/,338,Thaha Municipality,3,Municipality,191.12,http://www.thahamun.gov.np/,12
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,30,Makwanpur,Hetauda,https://dccmakwanpur.gov.np/,344,Bagmati Rural Municipality,4,Rural Municipality,311.79,http://www.bagmatimunmakawanpur.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,30,Makwanpur,Hetauda,https://dccmakwanpur.gov.np/,343,Bakaiya Rural Municipality,4,Rural Municipality,393.75,http://www.bakaiyamun.gov.np/,12
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,30,Makwanpur,Hetauda,https://dccmakwanpur.gov.np/,339,Bhimphedi Rural Municipality,4,Rural Municipality,245.27,http://www.bhimphedimun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,30,Makwanpur,Hetauda,https://dccmakwanpur.gov.np/,346,Indrasarowar Rural Municipality,4,Rural Municipality,97.34,http://www.indrasarowarmun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,30,Makwanpur,Hetauda,https://dccmakwanpur.gov.np/,345,Kailash Rural Municipality,4,Rural Municipality,204.48,http://www.kailashmun.gov.np/,10
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,30,Makwanpur,Hetauda,https://dccmakwanpur.gov.np/,340,Makawanpurgadhi Rural Municipality,4,Rural Municipality,148.72,http://www.makawanpurgadhimun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,30,Makwanpur,Hetauda,https://dccmakwanpur.gov.np/,341,Manahari Rural Municipality,4,Rural Municipality,199.52,http://www.manaharimun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,30,Makwanpur,Hetauda,https://dccmakwanpur.gov.np/,342,Raksirang Rural Municipality,4,Rural Municipality,226.7,http://www.raksirangmun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,348,Belkotgadhi Municipality,3,Municipality,155.6,http://www.belkotgadhimun.gov.np/,13
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,347,Bidur Municipality,3,Municipality,130.01,http://www.bidurmun.gov.np/,13
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,352,Dupcheshwar Rural Municipality,4,Rural Municipality,131.62,http://www.dupcheshwormun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,349,Kakani Rural Municipality,4,Rural Municipality,87.97,http://www.kakanimun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,357,Kispang Rural Municipality,4,Rural Municipality,82.57,http://www.kispangmun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,351,Likhu Rural Municipality,4,Rural Municipality,47.88,http://www.likhumunnuwakot.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,358,Myagang Rural Municipality,4,Rural Municipality,97.83,http://www.meghangmun.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,350,Panchakanya Rural Municipality,4,Rural Municipality,53.47,http://www.panchakanyamun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,353,Shivapuri Rural Municipality,4,Rural Municipality,101.5,http://www.shivapurimun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,355,Suryagadhi Rural Municipality,4,Rural Municipality,49.09,http://www.suryagadhimun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,354,Tadi Rural Municipality,4,Rural Municipality,69.8,http://www.tadimun.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,31,Nuwakot,Bidur,https://dccnuwakot.gov.np/,356,Tarkeshwar Rural Municipality,4,Rural Municipality,72.62,http://www.tarakeshwormunnuwakot.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,32,Ramechap,Manthali,https://dccramechhap.gov.np/,359,Manthali Municipality,3,Municipality,211.78,http://www.manthalimun.gov.np/,14
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,32,Ramechap,Manthali,https://dccramechhap.gov.np/,360,Ramechhap Municipality,3,Municipality,202.45,http://www.ramechhapmun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,32,Ramechap,Manthali,https://dccramechhap.gov.np/,363,Doramba Rural Municipality,4,Rural Municipality,140.88,http://www.dorambamun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,32,Ramechap,Manthali,https://dccramechhap.gov.np/,364,Gokulganga Rural Municipality,4,Rural Municipality,198.4,http://www.gokulgangamun.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,32,Ramechap,Manthali,https://dccramechhap.gov.np/,362,Khandadevi Rural Municipality,4,Rural Municipality,150.7,http://www.khandadevimun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,32,Ramechap,Manthali,https://dccramechhap.gov.np/,365,LikhuTamakoshi Rural Municipality,4,Rural Municipality,124.51,http://www.likhumunramechhap.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,32,Ramechap,Manthali,https://dccramechhap.gov.np/,366,Sunapati Rural Municipality,4,Rural Municipality,86.98,http://www.sunapatimun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,32,Ramechap,Manthali,https://dccramechhap.gov.np/,361,Umakunda Rural Municipality,4,Rural Municipality,451.99,http://www.umakundamun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,33,Rasuwa,Dhunche,https://dccrasuwa.gov.np/,368,Gosaikunda Rural Municipality,4,Rural Municipality,978.77,http://www.gosaikundamun.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,33,Rasuwa,Dhunche,https://dccrasuwa.gov.np/,367,Kalika Rural Municipality,4,Rural Municipality,192.54,http://www.kalikamunrasuwa.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,33,Rasuwa,Dhunche,https://dccrasuwa.gov.np/,369,Naukunda Rural Municipality,4,Rural Municipality,126.99,http://www.naukundamun.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,33,Rasuwa,Dhunche,https://dccrasuwa.gov.np/,370,Parbatikunda Rural Municipality,4,Rural Municipality,682.23,http://www.parbatikundamun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,33,Rasuwa,Dhunche,https://dccrasuwa.gov.np/,371,Uttargaya Rural Municipality,4,Rural Municipality,104.51,http://www.uttargayamun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,34,Sindhuli,Kamalamai,https://dccsindhuli.gov.np/,373,Dudhauli Municipality,3,Municipality,390.39,http://www.dudhaulimun.gov.np/,14
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,34,Sindhuli,Kamalamai,https://dccsindhuli.gov.np/,372,Kamalamai Municipality,3,Municipality,428.57,http://www.kamalamaimun.gov.np/,14
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,34,Sindhuli,Kamalamai,https://dccsindhuli.gov.np/,380,Ghyanglekh Rural Municipality,4,Rural Municipality,166.77,http://www.ghyanglekhmun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,34,Sindhuli,Kamalamai,https://dccsindhuli.gov.np/,378,Golanjor Rural Municipality,4,Rural Municipality,184.13,http://www.golanjormun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,34,Sindhuli,Kamalamai,https://dccsindhuli.gov.np/,375,Hariharpurgadhi Rural Municipality,4,Rural Municipality,343.9,http://www.hariharpurgadhimun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,34,Sindhuli,Kamalamai,https://dccsindhuli.gov.np/,377,Marin Rural Municipality,4,Rural Municipality,324.55,http://www.marinmun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,34,Sindhuli,Kamalamai,https://dccsindhuli.gov.np/,379,Phikkal Rural Municipality,4,Rural Municipality,186.06,http://www.phikkalmun.gov.np/,6
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,34,Sindhuli,Kamalamai,https://dccsindhuli.gov.np/,374,Sunkoshi Rural Municipality,4,Rural Municipality,154.68,http://www.sunkoshimunsindhuli.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,34,Sindhuli,Kamalamai,https://dccsindhuli.gov.np/,376,Tinpatan Rural Municipality,4,Rural Municipality,280.26,http://www.tinpatanmun.gov.np/,11
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,382,Bahrabise Municipality,3,Municipality,96.73,http://www.bahrabisemun.gov.np/,9
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,381,Chautara Sangachowkgadi Municipality,3,Municipality,165.25,http://www.chautarasangachowkgadhimun.gov.np/,14
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,383,Melamchi Municipality,3,Municipality,158.17,http://www.melamchimun.gov.np/,13
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,384,Balephi Rural Municipality,4,Rural Municipality,61.6,http://www.balephimun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,389,Bhotekoshi Rural Municipality,4,Rural Municipality,278.31,http://www.bhotekoshimun.gov.np/,5
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,391,Helambu Rural Municipality,4,Rural Municipality,287.26,http://www.helambumun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,386,Indrawati Rural Municipality,4,Rural Municipality,105.09,http://www.indrawatimun.gov.np/,12
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,387,Jugal Rural Municipality,4,Rural Municipality,273.62,http://www.jugalmun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,390,Lisankhu Rural Municipality,4,Rural Municipality,98.61,http://www.lisankhupakharmun.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,388,Panchpokhari Rural Municipality,4,Rural Municipality,187.29,http://www.panchpokharithangpalmun.gov.np/,8
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,385,Sunkoshi Rural Municipality,4,Rural Municipality,71.84,http://www.sunkoshimunsindhupalchowk.gov.np/,7
+3,Bagmati,Hetauda,https://ocmcm.bagamati.gov.np/,35,Sindhupalchok,Chautara,https://dccsindhupalchowk.gov.np/,392,Tripurasundari Rural Municipality,4,Rural Municipality,94.28,http://www.tripurasundarimunsindhupalchowk.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,36,Baglung,Baglung,https://dccbaglung.gov.np/,393,Baglung Municipality,3,Municipality,98.01,http://www.baglungmun.gov.np/,14
+4,Gandaki,Pokhara,https://gandaki.gov.np/,36,Baglung,Baglung,https://dccbaglung.gov.np/,394,Dhorpatan Municipality,3,Municipality,222.85,http://www.dhorpatanmun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,36,Baglung,Baglung,https://dccbaglung.gov.np/,395,Galkot Municipality,3,Municipality,194.39,http://www.galkotmun.gov.np/,11
+4,Gandaki,Pokhara,https://gandaki.gov.np/,36,Baglung,Baglung,https://dccbaglung.gov.np/,396,Jaimuni Municipality,3,Municipality,118.71,http://www.jaiminimun.gov.np/,10
+4,Gandaki,Pokhara,https://gandaki.gov.np/,36,Baglung,Baglung,https://dccbaglung.gov.np/,402,Badigad Rural Municipality,4,Rural Municipality,178.68,http://www.badigadmun.gov.np/,10
+4,Gandaki,Pokhara,https://gandaki.gov.np/,36,Baglung,Baglung,https://dccbaglung.gov.np/,397,Bareng Rural Municipality,4,Rural Municipality,75.28,http://www.barengmun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,36,Baglung,Baglung,https://dccbaglung.gov.np/,398,Khathekhola Rural Municipality,4,Rural Municipality,82.88,http://www.kathekholamun.gov.np/,8
+4,Gandaki,Pokhara,https://gandaki.gov.np/,36,Baglung,Baglung,https://dccbaglung.gov.np/,401,Nishi Khola Rural Municipality,4,Rural Municipality,244.37,http://www.nisikholamun.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,36,Baglung,Baglung,https://dccbaglung.gov.np/,399,Taman Khola Rural Municipality,4,Rural Municipality,178.02,http://www.tamankholamun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,36,Baglung,Baglung,https://dccbaglung.gov.np/,400,Tara Khola Rural Municipality,4,Rural Municipality,129.53,http://www.tarakholamun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,403,Gorkha Municipality,3,Municipality,131.86,http://www.gorkhamun.gov.np/,14
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,404,Palungtar Municipality,3,Municipality,158.62,http://www.palungtarmun.gov.np/,10
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,412,Aarughat Rural Municipality,4,Rural Municipality,160.79,http://www.aarughatmun.gov.np/,10
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,407,Ajirkot Rural Municipality,4,Rural Municipality,198.05,http://www.ajirkotmun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,410,Bhimsen Thapa Rural Municipality,4,Rural Municipality,101.25,http://www.bhimsenmun.gov.np/,8
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,408,Chumnubri Rural Municipality,4,Rural Municipality,1648.65,http://www.chumanuwrimun.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,409,Dharche Rural Municipality,4,Rural Municipality,651.52,http://www.dharchemun.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,413,Gandaki Rural Municipality,4,Rural Municipality,123.86,http://www.gandakimun.gov.np/,8
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,411,Sahid Lakhan Rural Municipality,4,Rural Municipality,147.97,http://www.shahidlakhanmun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,406,Siranchowk Rural Municipality,4,Rural Municipality,121.66,http://www.siranchowkmun.gov.np/,8
+4,Gandaki,Pokhara,https://gandaki.gov.np/,37,Gorkha,Gorkha,https://dccgorkha.gov.np/,405,Sulikot Rural Municipality,4,Rural Municipality,200.63,http://www.sulikotmun.gov.np/,8
+4,Gandaki,Pokhara,https://gandaki.gov.np/,38,Kaski,Pokhara,https://dcckaski.gov.np/,414,Pokhara Metropolitan City,1,Metropolitan City,464.24,http://www.pokharamun.gov.np/,33
+4,Gandaki,Pokhara,https://gandaki.gov.np/,38,Kaski,Pokhara,https://dcckaski.gov.np/,415,Annapurna Rural Municipality,4,Rural Municipality,417.73,http://www.annapurnamunkaski.gov.np/,11
+4,Gandaki,Pokhara,https://gandaki.gov.np/,38,Kaski,Pokhara,https://dcckaski.gov.np/,416,Machhapuchchhre Rural Municipality,4,Rural Municipality,544.58,http://www.machhapuchhremun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,38,Kaski,Pokhara,https://dcckaski.gov.np/,417,Madi Rural Municipality,4,Rural Municipality,563,http://www.madimunkaski.gov.np/,12
+4,Gandaki,Pokhara,https://gandaki.gov.np/,38,Kaski,Pokhara,https://dcckaski.gov.np/,418,Rupa Rural Municipality,4,Rural Municipality,94.81,http://www.rupamun.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,39,Lamjung,Besisahar,https://dcclamjung.gov.np/,419,Besisahar Municipality,3,Municipality,127.64,http://www.besishaharmun.gov.np/,11
+4,Gandaki,Pokhara,https://gandaki.gov.np/,39,Lamjung,Besisahar,https://dcclamjung.gov.np/,420,Madhya Nepal Municipality,3,Municipality,113.86,http://www.madhyanepalmun.gov.np/,10
+4,Gandaki,Pokhara,https://gandaki.gov.np/,39,Lamjung,Besisahar,https://dcclamjung.gov.np/,421,Rainas Municipality,3,Municipality,71.97,http://www.rainasmun.gov.np/,10
+4,Gandaki,Pokhara,https://gandaki.gov.np/,39,Lamjung,Besisahar,https://dcclamjung.gov.np/,422,Sundarbazar Municipality,3,Municipality,72.05,http://www.sundarbazarmun.gov.np/,11
+4,Gandaki,Pokhara,https://gandaki.gov.np/,39,Lamjung,Besisahar,https://dcclamjung.gov.np/,423,Dordi Rural Municipality,4,Rural Municipality,350.93,http://www.dordimun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,39,Lamjung,Besisahar,https://dcclamjung.gov.np/,424,Dudhpokhari Rural Municipality,4,Rural Municipality,155.33,http://www.dudhpokharimun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,39,Lamjung,Besisahar,https://dcclamjung.gov.np/,425,Kwhlosothar Rural Municipality,4,Rural Municipality,175.37,http://www.kwholasotharmun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,39,Lamjung,Besisahar,https://dcclamjung.gov.np/,426,Marsyangdi Rural Municipality,4,Rural Municipality,597.25,http://www.marsyangdimun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,40,Manang,Chame,https://dccmanang.gov.np/,427,Chame Rural Municipality,4,Rural Municipality,78.86,http://www.chamemun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,40,Manang,Chame,https://dccmanang.gov.np/,430,Manang Ngisyang Rural Municipality,4,Rural Municipality,694.63,http://www.manangngisyangmun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,40,Manang,Chame,https://dccmanang.gov.np/,429,NarpaBhumi Rural Municipality,4,Rural Municipality,837.54,http://www.narpabhumimun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,40,Manang,Chame,https://dccmanang.gov.np/,428,Nason Rural Municipality,4,Rural Municipality,709.58,http://www.nasonmun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,41,Mustang,Jomsom,https://dccmustang.gov.np/,433,Barhagaun Muktichhetra Rural Municipality,4,Rural Municipality,886,http://www.bahragaumuktichhetramun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,41,Mustang,Jomsom,https://dccmustang.gov.np/,431,Gharpajhong Rural Municipality,4,Rural Municipality,316,http://www.gharapjhongmun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,41,Mustang,Jomsom,https://dccmustang.gov.np/,435,Lo-Ghekar Damodarkunda Rural Municipality,4,Rural Municipality,1344,http://www.dalomemun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,41,Mustang,Jomsom,https://dccmustang.gov.np/,434,Lomanthang Rural Municipality,4,Rural Municipality,727,http://www.lomanthangmun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,41,Mustang,Jomsom,https://dccmustang.gov.np/,432,Thasang Rural Municipality,4,Rural Municipality,289,http://www.thasangmun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,42,Myagdi,Beni,https://dccmyagdi.gov.np/,436,Beni Municipality,3,Municipality,76.57,http://www.benimun.gov.np/,10
+4,Gandaki,Pokhara,https://gandaki.gov.np/,42,Myagdi,Beni,https://dccmyagdi.gov.np/,437,Annapurna Rural Municipality,4,Rural Municipality,556.41,http://www.annapurnamunmyagdi.gov.np/,8
+4,Gandaki,Pokhara,https://gandaki.gov.np/,42,Myagdi,Beni,https://dccmyagdi.gov.np/,438,Dhaulagiri Rural Municipality,4,Rural Municipality,1037,http://www.dhawalagirimun.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,42,Myagdi,Beni,https://dccmyagdi.gov.np/,440,Malika Rural Municipality,4,Rural Municipality,147,http://www.malikamunmyagdi.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,42,Myagdi,Beni,https://dccmyagdi.gov.np/,439,Mangala Rural Municipality,4,Rural Municipality,89,http://www.mangalamun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,42,Myagdi,Beni,https://dccmyagdi.gov.np/,441,Raghuganga Rural Municipality,4,Rural Municipality,379,http://www.raghugangamun.gov.np/,8
+4,Gandaki,Pokhara,https://gandaki.gov.np/,43,Nawalpur,Kawasoti,https://dccnawalparasi.gov.np/,444,Devachuli Municipality,3,Municipality,112.72,http://www.devchulimun.gov.np/,17
+4,Gandaki,Pokhara,https://gandaki.gov.np/,43,Nawalpur,Kawasoti,https://dccnawalparasi.gov.np/,443,Gaindakot Municipality,3,Municipality,159.93,http://www.gaindakotmun.gov.np/,18
+4,Gandaki,Pokhara,https://gandaki.gov.np/,43,Nawalpur,Kawasoti,https://dccnawalparasi.gov.np/,442,Kawasoti Municipality,3,Municipality,108.34,http://www.kawasotimun.gov.np/,17
+4,Gandaki,Pokhara,https://gandaki.gov.np/,43,Nawalpur,Kawasoti,https://dccnawalparasi.gov.np/,445,Madhya Bindu Municipality,3,Municipality,233.35,http://www.madhyabindumun.gov.np/,15
+4,Gandaki,Pokhara,https://gandaki.gov.np/,43,Nawalpur,Kawasoti,https://dccnawalparasi.gov.np/,446,Baudikali Rural Municipality,4,Rural Municipality,91.87,http://www.bungdikalimun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,43,Nawalpur,Kawasoti,https://dccnawalparasi.gov.np/,448,Binayi Tribeni Rural Municipality,4,Rural Municipality,288.06,http://www.binayitribenimun.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,43,Nawalpur,Kawasoti,https://dccnawalparasi.gov.np/,447,Bulingtar Rural Municipality,4,Rural Municipality,147.68,http://www.bulingtarmun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,43,Nawalpur,Kawasoti,https://dccnawalparasi.gov.np/,449,Hupsekot Rural Municipality,4,Rural Municipality,189.21,http://www.hupsekotmun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,44,Parwat,Kusma,https://dccparbat.gov.np/,450,Kushma Municipality,3,Municipality,93.18,http://www.kushmamun.gov.np/,14
+4,Gandaki,Pokhara,https://gandaki.gov.np/,44,Parwat,Kusma,https://dccparbat.gov.np/,451,Phalewas Municipality,3,Municipality,85.7,http://www.phalewasmun.gov.np/,11
+4,Gandaki,Pokhara,https://gandaki.gov.np/,44,Parwat,Kusma,https://dccparbat.gov.np/,456,Bihadi Rural Municipality,4,Rural Municipality,44.8,http://www.bihadimun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,44,Parwat,Kusma,https://dccparbat.gov.np/,452,Jaljala Rural Municipality,4,Rural Municipality,82.26,http://www.jaljalamun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,44,Parwat,Kusma,https://dccparbat.gov.np/,454,Mahashila Rural Municipality,4,Rural Municipality,49.38,http://www.mahashilamun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,44,Parwat,Kusma,https://dccparbat.gov.np/,455,Modi Rural Municipality,4,Rural Municipality,143.6,http://www.modimun.gov.np/,8
+4,Gandaki,Pokhara,https://gandaki.gov.np/,44,Parwat,Kusma,https://dccparbat.gov.np/,453,Paiyun Rural Municipality,4,Rural Municipality,42.65,http://www.paiyunmun.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,460,Bheerkot Municipality,3,Municipality,78.23,http://www.bheerkotmun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,458,Chapakot Municipality,3,Municipality,120.59,http://www.chapakotmun.gov.np/,10
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,457,Galyang Municipality,3,Municipality,122.71,http://www.galyangmun.gov.np/,11
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,459,Putalibazar Municipality,3,Municipality,147.21,http://www.putalibazarmun.gov.np/,14
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,461,Waling Municipality,3,Municipality,128.4,http://www.walingmun.gov.np/,14
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,463,Aandhikhola Rural Municipality,4,Rural Municipality,69.61,http://www.aandhikholamun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,462,Arjun Chaupari Rural Municipality,4,Rural Municipality,57.22,http://www.arjunchauparimun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,467,Biruwa Rural Municipality,4,Rural Municipality,95.79,http://www.biruwamun.gov.np/,8
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,466,Harinas Rural Municipality,4,Rural Municipality,87.48,http://www.harinasmun.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,464,Kaligandaki Rural Municipality,4,Rural Municipality,73.51,http://www.kaligandakimunsyangja.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,45,Syangja,Putalibazar,https://dccsyangja.gov.np/,465,Phedikhola Rural Municipality,4,Rural Municipality,56.73,http://www.phedikholamun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,46,Tanahun,Damauli,https://dcctanahun.gov.np/,468,Bhanu Municipality,3,Municipality,184,http://www.bhanumun.gov.np/,13
+4,Gandaki,Pokhara,https://gandaki.gov.np/,46,Tanahun,Damauli,https://dcctanahun.gov.np/,469,Bhimad Municipality,3,Municipality,129,http://www.bhimadmun.gov.np/,9
+4,Gandaki,Pokhara,https://gandaki.gov.np/,46,Tanahun,Damauli,https://dcctanahun.gov.np/,470,Byas Municipality,3,Municipality,248,http://www.vyasmun.gov.np/,14
+4,Gandaki,Pokhara,https://gandaki.gov.np/,46,Tanahun,Damauli,https://dcctanahun.gov.np/,471,Suklagandaki Municipality,3,Municipality,165,http://www.shuklagandakimun.gov.np/,12
+4,Gandaki,Pokhara,https://gandaki.gov.np/,46,Tanahun,Damauli,https://dcctanahun.gov.np/,472,AnbuKhaireni Rural Municipality,4,Rural Municipality,128,http://www.aanbookhairenimun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,46,Tanahun,Damauli,https://dcctanahun.gov.np/,474,Bandipur Rural Municipality,4,Rural Municipality,102,http://www.bandipurmun.gov.np/,6
+4,Gandaki,Pokhara,https://gandaki.gov.np/,46,Tanahun,Damauli,https://dcctanahun.gov.np/,473,Devghat Rural Municipality,4,Rural Municipality,159,http://www.devghatmun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,46,Tanahun,Damauli,https://dcctanahun.gov.np/,476,Ghiring Rural Municipality,4,Rural Municipality,126,http://www.ghiringmun.gov.np/,5
+4,Gandaki,Pokhara,https://gandaki.gov.np/,46,Tanahun,Damauli,https://dcctanahun.gov.np/,477,Myagde Rural Municipality,4,Rural Municipality,115,http://www.myagdemun.gov.np/,7
+4,Gandaki,Pokhara,https://gandaki.gov.np/,46,Tanahun,Damauli,https://dcctanahun.gov.np/,475,Rishing Rural Municipality,4,Rural Municipality,215,http://www.rishingmun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,47,Kapilvastu,Taulihawa,https://dcckapilvastu.gov.np/,479,Banganga Municipality,3,Municipality,233.68,http://www.bangangamun.gov.np/,11
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,47,Kapilvastu,Taulihawa,https://dcckapilvastu.gov.np/,480,Buddhabhumi Municipality,3,Municipality,366.67,http://www.buddhabhumimun.gov.np/,10
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,47,Kapilvastu,Taulihawa,https://dcckapilvastu.gov.np/,478,Kapilvastu Municipality,3,Municipality,136.91,http://www.kapilvastumun.gov.np/,12
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,47,Kapilvastu,Taulihawa,https://dcckapilvastu.gov.np/,482,Krishnanagar Municipality,3,Municipality,96.66,http://www.krishnanagarmun.gov.np/,12
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,47,Kapilvastu,Taulihawa,https://dcckapilvastu.gov.np/,483,Maharajgunj Municipality,3,Municipality,112.21,http://www.maharajgunjmun.gov.np/,11
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,47,Kapilvastu,Taulihawa,https://dcckapilvastu.gov.np/,481,Shivaraj Municipality,3,Municipality,284.07,http://www.shivrajmun.gov.np/,11
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,47,Kapilvastu,Taulihawa,https://dcckapilvastu.gov.np/,487,Bijaynagar Rural Municipality,4,Rural Municipality,173.19,http://www.bijaynagarmun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,47,Kapilvastu,Taulihawa,https://dcckapilvastu.gov.np/,484,Mayadevi Rural Municipality,4,Rural Municipality,88.53,http://www.mayadevimunkapilvastu.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,47,Kapilvastu,Taulihawa,https://dcckapilvastu.gov.np/,486,Suddhodan Rural Municipality,4,Rural Municipality,91.69,http://www.shuddhodhanmunkapilvastu.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,47,Kapilvastu,Taulihawa,https://dcckapilvastu.gov.np/,485,Yashodhara Rural Municipality,4,Rural Municipality,67.56,http://www.yasodharamun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,48,Parasi,Ramgram,https://dccnawalparasi.gov.np/,488,Bardaghat Municipality,3,Municipality,162.05,http://www.bardghatmun.gov.np/,16
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,48,Parasi,Ramgram,https://dccnawalparasi.gov.np/,489,Ramgram Municipality,3,Municipality,128.32,http://www.ramgrammun.gov.np/,18
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,48,Parasi,Ramgram,https://dccnawalparasi.gov.np/,490,Sunwal Municipality,3,Municipality,139.1,http://www.sunwalmun.gov.np/,13
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,48,Parasi,Ramgram,https://dccnawalparasi.gov.np/,492,Palhi Nandan Rural Municipality,4,Rural Municipality,44.67,http://www.palhinandanmun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,48,Parasi,Ramgram,https://dccnawalparasi.gov.np/,493,Pratappur Rural Municipality,4,Rural Municipality,87.55,http://www.pratappurmun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,48,Parasi,Ramgram,https://dccnawalparasi.gov.np/,494,Sarawal Rural Municipality,4,Rural Municipality,73.19,http://www.sarawalmun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,48,Parasi,Ramgram,https://dccnawalparasi.gov.np/,491,Susta Rural Municipality,4,Rural Municipality,91.24,http://www.sustamun.gov.np/,5
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,495,Butwal Sub-Metropolitan City,2,Sub-Metropolitan City,101.61,http://www.butwalmun.gov.np/,19
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,496,Devdaha Municipality,3,Municipality,136.95,http://www.devdahamun.gov.np/,12
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,497,Lumbini Sanskritik Municipality,3,Municipality,112.21,http://www.lumbinisanskritikmun.gov.np/,13
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,498,Sainamaina Municipality,3,Municipality,162.18,http://www.sainamainamun.gov.np/,11
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,499,Siddharthanagar Municipality,3,Municipality,36.03,http://www.siddharthanagarmun.gov.np/,13
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,500,Tilottama Municipality,3,Municipality,126.19,http://www.tilottamamun.gov.np/,17
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,501,Gaidahawa Rural Municipality,4,Rural Municipality,96.79,http://www.gaidahawamun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,502,Kanchan Rural Municipality,4,Rural Municipality,58.51,http://www.kanchanmun.gov.np/,5
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,503,Kotahimai Rural Municipality,4,Rural Municipality,58.26,http://www.kotahimaimun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,504,Marchawari Rural Municipality,4,Rural Municipality,48.55,http://www.marchawarimun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,505,Mayadevi Rural Municipality,4,Rural Municipality,72.44,http://www.mayadevimunrupandehi.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,506,Omsatiya Rural Municipality,4,Rural Municipality,48.54,http://www.omsatiyamun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,507,Rohini Rural Municipality,4,Rural Municipality,64.62,http://www.rohinimun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,508,Sammarimai Rural Municipality,4,Rural Municipality,50.78,http://www.sammarimaimun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,509,Siyari Rural Municipality,4,Rural Municipality,66.17,http://www.siyarimun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,49,Rupandehi,Siddharthanagar,https://dccrupandehi.gov.np/,510,Suddodhan Rural Municipality,4,Rural Municipality,57.66,http://www.shuddhodhanmunrupandehi.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,50,Arghakhanchi,Sandhikharka,https://dccargakhanchi.gov.np/,513,Bhumikasthan Municipality,3,Municipality,159.13,http://www.bhumikasthanmun.gov.np/,10
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,50,Arghakhanchi,Sandhikharka,https://dccargakhanchi.gov.np/,511,Sandhikharka Municipality,3,Municipality,129.42,http://www.sandhikharkamun.gov.np/,12
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,50,Arghakhanchi,Sandhikharka,https://dccargakhanchi.gov.np/,512,Sitganga Municipality,3,Municipality,610.43,http://www.shitagangamun.gov.np/,14
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,50,Arghakhanchi,Sandhikharka,https://dccargakhanchi.gov.np/,514,Chhatradev Rural Municipality,4,Rural Municipality,87.62,http://www.chhatradevmun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,50,Arghakhanchi,Sandhikharka,https://dccargakhanchi.gov.np/,516,Malarani Rural Municipality,4,Rural Municipality,101.06,http://www.malaranimun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,50,Arghakhanchi,Sandhikharka,https://dccargakhanchi.gov.np/,515,Panini Rural Municipality,4,Rural Municipality,151.42,http://www.paninimun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,518,Musikot Municipality,3,Municipality,114.74,http://www.musikotmungulmi.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,517,Resunga Municipality,3,Municipality,83.74,http://www.resungamun.gov.np/,14
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,522,Chandrakot Rural Municipality,4,Rural Municipality,105.73,http://www.chandrakotmun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,520,Chhatrakot Rural Municipality,4,Rural Municipality,87.01,http://www.chhatrakotmun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,524,Dhurkot Rural Municipality,4,Rural Municipality,86.32,http://www.dhurkotmun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,521,Gulmidarbar Rural Municipality,4,Rural Municipality,79.99,http://www.gulmidarbarmun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,526,Isma Rural Municipality,4,Rural Municipality,81.88,http://www.ishmamun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,525,Kaligandaki Rural Municipality,4,Rural Municipality,101.04,http://www.kaligandakimungulmi.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,528,Madane Rural Municipality,4,Rural Municipality,94.52,http://www.madanemun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,527,Malika Rural Municipality,4,Rural Municipality,92.49,http://www.malikamungulmi.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,519,Rurukshetra Rural Municipality,4,Rural Municipality,67.38,http://www.rurumun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,51,Gulmi,Tamghas,https://dccgulmi.gov.np/,523,Satyawati Rural Municipality,4,Rural Municipality,115.92,http://www.satyawatimun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,52,Palpa,Tansen,https://dccpalpa.gov.np/,530,Rampur Municipality,3,Municipality,123.34,http://www.rampurmun.gov.np/,10
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,52,Palpa,Tansen,https://dccpalpa.gov.np/,529,Tansen Municipality,3,Municipality,109.8,http://www.tansenmun.gov.np/,14
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,52,Palpa,Tansen,https://dccpalpa.gov.np/,533,Bagnaskali Rural Municipality,4,Rural Municipality,84.17,http://www.baganaskalimun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,52,Palpa,Tansen,https://dccpalpa.gov.np/,537,Mathagadhi Rural Municipality,4,Rural Municipality,215.49,http://www.mathagadhimun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,52,Palpa,Tansen,https://dccpalpa.gov.np/,536,Nisdi Rural Municipality,4,Rural Municipality,194.5,http://www.nisdimun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,52,Palpa,Tansen,https://dccpalpa.gov.np/,535,Purbakhola Rural Municipality,4,Rural Municipality,138.05,http://www.purbakholamun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,52,Palpa,Tansen,https://dccpalpa.gov.np/,531,Rainadevi Chhahara Rural Municipality,4,Rural Municipality,175.78,http://www.rainadevichhaharamun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,52,Palpa,Tansen,https://dccpalpa.gov.np/,534,Rambha Rural Municipality,4,Rural Municipality,94.12,http://www.rambhamun.gov.np/,5
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,52,Palpa,Tansen,https://dccpalpa.gov.np/,532,Ripdikot Rural Municipality,4,Rural Municipality,124.55,http://www.ribdikotmun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,52,Palpa,Tansen,https://dccpalpa.gov.np/,538,Tinahu Rural Municipality,4,Rural Municipality,202,http://www.tinaumun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,53,Dang,Ghorahi,https://dccdang.gov.np/,539,Ghorahi Sub-Metropolitan City,2,Sub-Metropolitan City,522.21,http://www.ghorahimun.gov.np/,19
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,53,Dang,Ghorahi,https://dccdang.gov.np/,540,Tulsipur Sub-Metropolitan City,2,Sub-Metropolitan City,384.63,http://www.tulsipurmun.gov.np/,19
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,53,Dang,Ghorahi,https://dccdang.gov.np/,541,Lamahi Municipality,3,Municipality,326.66,http://www.lamahimun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,53,Dang,Ghorahi,https://dccdang.gov.np/,548,Babai Rural Municipality,4,Rural Municipality,257.48,http://www.babaimun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,53,Dang,Ghorahi,https://dccdang.gov.np/,546,Banglachuli Rural Municipality,4,Rural Municipality,245.14,http://www.bangalachulimun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,53,Dang,Ghorahi,https://dccdang.gov.np/,547,Dangisharan Rural Municipality,4,Rural Municipality,110.7,http://www.dangisharanmun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,53,Dang,Ghorahi,https://dccdang.gov.np/,542,Gadhawa Rural Municipality,4,Rural Municipality,358.57,http://www.gadhawamun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,53,Dang,Ghorahi,https://dccdang.gov.np/,543,Rajpur Rural Municipality,4,Rural Municipality,577.33,http://www.rajpurmundang.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,53,Dang,Ghorahi,https://dccdang.gov.np/,545,Rapti Rural Municipality,4,Rural Municipality,161.07,http://www.raptimundang.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,53,Dang,Ghorahi,https://dccdang.gov.np/,544,Shantinagar Rural Municipality,4,Rural Municipality,116.02,http://www.shantinagarmun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,54,Pyuthan,Pyuthan,https://dccpyuthan.gov.np/,550,Pyuthan Municipality,3,Municipality,128.96,http://www.pyuthanmun.gov.np/,10
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,54,Pyuthan,Pyuthan,https://dccpyuthan.gov.np/,549,Sworgadwari Municipality,3,Municipality,224.7,http://www.swargadwarimun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,54,Pyuthan,Pyuthan,https://dccpyuthan.gov.np/,553,Ayirawati Rural Municipality,4,Rural Municipality,156.75,http://www.airawatimun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,54,Pyuthan,Pyuthan,https://dccpyuthan.gov.np/,557,Gaumukhi Rural Municipality,4,Rural Municipality,139.04,http://www.gaumukhimun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,54,Pyuthan,Pyuthan,https://dccpyuthan.gov.np/,555,Jhimruk Rural Municipality,4,Rural Municipality,106.93,http://www.jhimrukmun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,54,Pyuthan,Pyuthan,https://dccpyuthan.gov.np/,554,Mallarani Rural Municipality,4,Rural Municipality,80.09,http://www.mallaranimun.gov.np/,5
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,54,Pyuthan,Pyuthan,https://dccpyuthan.gov.np/,551,Mandavi Rural Municipality,4,Rural Municipality,113.08,http://www.mandavimun.gov.np/,5
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,54,Pyuthan,Pyuthan,https://dccpyuthan.gov.np/,556,Naubahini Rural Municipality,4,Rural Municipality,213.41,http://www.naubahinimun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,54,Pyuthan,Pyuthan,https://dccpyuthan.gov.np/,552,Sarumarani Rural Municipality,4,Rural Municipality,157.97,http://www.sarumaranimun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,55,Rolpa,Liwang,https://dccrolpa.gov.np/,558,Rolpa Municipality,3,Municipality,270.42,http://www.rolpamun.gov.np/,10
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,55,Rolpa,Liwang,https://dccrolpa.gov.np/,566,GangaDev Rural Municipality,4,Rural Municipality,124.38,http://www.sukidahamun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,55,Rolpa,Liwang,https://dccrolpa.gov.np/,562,Lungri Rural Municipality,4,Rural Municipality,135.23,http://www.lungrimun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,55,Rolpa,Liwang,https://dccrolpa.gov.np/,565,Madi Rural Municipality,4,Rural Municipality,129.05,http://www.madimunrolpa.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,55,Rolpa,Liwang,https://dccrolpa.gov.np/,567,Pariwartan Rural Municipality,4,Rural Municipality,163.01,http://www.duikholimun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,55,Rolpa,Liwang,https://dccrolpa.gov.np/,559,Runtigadi Rural Municipality,4,Rural Municipality,232.69,http://www.runtigadhimun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,55,Rolpa,Liwang,https://dccrolpa.gov.np/,563,Sunchhahari Rural Municipality,4,Rural Municipality,277.62,http://www.sunchhaharimun.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,55,Rolpa,Liwang,https://dccrolpa.gov.np/,561,Sunil Smiriti Rural Municipality,4,Rural Municipality,156.55,http://www.sunilsmritimun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,55,Rolpa,Liwang,https://dccrolpa.gov.np/,564,Thawang Rural Municipality,4,Rural Municipality,191.07,http://www.thabangmun.gov.np/,5
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,55,Rolpa,Liwang,https://dccrolpa.gov.np/,560,Triveni Rural Municipality,4,Rural Municipality,205.39,http://www.trivenimunrolpa.gov.np/,7
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,56,Eastern Rukum,Rukumkot,https://dccrukum.gov.np/,569,Bhume Rural Municipality,4,Rural Municipality,273.67,http://www.bhumemun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,56,Eastern Rukum,Rukumkot,https://dccrukum.gov.np/,568,Putha Uttarganga Rural Municipality,4,Rural Municipality,560.34,http://www.puthauttargangamun.gov.np/,14
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,56,Eastern Rukum,Rukumkot,https://dccrukum.gov.np/,570,Sisne Rural Municipality,4,Rural Municipality,327.12,http://www.sisnemun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,57,Banke,Nepalganj,https://dccbanke.gov.np/,571,Nepalgunj Sub-Metropolitan City,2,Sub-Metropolitan City,85.94,http://www.nepalgunjmun.gov.np/,23
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,57,Banke,Nepalganj,https://dccbanke.gov.np/,572,Kohalpur Municipality,3,Municipality,184.26,http://www.kohalpurmun.gov.np/,15
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,57,Banke,Nepalganj,https://dccbanke.gov.np/,578,Baijanath Rural Municipality,4,Rural Municipality,141.67,http://www.baijanathmun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,57,Banke,Nepalganj,https://dccbanke.gov.np/,575,Duduwa Rural Municipality,4,Rural Municipality,91.1,http://www.duduwamun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,57,Banke,Nepalganj,https://dccbanke.gov.np/,576,Janaki Rural Municipality,4,Rural Municipality,63.32,http://www.janakimunbanke.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,57,Banke,Nepalganj,https://dccbanke.gov.np/,577,Khajura Rural Municipality,4,Rural Municipality,101.91,http://www.khajuramun.gov.np/,8
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,57,Banke,Nepalganj,https://dccbanke.gov.np/,574,Narainapur Rural Municipality,4,Rural Municipality,172.34,http://www.narainapurmun.gov.np/,6
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,57,Banke,Nepalganj,https://dccbanke.gov.np/,573,Rapti-Sonari Rural Municipality,4,Rural Municipality,1041.73,http://www.raptisonarimun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,58,Bardiya,Gulariya,https://dccbardiya.gov.np/,584,Barbardiya Municipality,3,Municipality,226.09,http://www.barbardiyamun.gov.np/,11
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,58,Bardiya,Gulariya,https://dccbardiya.gov.np/,583,Basgadhi Municipality,3,Municipality,206.08,http://www.bansgadhimun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,58,Bardiya,Gulariya,https://dccbardiya.gov.np/,579,Gulariya Municipality,3,Municipality,118.21,http://www.gulariyamun.gov.np/,12
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,58,Bardiya,Gulariya,https://dccbardiya.gov.np/,581,Madhuwan Municipality,3,Municipality,129.73,http://www.madhuwanmun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,58,Bardiya,Gulariya,https://dccbardiya.gov.np/,580,Rajapur Municipality,3,Municipality,127.08,http://www.rajapurmun.gov.np/,10
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,58,Bardiya,Gulariya,https://dccbardiya.gov.np/,582,Thakurbaba Municipality,3,Municipality,104.57,http://www.thakurbabamun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,58,Bardiya,Gulariya,https://dccbardiya.gov.np/,585,Badhaiyatal Rural Municipality,4,Rural Municipality,115.19,http://www.badhaiyatalmun.gov.np/,9
+5,Lumbini,Deukhuri,https://ocmcm.lumbini.gov.np/,58,Bardiya,Gulariya,https://dccbardiya.gov.np/,586,Geruwa Rural Municipality,4,Rural Municipality,78.41,http://www.geruwamun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,59,Western Rukum,Musikot,https://dccrukum.gov.np/,587,Aathabiskot Municipality,3,Municipality,560.34,http://www.aathbiskotmun.gov.np/,14
+6,Karnali,Birendranagar,https://karnali.gov.np/,59,Western Rukum,Musikot,https://dccrukum.gov.np/,589,Chaurjahari Municipality,3,Municipality,107.38,http://www.chaurjaharimun.gov.np/,14
+6,Karnali,Birendranagar,https://karnali.gov.np/,59,Western Rukum,Musikot,https://dccrukum.gov.np/,588,Musikot Municipality,3,Municipality,136.06,http://www.musikotmunrukum.gov.np/,14
+6,Karnali,Birendranagar,https://karnali.gov.np/,59,Western Rukum,Musikot,https://dccrukum.gov.np/,592,Banphikot Rural Municipality,4,Rural Municipality,190.42,http://www.banphikotmun.gov.np/,10
+6,Karnali,Birendranagar,https://karnali.gov.np/,59,Western Rukum,Musikot,https://dccrukum.gov.np/,590,SaniBheri Rural Municipality,4,Rural Municipality,133.8,http://www.sanibherimun.gov.np/,11
+6,Karnali,Birendranagar,https://karnali.gov.np/,59,Western Rukum,Musikot,https://dccrukum.gov.np/,591,Triveni Rural Municipality,4,Rural Municipality,85.49,http://www.trivenimunrukum.gov.np/,10
+6,Karnali,Birendranagar,https://karnali.gov.np/,60,Salyan,Salyan,https://dccsalyan.gov.np/,600,Bagchaur Municipality,3,Municipality,163.14,http://www.bagchaurmun.gov.np/,12
+6,Karnali,Birendranagar,https://karnali.gov.np/,60,Salyan,Salyan,https://dccsalyan.gov.np/,602,Bangad Kupinde Municipality,3,Municipality,338.21,http://www.bangadkupindemun.gov.np/,12
+6,Karnali,Birendranagar,https://karnali.gov.np/,60,Salyan,Salyan,https://dccsalyan.gov.np/,601,Shaarda Municipality,3,Municipality,198.34,http://www.shaaradamun.gov.np/,15
+6,Karnali,Birendranagar,https://karnali.gov.np/,60,Salyan,Salyan,https://dccsalyan.gov.np/,595,Chhatreshwari Rural Municipality,4,Rural Municipality,150.69,http://www.chhatreshworimun.gov.np/,7
+6,Karnali,Birendranagar,https://karnali.gov.np/,60,Salyan,Salyan,https://dccsalyan.gov.np/,596,Darma Rural Municipality,4,Rural Municipality,81.46,http://www.darmamun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,60,Salyan,Salyan,https://dccsalyan.gov.np/,594,Kalimati Rural Municipality,4,Rural Municipality,500.72,http://www.kalimatimun.gov.np/,7
+6,Karnali,Birendranagar,https://karnali.gov.np/,60,Salyan,Salyan,https://dccsalyan.gov.np/,597,Kapurkot Rural Municipality,4,Rural Municipality,119.21,http://www.kapurkotmun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,60,Salyan,Salyan,https://dccsalyan.gov.np/,593,Kumakh Rural Municipality,4,Rural Municipality,177.28,http://www.kumakhmalikamun.gov.np/,7
+6,Karnali,Birendranagar,https://karnali.gov.np/,60,Salyan,Salyan,https://dccsalyan.gov.np/,599,Siddha Kumakh Rural Municipality,4,Rural Municipality,89.36,http://www.siddhakumakhmun.gov.np/,5
+6,Karnali,Birendranagar,https://karnali.gov.np/,60,Salyan,Salyan,https://dccsalyan.gov.np/,598,Triveni Rural Municipality,4,Rural Municipality,119.11,http://www.trivenimunsalyan.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,61,Dolpa,Dunai,https://dccdolpa.gov.np/,609,Thuli Bheri Municipality,3,Municipality,421.34,http://www.thulibherimun.gov.np/,11
+6,Karnali,Birendranagar,https://karnali.gov.np/,61,Dolpa,Dunai,https://dccdolpa.gov.np/,610,Tripurasundari Municipality,3,Municipality,393.54,http://www.tripurasundarimundolpa.gov.np/,11
+6,Karnali,Birendranagar,https://karnali.gov.np/,61,Dolpa,Dunai,https://dccdolpa.gov.np/,608,Chharka Tongsong Rural Municipality,4,Rural Municipality,345.57,http://www.chharkatangsongmun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,61,Dolpa,Dunai,https://dccdolpa.gov.np/,607,Dolpo Buddha Rural Municipality,4,Rural Municipality,377.38,http://www.dolpobuddhamun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,61,Dolpa,Dunai,https://dccdolpa.gov.np/,606,Jagadulla Rural Municipality,4,Rural Municipality,83.31,http://www.jagdullamun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,61,Dolpa,Dunai,https://dccdolpa.gov.np/,604,Kaike Rural Municipality,4,Rural Municipality,466.6,http://www.kaikemun.gov.np/,7
+6,Karnali,Birendranagar,https://karnali.gov.np/,61,Dolpa,Dunai,https://dccdolpa.gov.np/,603,Mudkechula Rural Municipality,4,Rural Municipality,250.08,http://www.mudkechulamun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,61,Dolpa,Dunai,https://dccdolpa.gov.np/,605,She Phoksundo Rural Municipality,4,Rural Municipality,123.07,http://www.shephoksundomun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,62,Humla,Simikot,https://dcchumla.gov.np/,613,Adanchuli Rural Municipality,4,Rural Municipality,150.61,http://www.adanchulimun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,62,Humla,Simikot,https://dcchumla.gov.np/,616,Chankheli Rural Municipality,4,Rural Municipality,1310.41,http://www.chankhelimun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,62,Humla,Simikot,https://dcchumla.gov.np/,614,Kharpunath Rural Municipality,4,Rural Municipality,880,http://www.kharpunathmun.gov.np/,5
+6,Karnali,Birendranagar,https://karnali.gov.np/,62,Humla,Simikot,https://dcchumla.gov.np/,617,Namkha Rural Municipality,4,Rural Municipality,2419.64,http://www.namkhamun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,62,Humla,Simikot,https://dcchumla.gov.np/,612,Sarkegad Rural Municipality,4,Rural Municipality,306.7,http://www.sarkegadmun.gov.np/,8
+6,Karnali,Birendranagar,https://karnali.gov.np/,62,Humla,Simikot,https://dcchumla.gov.np/,611,Simkot Rural Municipality,4,Rural Municipality,785.89,http://www.simkotmun.gov.np/,8
+6,Karnali,Birendranagar,https://karnali.gov.np/,62,Humla,Simikot,https://dcchumla.gov.np/,615,Tanjakot Rural Municipality,4,Rural Municipality,159.1,http://www.tajakotmun.gov.np/,5
+6,Karnali,Birendranagar,https://karnali.gov.np/,63,Jumla,Chandannath,https://dccjumla.gov.np/,625,Chandannath Municipality,3,Municipality,102.03,http://www.chandannathmun.gov.np/,10
+6,Karnali,Birendranagar,https://karnali.gov.np/,63,Jumla,Chandannath,https://dccjumla.gov.np/,624,Guthichaur Rural Municipality,4,Rural Municipality,427,http://www.guthichaurmun.gov.np/,5
+6,Karnali,Birendranagar,https://karnali.gov.np/,63,Jumla,Chandannath,https://dccjumla.gov.np/,623,Hima Rural Municipality,4,Rural Municipality,132.32,http://www.himamun.gov.np/,7
+6,Karnali,Birendranagar,https://karnali.gov.np/,63,Jumla,Chandannath,https://dccjumla.gov.np/,621,Kanaka Sundari Rural Municipality,4,Rural Municipality,225.39,http://www.kankasundarimun.gov.np/,8
+6,Karnali,Birendranagar,https://karnali.gov.np/,63,Jumla,Chandannath,https://dccjumla.gov.np/,619,Patarasi Rural Municipality,4,Rural Municipality,814.07,http://www.patarasimun.gov.np/,7
+6,Karnali,Birendranagar,https://karnali.gov.np/,63,Jumla,Chandannath,https://dccjumla.gov.np/,622,Sinja Rural Municipality,4,Rural Municipality,153.29,http://www.sinjamun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,63,Jumla,Chandannath,https://dccjumla.gov.np/,618,Tatopani Rural Municipality,4,Rural Municipality,525.56,http://www.tatopanimun.gov.np/,8
+6,Karnali,Birendranagar,https://karnali.gov.np/,63,Jumla,Chandannath,https://dccjumla.gov.np/,620,Tila Rural Municipality,4,Rural Municipality,175.49,http://www.tilamun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,64,Kalikot,Manma,https://dcckalikot.gov.np/,626,Khandachakra Municipality,3,Municipality,133.29,http://www.khandachakramun.gov.np/,11
+6,Karnali,Birendranagar,https://karnali.gov.np/,64,Kalikot,Manma,https://dcckalikot.gov.np/,627,Raskot Municipality,3,Municipality,59.73,http://www.raskotmun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,64,Kalikot,Manma,https://dcckalikot.gov.np/,628,Tilagufa Municipality,3,Municipality,262.56,http://www.tilagufamun.gov.np/,11
+6,Karnali,Birendranagar,https://karnali.gov.np/,64,Kalikot,Manma,https://dcckalikot.gov.np/,634,Mahawai Rural Municipality,4,Rural Municipality,322.07,http://www.mahawaimun.gov.np/,7
+6,Karnali,Birendranagar,https://karnali.gov.np/,64,Kalikot,Manma,https://dcckalikot.gov.np/,629,Narharinath Rural Municipality,4,Rural Municipality,143.86,http://www.narharinathmun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,64,Kalikot,Manma,https://dcckalikot.gov.np/,633,Pachaljharana Rural Municipality,4,Rural Municipality,166.92,http://www.pachaljharanamun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,64,Kalikot,Manma,https://dcckalikot.gov.np/,630,Palata Rural Municipality,4,Rural Municipality,318.84,http://www.palatamun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,64,Kalikot,Manma,https://dcckalikot.gov.np/,632,Sanni Triveni Rural Municipality,4,Rural Municipality,136.71,http://www.sannitrivenimun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,64,Kalikot,Manma,https://dcckalikot.gov.np/,631,Shubha Kalika Rural Municipality,4,Rural Municipality,97.32,http://www.kalikamunkalikot.gov.np/,8
+6,Karnali,Birendranagar,https://karnali.gov.np/,65,Mugu,Gamgadhi,https://dccmugu.gov.np/,638,Chhayanath Rara Municipality,3,Municipality,480.67,http://www.chhayanathraramun.gov.np/,14
+6,Karnali,Birendranagar,https://karnali.gov.np/,65,Mugu,Gamgadhi,https://dccmugu.gov.np/,635,Khatyad Rural Municipality,4,Rural Municipality,281.12,http://www.khatyadmun.gov.np/,11
+6,Karnali,Birendranagar,https://karnali.gov.np/,65,Mugu,Gamgadhi,https://dccmugu.gov.np/,637,Mugum Karmarong Rural Municipality,4,Rural Municipality,2106.91,http://www.mugumkarmarongmun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,65,Mugu,Gamgadhi,https://dccmugu.gov.np/,636,Soru Rural Municipality,4,Rural Municipality,365.8,http://www.sorumun.gov.np/,11
+6,Karnali,Birendranagar,https://karnali.gov.np/,66,Surkhet,Birendranagar,https://dccsurkhet.gov.np/,645,Bheriganga Municipality,3,Municipality,256.2,http://www.bherigangamun.gov.np/,13
+6,Karnali,Birendranagar,https://karnali.gov.np/,66,Surkhet,Birendranagar,https://dccsurkhet.gov.np/,644,Birendranagar Municipality,3,Municipality,245.06,http://www.birendranagarmun.gov.np/,16
+6,Karnali,Birendranagar,https://karnali.gov.np/,66,Surkhet,Birendranagar,https://dccsurkhet.gov.np/,643,Gurbhakot Municipality,3,Municipality,228.62,http://www.gurbhakotmun.gov.np/,14
+6,Karnali,Birendranagar,https://karnali.gov.np/,66,Surkhet,Birendranagar,https://dccsurkhet.gov.np/,647,Lekbeshi Municipality,3,Municipality,180.92,http://www.lekbeshimun.gov.np/,10
+6,Karnali,Birendranagar,https://karnali.gov.np/,66,Surkhet,Birendranagar,https://dccsurkhet.gov.np/,646,Panchapuri Municipality,3,Municipality,329.9,http://www.panchapurimun.gov.np/,11
+6,Karnali,Birendranagar,https://karnali.gov.np/,66,Surkhet,Birendranagar,https://dccsurkhet.gov.np/,640,Barahatal Rural Municipality,4,Rural Municipality,455.09,http://www.barahatalmun.gov.np/,10
+6,Karnali,Birendranagar,https://karnali.gov.np/,66,Surkhet,Birendranagar,https://dccsurkhet.gov.np/,641,Chaukune Rural Municipality,4,Rural Municipality,381.01,http://www.chaukunemun.gov.np/,10
+6,Karnali,Birendranagar,https://karnali.gov.np/,66,Surkhet,Birendranagar,https://dccsurkhet.gov.np/,642,Chingad Rural Municipality,4,Rural Municipality,170.19,http://www.chingadmun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,66,Surkhet,Birendranagar,https://dccsurkhet.gov.np/,639,Simta Rural Municipality,4,Rural Municipality,241.64,http://www.simtamun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,656,Aathabis Municipality,3,Municipality,168,http://www.aathabismun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,658,Chamunda Bindrasaini Municipality,3,Municipality,90.6,http://www.chamundabindrasainimun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,648,Dullu Municipality,3,Municipality,156.77,http://www.dullumun.gov.np/,13
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,657,Narayan Municipality,3,Municipality,110.63,http://www.narayanmun.gov.np/,11
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,654,Bhagawatimai Rural Municipality,4,Rural Municipality,151.52,http://www.bhagawatimaimun.gov.np/,7
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,650,Bhairabi Rural Municipality,4,Rural Municipality,110.46,http://www.bhairabimun.gov.np/,7
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,655,Dungeshwar Rural Municipality,4,Rural Municipality,105.19,http://www.dungeshwormun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,649,Gurans Rural Municipality,4,Rural Municipality,164.79,http://www.guransmun.gov.np/,8
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,652,Mahabu Rural Municipality,4,Rural Municipality,110.8,http://www.mahabumun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,651,Naumule Rural Municipality,4,Rural Municipality,228.59,http://www.naumulemun.gov.np/,8
+6,Karnali,Birendranagar,https://karnali.gov.np/,67,Dailekh,Dailekh,https://dccdailekh.gov.np/,653,Thantikandh Rural Municipality,4,Rural Municipality,88.22,http://www.thantikandhmun.gov.np/,6
+6,Karnali,Birendranagar,https://karnali.gov.np/,68,Jajarkot,Khalanga,https://dccjajarkot.gov.np/,660,Bheri Municipality,3,Municipality,219.77,http://www.bherimun.gov.np/,13
+6,Karnali,Birendranagar,https://karnali.gov.np/,68,Jajarkot,Khalanga,https://dccjajarkot.gov.np/,659,Chhedagad Municipality,3,Municipality,284.2,http://www.chhedagadmun.gov.np/,13
+6,Karnali,Birendranagar,https://karnali.gov.np/,68,Jajarkot,Khalanga,https://dccjajarkot.gov.np/,661,Nalgad Municipality,3,Municipality,387.44,http://www.tribeninalgaadmun.gov.np/,13
+6,Karnali,Birendranagar,https://karnali.gov.np/,68,Jajarkot,Khalanga,https://dccjajarkot.gov.np/,664,Barekot Rural Municipality,4,Rural Municipality,577.5,http://www.barekotmun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,68,Jajarkot,Khalanga,https://dccjajarkot.gov.np/,662,Junichande Rural Municipality,4,Rural Municipality,346.21,http://www.junichaandemun.gov.np/,11
+6,Karnali,Birendranagar,https://karnali.gov.np/,68,Jajarkot,Khalanga,https://dccjajarkot.gov.np/,663,Kuse Rural Municipality,4,Rural Municipality,273.97,http://www.kushemun.gov.np/,9
+6,Karnali,Birendranagar,https://karnali.gov.np/,68,Jajarkot,Khalanga,https://dccjajarkot.gov.np/,665,Shivalaya Rural Municipality,4,Rural Municipality,134.26,http://www.shibalayamun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,69,Darchula,Darchula,https://ddcdarchula.gov.np/,666,Mahakali Municipality,3,Municipality,135.11,http://www.mahakalimundarchula.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,69,Darchula,Darchula,https://ddcdarchula.gov.np/,667,Shailyashikhar Municipality,3,Municipality,117.81,http://www.shailyashikharmun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,69,Darchula,Darchula,https://ddcdarchula.gov.np/,674,Apihimal Rural Municipality,4,Rural Municipality,613.95,http://www.apihimalmun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,69,Darchula,Darchula,https://ddcdarchula.gov.np/,672,Duhun Rural Municipality,4,Rural Municipality,65.35,http://www.duhunmun.gov.np/,5
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,69,Darchula,Darchula,https://ddcdarchula.gov.np/,671,Lekam Rural Municipality,4,Rural Municipality,83.98,http://www.lekammun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,69,Darchula,Darchula,https://ddcdarchula.gov.np/,669,Malikarjun Rural Municipality,4,Rural Municipality,100.82,http://www.malikarjunmun.gov.np/,8
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,69,Darchula,Darchula,https://ddcdarchula.gov.np/,670,Marma Rural Municipality,4,Rural Municipality,208.06,http://www.marmamun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,69,Darchula,Darchula,https://ddcdarchula.gov.np/,668,Naugad Rural Municipality,4,Rural Municipality,180.27,http://www.naugadmun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,69,Darchula,Darchula,https://ddcdarchula.gov.np/,673,Vyans Rural Municipality,4,Rural Municipality,839.26,http://www.vyansmun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,676,Bungal Municipality,3,Municipality,447.59,http://www.bungalmun.gov.np/,11
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,675,Jayaprithvi Municipality,3,Municipality,166.79,http://www.jayaprithvimun.gov.np/,11
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,679,Bitthadchir Rural Municipality,4,Rural Municipality,86.15,http://www.bitthadchirmun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,680,Chhabis Pathibhera Rural Municipality,4,Rural Municipality,116.34,http://www.chhabispathiveramun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,683,Durgathali Rural Municipality,4,Rural Municipality,61.83,http://www.durgathalimun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,677,Kedarsyu Rural Municipality,4,Rural Municipality,113.91,http://www.kedarasyumun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,681,Khaptadchhanna Rural Municipality,4,Rural Municipality,113.52,http://www.khaptadchhannamun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,682,Masta Rural Municipality,4,Rural Municipality,109.24,http://www.mastamun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,686,Saipal Rural Municipality,4,Rural Municipality,1467.27,http://www.kandamun.gov.np/,5
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,685,Surma Rural Municipality,4,Rural Municipality,270.8,http://www.surmamun.gov.np/,5
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,684,Talkot Rural Municipality,4,Rural Municipality,335.26,http://www.talkotmun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,70,Bajhang,Jayaprithvi,https://dccbajhang.gov.np/,678,Thalara Rural Municipality,4,Rural Municipality,105.51,http://www.thalaramun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,71,Bajura,Badimalika,https://dccbajura.gov.np/,687,Badimalika Municipality,3,Municipality,276,http://www.badimalikamun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,71,Bajura,Badimalika,https://dccbajura.gov.np/,689,Budhiganga Municipality,3,Municipality,59.2,http://www.budhigangamunbajura.gov.np/,10
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,71,Bajura,Badimalika,https://dccbajura.gov.np/,690,Budhinanda Municipality,3,Municipality,232.48,http://www.budhinandamun.gov.np/,10
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,71,Bajura,Badimalika,https://dccbajura.gov.np/,688,Triveni Municipality,3,Municipality,170.32,http://www.trivenimunbajura.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,71,Bajura,Badimalika,https://dccbajura.gov.np/,695,Gaumul Rural Municipality,4,Rural Municipality,314.66,http://www.gaumulmun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,71,Bajura,Badimalika,https://dccbajura.gov.np/,694,Himali Rural Municipality,4,Rural Municipality,830.33,http://www.himalimun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,71,Bajura,Badimalika,https://dccbajura.gov.np/,693,Jagannath Rural Municipality,4,Rural Municipality,171.72,http://www.jagganathmun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,71,Bajura,Badimalika,https://dccbajura.gov.np/,691,Khaptad Chhededaha Rural Municipality,4,Rural Municipality,135.08,http://www.chhededahamun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,71,Bajura,Badimalika,https://dccbajura.gov.np/,692,Swami Kartik Khapar Rural Municipality,4,Rural Municipality,110.55,http://www.swamikartikmun.gov.np/,5
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,72,Baitadi,Dasharathchand,https://dccbaitadi.gov.np/,696,Dashrathchanda Municipality,3,Municipality,135.15,http://www.dasharathchandmun.gov.np/,11
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,72,Baitadi,Dasharathchand,https://dccbaitadi.gov.np/,698,Melauli Municipality,3,Municipality,119.43,http://www.melaulimun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,72,Baitadi,Dasharathchand,https://dccbaitadi.gov.np/,697,Patan Municipality,3,Municipality,219.26,http://www.patanmun.gov.np/,10
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,72,Baitadi,Dasharathchand,https://dccbaitadi.gov.np/,699,Purchaudi Municipality,3,Municipality,198.52,http://www.purchaudimun.gov.np/,10
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,72,Baitadi,Dasharathchand,https://dccbaitadi.gov.np/,701,Dilashaini Rural Municipality,4,Rural Municipality,125.28,http://www.dilasainimun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,72,Baitadi,Dasharathchand,https://dccbaitadi.gov.np/,700,Dogdakedar Rural Municipality,4,Rural Municipality,126.38,http://www.dogdakedarmun.gov.np/,8
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,72,Baitadi,Dasharathchand,https://dccbaitadi.gov.np/,703,Pancheshwar Rural Municipality,4,Rural Municipality,120.41,http://www.pancheshwormun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,72,Baitadi,Dasharathchand,https://dccbaitadi.gov.np/,705,Shivanath Rural Municipality,4,Rural Municipality,81.65,http://www.shivanathmun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,72,Baitadi,Dasharathchand,https://dccbaitadi.gov.np/,702,Sigas Rural Municipality,4,Rural Municipality,245.44,http://www.sigasmun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,72,Baitadi,Dasharathchand,https://dccbaitadi.gov.np/,704,Surnaya Rural Municipality,4,Rural Municipality,124.52,http://www.sunaryamun.gov.np/,8
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,73,Doti,Dipayal Silgadhi,https://dccdoti.gov.np/,706,Dipayal Silgadhi Municipality,3,Municipality,162.62,http://www.dipayalsilgadhimun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,73,Doti,Dipayal Silgadhi,https://dccdoti.gov.np/,707,Shikhar Municipality,3,Municipality,585.37,http://www.shikharmun.gov.np/,11
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,73,Doti,Dipayal Silgadhi,https://dccdoti.gov.np/,708,Aadarsha Rural Municipality,4,Rural Municipality,128.47,http://www.aadarshamun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,73,Doti,Dipayal Silgadhi,https://dccdoti.gov.np/,714,Badikedar Rural Municipality,4,Rural Municipality,332.55,http://www.badikedarmun.gov.np/,5
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,73,Doti,Dipayal Silgadhi,https://dccdoti.gov.np/,713,Bogatan-Phudsil Rural Municipality,4,Rural Municipality,300.22,http://www.bogatanmun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,73,Doti,Dipayal Silgadhi,https://dccdoti.gov.np/,711,Jorayal Rural Municipality,4,Rural Municipality,419.09,http://www.jorayalmun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,73,Doti,Dipayal Silgadhi,https://dccdoti.gov.np/,710,K.I.Singh Rural Municipality,4,Rural Municipality,127.01,http://www.kisinghmun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,73,Doti,Dipayal Silgadhi,https://dccdoti.gov.np/,709,Purbichauki Rural Municipality,4,Rural Municipality,117.66,http://www.purbichaukimun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,73,Doti,Dipayal Silgadhi,https://dccdoti.gov.np/,712,Sayal Rural Municipality,4,Rural Municipality,122.72,http://www.sayalmun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,74,Acham,Mangalsen,https://dccacham.gov.np/,722,Kamalbazar Municipality,3,Municipality,120.78,http://www.kamalbazarmun.gov.np/,10
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,74,Acham,Mangalsen,https://dccacham.gov.np/,721,Mangalsen Municipality,3,Municipality,220.14,http://www.mangalsenmun.gov.np/,14
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,74,Acham,Mangalsen,https://dccacham.gov.np/,724,Panchadewal Binayak Municipality,3,Municipality,147.75,http://www.panchadewalbinayakmun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,74,Acham,Mangalsen,https://dccacham.gov.np/,723,Sanfebagar Municipality,3,Municipality,166.71,http://www.sanfebagarmun.gov.np/,14
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,74,Acham,Mangalsen,https://dccacham.gov.np/,720,Bannigadi Jayagad Rural Municipality,4,Rural Municipality,58.26,http://www.bannigadhijaygadhmun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,74,Acham,Mangalsen,https://dccacham.gov.np/,716,Chaurpati Rural Municipality,4,Rural Municipality,182.16,http://www.chaurpatimun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,74,Acham,Mangalsen,https://dccacham.gov.np/,719,Dhakari Rural Municipality,4,Rural Municipality,227.88,http://www.dhakarimun.gov.np/,8
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,74,Acham,Mangalsen,https://dccacham.gov.np/,718,Mellekh Rural Municipality,4,Rural Municipality,134.78,http://www.mellekhmun.gov.np/,8
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,74,Acham,Mangalsen,https://dccacham.gov.np/,715,Ramaroshan Rural Municipality,4,Rural Municipality,173.33,http://www.ramaroshanmun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,74,Acham,Mangalsen,https://dccacham.gov.np/,717,Turmakhand Rural Municipality,4,Rural Municipality,232.07,http://www.turmakhadmun.gov.np/,8
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,75,Dadeldhura,Amargadhi,https://dccdadeldhura.gov.np/,730,Amargadhi Municipality,3,Municipality,139.33,http://www.amargadhimun.gov.np/,11
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,75,Dadeldhura,Amargadhi,https://dccdadeldhura.gov.np/,731,Parshuram Municipality,3,Municipality,414.07,http://www.parshurammun.gov.np/,12
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,75,Dadeldhura,Amargadhi,https://dccdadeldhura.gov.np/,726,Aalitaal Rural Municipality,4,Rural Municipality,292.87,http://www.aalitalmun.gov.np/,8
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,75,Dadeldhura,Amargadhi,https://dccdadeldhura.gov.np/,729,Ajaymeru Rural Municipality,4,Rural Municipality,148.9,http://www.ajayamerumun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,75,Dadeldhura,Amargadhi,https://dccdadeldhura.gov.np/,728,Bhageshwar Rural Municipality,4,Rural Municipality,233.38,http://www.bhageshwormun.gov.np/,5
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,75,Dadeldhura,Amargadhi,https://dccdadeldhura.gov.np/,727,Ganyapadhura Rural Municipality,4,Rural Municipality,135.65,http://www.ganyapadhuramun.gov.np/,5
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,75,Dadeldhura,Amargadhi,https://dccdadeldhura.gov.np/,725,Navadurga Rural Municipality,4,Rural Municipality,141.89,http://www.navadurgamun.gov.np/,5
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,76,Kanchanpur,Bheemdatta,https://dcckanchanpur.gov.np/,734,Bedkot Municipality,3,Municipality,159.92,http://www.bedkotmun.gov.np/,10
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,76,Kanchanpur,Bheemdatta,https://dcckanchanpur.gov.np/,737,Belauri Municipality,3,Municipality,123.37,http://www.belaurimun.gov.np/,10
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,76,Kanchanpur,Bheemdatta,https://dcckanchanpur.gov.np/,732,Bhimdatta Municipality,3,Municipality,171.8,http://www.bheemdattamun.gov.np/,19
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,76,Kanchanpur,Bheemdatta,https://dcckanchanpur.gov.np/,738,Krishnapur Municipality,3,Municipality,252.75,http://www.krishnapurmun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,76,Kanchanpur,Bheemdatta,https://dcckanchanpur.gov.np/,735,Mahakali Municipality,3,Municipality,56.84,https://mahakalimunkanchanpur.gov.np/,10
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,76,Kanchanpur,Bheemdatta,https://dcckanchanpur.gov.np/,733,Punarbas Municipality,3,Municipality,103.71,http://www.punarbasmun.gov.np/,11
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,76,Kanchanpur,Bheemdatta,https://dcckanchanpur.gov.np/,736,Shuklaphanta Municipality,3,Municipality,162.57,http://www.shuklaphantamun.gov.np/,12
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,76,Kanchanpur,Bheemdatta,https://dcckanchanpur.gov.np/,740,Beldandi Rural Municipality,4,Rural Municipality,36.7,http://www.beldandimun.gov.np/,5
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,76,Kanchanpur,Bheemdatta,https://dcckanchanpur.gov.np/,739,Laljhadi Rural Municipality,4,Rural Municipality,154.65,http://www.laljhadimun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,753,Dhangadhi Sub-Metropolitan City,2,Sub-Metropolitan City,261.75,http://www.dhangadhimun.gov.np/,19
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,750,Bhajni Municipality,3,Municipality,176.25,http://www.bhajanimun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,752,Gauriganga Municipality,3,Municipality,244.44,http://www.gaurigangamun.gov.np/,11
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,748,Ghodaghodi Municipality,3,Municipality,354.45,http://www.ghodaghodimun.gov.np/,12
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,751,Godawari Municipality,3,Municipality,308.63,http://www.godawarimunkailali.gov.np/,12
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,749,Lamkichuha Municipality,3,Municipality,225,http://www.lamkichuhamun.gov.np/,10
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,747,Tikapur Municipality,3,Municipality,118.33,http://www.tikapurmun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,744,Bardagoriya Rural Municipality,4,Rural Municipality,77.26,http://www.bardgoriyamun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,746,Chure Rural Municipality,4,Rural Municipality,493.18,http://www.churemun.gov.np/,6
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,741,Janaki Rural Municipality,4,Rural Municipality,107.27,http://www.janakimunkailali.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,743,Joshipur Rural Municipality,4,Rural Municipality,65.57,http://www.joshipurmun.gov.np/,7
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,742,Kailari Rural Municipality,4,Rural Municipality,233.27,http://www.kailarimun.gov.np/,9
+7,Sudur Paschimanchal,Godawari,https://sudurpashchim.gov.np/,77,Kailali,Dhangadhi,https://dcckailali.gov.np/,745,Mohanyal Rural Municipality,4,Rural Municipality,626.95,http://www.mohanyalmun.gov.np/,7
