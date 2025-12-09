@@ -12,11 +12,8 @@ interface Member {
 }
 
 const PLACEHOLDERS = [
-    "https://placehold.co/150/FF5733/FFF?text=Member",
-    "https://placehold.co/150/33FF57/FFF?text=Member",
-    "https://placehold.co/150/3357FF/FFF?text=Member",
-    "https://placehold.co/150/FF33F6/FFF?text=Member",
-    "https://placehold.co/150/F6FF33/FFF?text=Member",
+    "/placeholders/eye-red.svg",
+    "/placeholders/eye-blue.svg",
 ];
 
 export default function InteractiveMemberGrid({ members }: { members: Member[] }) {

@@ -8,7 +8,7 @@ export default async function MembersGalleryPage() {
     const { data: members, error } = await supabaseAdmin
         .from("members")
         .select("id, full_name_ne, full_name_en, photo_url")
-        .in("status", ["approved", "pending"])
+        .in("status", ["approved"])
         .eq("confidentiality", "public_ok");
 
     if (error) {

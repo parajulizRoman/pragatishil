@@ -59,6 +59,7 @@ export async function createMembershipApplication(payload: MembershipRequestPayl
     }
 
     const memberData = {
+        id: payload.id || undefined, // Use provided ID if available
         capacity: personal.capacity || 'party_member',
 
         full_name_ne: names.full_name_ne,

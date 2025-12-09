@@ -36,6 +36,16 @@ export default function JoinPage() {
     const [zoom, setZoom] = useState(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
+    // -- Member ID Generation (Client Side) for Deterministic Paths --
+    const [memberId, setMemberId] = useState<string>("");
+
+    useEffect(() => {
+        // Generate UUID on mount
+        if (typeof window !== "undefined") {
+            setMemberId(self.crypto.randomUUID ? self.crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36));
+        }
+    }, []);
+
     const supabase = createClient();
 
     useEffect(() => {
@@ -306,6 +316,9 @@ export default function JoinPage() {
             const file = new File([croppedBlob], "profile_cropped.jpg", { type: "image/jpeg" });
             const formData = new FormData();
             formData.append("image", file);
+            if (memberId) {
+                formData.append("memberId", memberId);
+            }
 
             const res = await fetch("/api/upload/profile-photo", {
                 method: "POST",
@@ -355,6 +368,7 @@ export default function JoinPage() {
             const combinedAddress = `Ward-${formData.ward}, ${formData.toleNe}`;
 
             const payload = {
+                id: memberId, // Pass the pre-generated ID
                 personal: {
                     // capacity removed from UI, handled by backend default
                     fullNameNe: formData.fullNameNe,

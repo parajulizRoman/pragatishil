@@ -11,15 +11,29 @@ export async function POST(req: NextRequest) {
         }
 
         // Validate file type
-        if (!file.type.startsWith("image/")) {
-            return NextResponse.json({ error: "File must be an image" }, { status: 400 });
+        const validExtensions = ["image/jpeg", "image/png", "image/webp"];
+        if (!validExtensions.includes(file.type)) {
+            return NextResponse.json({ error: "Invalid file type. Only JPG, PNG, WEBP allowed." }, { status: 400 });
         }
 
         const buffer = Buffer.from(await file.arrayBuffer());
-        const timestamp = Date.now();
-        // Clean filename: remove special chars, spaces, etc.
-        const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
-        const filePath = `${timestamp}-${cleanName}`;
+
+        // Check for memberId in formData
+        const memberId = formData.get("memberId") as string;
+
+        let filePath = "";
+
+        if (memberId) {
+            // Deterministic path: members/<id>/profile.jpg
+            // We can infer extension from mime type or just use standard .jpg or keep original extension
+            const ext = file.type.split("/")[1] || "jpg";
+            filePath = `members/${memberId}/profile.${ext}`;
+        } else {
+            // Fallback to old timestamp method if no memberId (backward compatibility)
+            const timestamp = Date.now();
+            const cleanName = file.name.replace(/[^a-zA-Z0-9.]/g, "_");
+            filePath = `${timestamp}-${cleanName}`;
+        }
         const BUCKET_NAME = "member-photos";
 
         const { error } = await supabaseAdmin.storage

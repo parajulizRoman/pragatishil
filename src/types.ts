@@ -148,6 +148,7 @@ export interface MemberDocument {
 // -- API Payloads --
 
 export interface MembershipRequestPayload {
+    id?: string;
     personal: {
         capacity?: "party_member" | "volunteer" | "other" | null;
         fullNameNe: string;
