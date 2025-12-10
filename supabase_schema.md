@@ -122,3 +122,18 @@ CREATE POLICY "Public departments are viewable" ON public.departments
 -- For now, our Membership API uses the Service Role Key, which bypasses these policies automatically.
 
 ```
+
+### [NEW] Gender & Identity Fields (Added 2025-12-10)
+```sql
+-- Gender
+ALTER TABLE members ADD COLUMN gender_code text; -- 'male', 'female', 'third_gender', 'prefer_not_to_say', 'self_described'
+ALTER TABLE members ADD COLUMN gender_label_ne text;
+ALTER TABLE members ADD COLUMN gender_label_en text;
+ALTER TABLE members ADD COLUMN gender_raw text; -- User's free text or OCR original
+
+-- Inclusion / Identity
+ALTER TABLE members ADD COLUMN inclusion_groups text[]; -- Array of codes: 'khas_arya', 'adivasi_janajati', etc.
+ALTER TABLE members ADD COLUMN inclusion_groups_ne jsonb; -- Map of code -> label (ne)
+ALTER TABLE members ADD COLUMN inclusion_groups_en jsonb; -- Map of code -> label (en)
+ALTER TABLE members ADD COLUMN inclusion_raw text; -- Free text for "Other" or raw OCR
+```

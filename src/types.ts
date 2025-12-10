@@ -45,12 +45,43 @@ columns:
   created_at: timestamptz, default now()
   updated_at: timestamptz, default now()
 */
+// Domain Types
+
+export type GenderCode = 'male' | 'female' | 'third_gender' | 'prefer_not_to_say' | 'self_described';
+
+export type InclusionGroupCode =
+    | 'khas_arya'
+    | 'adivasi_janajati'
+    | 'madhesi'
+    | 'tharu'
+    | 'dalit'
+    | 'muslim'
+    | 'person_with_disability'
+    | 'senior_citizen'
+    | 'women'
+    | 'sexual_gender_minority'
+    | 'other_minority'
+    | 'other_specified';
+
 export interface Member {
     id: string;
     capacity: 'party_member' | 'volunteer' | 'other';
     full_name_ne: string;
     full_name_en?: string | null;
-    gender?: 'male' | 'female' | 'diverse' | 'prefer_not_to_say' | 'other' | null;
+    // Gender (New Robust Fields)
+    gender_code?: 'male' | 'female' | 'third_gender' | 'prefer_not_to_say' | 'self_described' | null;
+    gender_label_ne?: string | null;
+    gender_label_en?: string | null;
+    gender_raw?: string | null; // From user input or OCR
+
+    // Inclusion / Identity
+    inclusion_groups?: string[] | null; // Array of InclusionGroupCode
+    inclusion_groups_ne?: Record<string, string> | null;
+    inclusion_groups_en?: Record<string, string> | null;
+    inclusion_raw?: string | null;
+
+    // Deprecated or Legacy
+    gender?: string | null;
 
     date_of_birth?: string | null; // ISO Date "YYYY-MM-DD"
     dob_original: string;
@@ -154,7 +185,19 @@ export interface MembershipRequestPayload {
         fullNameNe: string;
         fullNameEn?: string | null;
 
-        gender?: "male" | "female" | "diverse" | "prefer_not-to-say" | "other" | null;
+        gender?: string | null; // Legacy
+
+        // New Gender Fields
+        genderCode?: 'male' | 'female' | 'third_gender' | 'prefer_not_to_say' | 'self_described' | null;
+        genderLabelNe?: string | null;
+        genderLabelEn?: string | null;
+        genderRaw?: string | null;
+
+        // Inclusion
+        inclusionGroups?: string[];
+        inclusionGroupsNe?: Record<string, string>;
+        inclusionGroupsEn?: Record<string, string>;
+        inclusionRaw?: string | null;
 
         dobOriginal: string;
         dobCalendar: "AD" | "BS" | "unknown";

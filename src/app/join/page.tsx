@@ -10,14 +10,88 @@ import { NestedProvince } from "@/lib/geo";
 import Cropper, { Area } from "react-easy-crop";
 import getCroppedImg from "@/lib/cropImage";
 
+
 // Hardcoded departments matching DB schema where possible or generic list
 const DEPARTMENTS = [
     { id: "organization", name: "संगठन विभाग (Organization)" },
-    { id: "finance", name: "आर्थिक विभाग (Finance)" },
-    { id: "it", name: "सूचना तथा प्रविधि (IT)" },
-    { id: "training", name: "प्रशिक्षण विभाग (Training)" },
-    { id: "publicity", name: "प्रचार प्रसार (Publicity)" }
+    // ... items
 ];
+
+interface JoinFormData {
+    // Personal derived from payload types manually or intersection
+    fullNameNe: string;
+    fullNameEn: string;
+    gender: string; // legacy
+    genderCode: "male" | "female" | "third_gender" | "prefer_not_to_say" | "self_described";
+    genderRaw: string;
+    genderLabelNe: string;
+    genderLabelEn: string;
+
+    inclusionGroups: string[];
+    inclusionGroupsNe: Record<string, string>;
+    inclusionGroupsEn: Record<string, string>;
+    inclusionRaw: string;
+
+    dobOriginal: string;
+    dobCalendar: string;
+
+    // Location breakdown (not all in payload personal)
+    provinceNe: string;
+    districtNe: string;
+    localLevelNe: string;
+    ward: string;
+    toleNe: string;
+    addressNe: string; // Combined?
+
+    // IDs
+    provinceId?: string;
+    districtId?: string;
+    localLevelId?: string;
+    citizenshipNumber?: string;
+
+    // Contact
+    phone: string;
+    email: string;
+
+    // Party
+    skillsText: string;
+    pastAffiliations: string;
+    motivationTextNe: string;
+    motivationTextEn: string;
+    departmentIds: string[];
+    inspiredBy: string;
+    confidentiality: "public_ok" | "keep_private";
+
+    // Photos
+    idImageUrl: string;
+    profileImageUrl: string;
+
+    // Extracted
+    extracted: Record<string, string | null | undefined>;
+}
+
+const GENDER_OPTIONS = [
+    { code: "male", labelNe: "पुरुष", labelEn: "Male" },
+    { code: "female", labelNe: "महिला", labelEn: "Female" },
+    { code: "third_gender", labelNe: "तेस्रो लिङ्ग / विविध लैंगिक", labelEn: "LGBTQI+" },
+    { code: "prefer_not_to_say", labelNe: "भन्न चाहिन्न", labelEn: "Prefer not to say" },
+    { code: "self_described", labelNe: "अन्य", labelEn: "Self described" }
+] as const;
+
+const INCLUSION_OPTIONS = [
+    { code: "khas_arya", labelNe: "खस आर्य", labelEn: "Khas Arya" },
+    { code: "adivasi_janajati", labelNe: "आदिवासी जनजाति", labelEn: "Adivasi Janajati" },
+    { code: "madhesi", labelNe: "मधेसी समुदाय", labelEn: "Madhesi" },
+    { code: "tharu", labelNe: "थारु समुदाय", labelEn: "Tharu" },
+    { code: "dalit", labelNe: "दलित", labelEn: "Dalit" },
+    { code: "muslim", labelNe: "मुस्लिम", labelEn: "Muslim" },
+    { code: "person_with_disability", labelNe: "अपांगता भएका व्यक्ति", labelEn: "Person with Disability" },
+    { code: "senior_citizen", labelNe: "जेष्ठ नागरिक", labelEn: "Senior Citizen" },
+    { code: "women", labelNe: "महिला", labelEn: "Women" },
+    { code: "sexual_gender_minority", labelNe: "यौनिक तथा लैङ्गिक अल्पसंख्यक", labelEn: "Sexual/Gender Minority" },
+    { code: "other_minority", labelNe: "अन्य अल्पसंख्यक", labelEn: "Other Minority" },
+    { code: "other_specified", labelNe: "अन्य (विवरण दिनुहोस्...)", labelEn: "Other (Specify...)" }
+] as const;
 
 export default function JoinPage() {
     // -- UI State --
@@ -74,45 +148,54 @@ export default function JoinPage() {
     };
 
     // -- Form Data State --
-    const [formData, setFormData] = useState({
-        // Personal
+    const [formData, setFormData] = useState<JoinFormData>({
         fullNameNe: "",
         fullNameEn: "",
-        gender: "male",
+
+        // Gender
+        gender: "male", // Legacy
+        genderCode: "male", // Default
+        genderRaw: "",
+        genderLabelNe: "पुरुष",
+        genderLabelEn: "Male",
+
+        // Inclusion
+        inclusionGroups: [],
+        inclusionGroupsNe: {},
+        inclusionGroupsEn: {},
+        inclusionRaw: "",
 
         dobOriginal: "",
-        dobCalendar: "BS",  // Default to BS for Nepal
+        dobCalendar: "BS",
 
-        // Location (Cascading)
-        provinceId: "",     // ID from DB
-        districtId: "",     // ID from DB
-        localLevelId: "",   // ID from DB (New)
-
-        provinceNe: "",     // Name from DB
-        districtNe: "",     // Name from DB
-        localLevelNe: "",   // Name from DB
-        ward: "",           // 1-32
-        toleNe: "",         // "Address of Residence" / Tole
+        // Location
+        provinceNe: "",
+        districtNe: "",
+        localLevelNe: "",
+        addressNe: "",
+        ward: "",
+        toleNe: "",
+        // IDs are separate from payload usually, but let's keep them in state if needed
+        // provinceId: "", districtId: "", localLevelId: "", -> handled separately in state variables if not in payload
 
         // Contact
         phone: "",
         email: "",
 
-        // Party
+        // Extra Fields not in 'personal' strict payload but needed for form
+        departmentIds: [],
         skillsText: "",
         pastAffiliations: "",
         motivationTextNe: "",
-        departmentIds: [] as string[],
+        motivationTextEn: "",
         inspiredBy: "",
         confidentiality: "public_ok",
-
-        // Photos (Placeholders)
         idImageUrl: "",
         profileImageUrl: "",
-
-        // AI Extracted Data
-        extracted: {} as Record<string, string | null | undefined>
+        extracted: {}
     });
+
+
 
     // -- Geo Data Fetching --
     const [geoStructure, setGeoStructure] = useState<NestedProvince[]>([]);
@@ -253,29 +336,33 @@ export default function JoinPage() {
 
             setFormData(prev => ({
                 ...prev,
+                extracted: data,
+
+                // Auto-fill logic (with overrides if user hasn't typed?)
+                // We overwrite for now as this is an explicit "Scan" action by user.
                 fullNameNe: data.full_name || prev.fullNameNe,
                 dobOriginal: data.date_of_birth || prev.dobOriginal,
-                // We don't auto-select dropdowns from AI text yet to avoid confusing mismatches.
-                // We accept the user must select location.
+                citizenshipNumber: data.citizenship_number || data.voter_id_number || prev.citizenshipNumber,
 
-                extracted: {
-                    rawText: data.raw_text,
-                    fullNameRaw: data.full_name,
-                    addressRaw: data.address_full,
-                    dateOfBirthRaw: data.date_of_birth,
-                    citizenshipNumberRaw: data.citizenship_number,
-                    voterIdNumberRaw: data.voter_id_number,
-                    provinceNe: data.province,
-                    districtNe: data.district,
-                    localLevelNe: data.municipality,
-                    wardRaw: data.ward
-                },
+                // Address (Best effort text fill)
+                provinceNe: data.province || prev.provinceNe,
+                districtNe: data.district || prev.districtNe,
+                localLevelNe: data.municipality || prev.localLevelNe,
+                ward: data.ward || prev.ward,
+                toleNe: data.address_full || prev.toleNe,
 
+                // Gender & Identity
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                genderCode: (data.gender_code as any) || prev.genderCode,
+                genderRaw: data.gender_raw || prev.genderRaw,
+                inclusionRaw: (data.inclusion_clues && data.inclusion_clues.length > 0) ? data.inclusion_clues.join(", ") : prev.inclusionRaw,
                 idImageUrl: "https://placehold.co/600x400?text=ID+Card+Scanned"
             }));
 
-        } catch (err) {
-            setScanError(err instanceof Error ? err.message : "Failed to scan document");
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: any) {
+            console.error("Error parsing ID:", error);
+            setScanError(error.message || "Failed to scan ID");
         } finally {
             setLoadingScan(false);
         }
@@ -299,7 +386,8 @@ export default function JoinPage() {
         }
     };
 
-    const onCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const onCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
         setCroppedAreaPixels(croppedAreaPixels);
     };
 
@@ -365,27 +453,46 @@ export default function JoinPage() {
             // Construct Payload
             // "Address of Residence" -> toleNe. 
             // We can combine Ward + Tole into addressNe for the DB schema `address_ne`.
-            const combinedAddress = `Ward-${formData.ward}, ${formData.toleNe}`;
+
 
             const payload = {
                 id: memberId, // Pass the pre-generated ID
                 personal: {
-                    // capacity removed from UI, handled by backend default
+                    // capacity removed from UI, handled                personal: {
                     fullNameNe: formData.fullNameNe,
                     fullNameEn: formData.fullNameEn || null,
-                    gender: formData.gender,
+                    // Legacy gender (map for safety)
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    gender: (["male", "female", "lgbtqi_plus", "prefer_not_to_say", "other"].includes(formData.genderCode) ? formData.genderCode : "other") as any,
+
+                    // New fields
+                    genderCode: formData.genderCode,
+                    genderLabelNe: GENDER_OPTIONS.find(g => g.code === formData.genderCode)?.labelNe || null,
+                    genderLabelEn: GENDER_OPTIONS.find(g => g.code === formData.genderCode)?.labelEn || null,
+                    genderRaw: formData.genderRaw || null,
+
+                    inclusionGroups: formData.inclusionGroups,
+                    inclusionGroupsNe: formData.inclusionGroups.reduce((acc, code) => {
+                        const opt = INCLUSION_OPTIONS.find(o => o.code === code);
+                        if (opt) acc[code] = opt.labelNe;
+                        return acc;
+                    }, {} as Record<string, string>),
+                    inclusionGroupsEn: formData.inclusionGroups.reduce((acc, code) => {
+                        const opt = INCLUSION_OPTIONS.find(o => o.code === code);
+                        if (opt) acc[code] = opt.labelEn;
+                        return acc;
+                    }, {} as Record<string, string>),
+                    inclusionRaw: formData.inclusionRaw || null,
+
                     dobOriginal: formData.dobOriginal,
-                    dobCalendar: formData.dobCalendar,
-                    dobCanonicalAd: null,
+                    dobCalendar: formData.dobCalendar as "AD" | "BS" | "unknown",
 
-                    provinceNe: formData.provinceNe,
-                    districtNe: formData.districtNe,
-                    localLevelNe: formData.localLevelNe,
-                    addressNe: combinedAddress,
+                    provinceNe: formData.provinceNe || null,
+                    districtNe: formData.districtNe || null,
+                    localLevelNe: formData.localLevelNe || null,
+                    addressNe: `${formData.localLevelNe || ''} - ${formData.ward}, ${formData.toleNe || ''}`, // Combined format
 
-                    // We can also store the IDs if we modify the backend/schema to accept them, 
-                    // but for now the user asked to include them in the payload. 
-                    // The backend `MembershipRequestPayload` types are currently structured for text. I'll rely on text for now unless I update types.
+
                     // Actually, the prompt said: "The selected province_id, district_id, local_level_id should be included in the membership form payload."
                     // I will stick them in `meta` or add them if the type allows.
                     // Checking `types.ts`, `personal` has string fields. 
@@ -419,7 +526,7 @@ export default function JoinPage() {
                         aiModel: "gemini-2.5-flash"
                     },
                     profilePhoto: {
-                        imageUrl: formData.profileImageUrl || "placeholder-no-photo"
+                        imageUrl: formData.profileImageUrl || ""
                     }
                 },
                 meta: {
@@ -543,17 +650,84 @@ export default function JoinPage() {
                                 <input type="text" name="fullNameNe" value={formData.fullNameNe} onChange={handleChange} className={inputStyle} required />
                             </div>
                             <div>
-                                <label className={labelStyle}>लिङ्ग (Gender)</label>
-                                <select name="gender" value={formData.gender} onChange={handleChange} className={inputStyle}>
-                                    <option value="male">पुरुष (Male)</option>
-                                    <option value="female">महिला (Female)</option>
-                                    <option value="diverse">अन्य (Other)</option>
-                                    <option value="prefer_not_to_say">भन्न चाहन्न (Prefer not to say)</option>
-                                </select>
+                                <label className={labelStyle}>लिङ्ग (Gender) <span className="text-brand-red">*</span></label>
+                                <div className="space-y-3 mt-2">
+                                    {GENDER_OPTIONS.map((opt) => (
+                                        <label key={opt.code} className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.genderCode === opt.code ? "bg-blue-50 border-blue-400" : "hover:bg-gray-50 border-gray-200"}`}>
+                                            <input
+                                                type="radio"
+                                                name="genderCode"
+                                                value={opt.code}
+                                                checked={formData.genderCode === opt.code}
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                onChange={(e) => setFormData(p => ({ ...p, genderCode: e.target.value as any }))}
+                                                className="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300"
+                                            />
+                                            <div className="ml-3">
+                                                <span className="block text-slate-800 font-medium">{opt.labelNe}</span>
+                                                <span className="block text-slate-500 text-xs">{opt.labelEn}</span>
+                                            </div>
+                                        </label>
+                                    ))}
+
+                                    {/* Free text input if 'self_described' is selected */}
+                                    {formData.genderCode === 'self_described' && (
+                                        <input
+                                            type="text"
+                                            value={formData.genderRaw}
+                                            onChange={(e) => setFormData(p => ({ ...p, genderRaw: e.target.value }))}
+                                            className={`${inputStyle} mt-2`}
+                                            placeholder="तपाईंको लैङ्गिक पहिचान लेख्नुहोस् (Self describe...)"
+                                        />
+                                    )}
+                                </div>
                             </div>
                         </div>
 
-                        <div className="grid md:grid-cols-2 gap-6">
+                        {/* Inclusive Identity Section */}
+                        <div>
+                            <h3 className="font-semibold text-slate-800 mb-2 border-b pb-1">समावेशी पहिचान / Inclusive Identity <span className="text-xs font-normal text-slate-500 ml-2">(Optional but Encouraged)</span></h3>
+                            <div className="grid md:grid-cols-2 gap-3">
+                                {INCLUSION_OPTIONS.map((opt) => (
+                                    <label key={opt.code} className={`flex items-start p-3 border rounded-lg cursor-pointer transition-colors ${formData.inclusionGroups.includes(opt.code) ? "bg-blue-50 border-blue-400" : "hover:bg-gray-50 border-gray-200"}`}>
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.inclusionGroups.includes(opt.code)}
+                                            onChange={(e) => {
+                                                const checked = e.target.checked;
+                                                setFormData(prev => {
+                                                    const current = prev.inclusionGroups;
+                                                    if (checked) {
+                                                        return { ...prev, inclusionGroups: [...current, opt.code] };
+                                                    } else {
+                                                        return { ...prev, inclusionGroups: current.filter(c => c !== opt.code) };
+                                                    }
+                                                });
+                                            }}
+                                            className="w-4 h-4 mt-1 text-blue-600 rounded focus:ring-blue-500"
+                                        />
+                                        <div className="ml-3">
+                                            <span className="block text-slate-800 text-sm font-medium">{opt.labelNe}</span>
+                                            <span className="block text-slate-500 text-xs">{opt.labelEn}</span>
+                                        </div>
+                                    </label>
+                                ))}
+                            </div>
+                            {formData.inclusionGroups.includes('other_specified') && (
+                                <div className="mt-3">
+                                    <label className={labelStyle}>अन्य विवरण (Specify Other Identity)</label>
+                                    <input
+                                        type="text"
+                                        value={formData.inclusionRaw}
+                                        onChange={(e) => setFormData(p => ({ ...p, inclusionRaw: e.target.value }))}
+                                        className={inputStyle}
+                                        placeholder=".."
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6 pt-2">
                             <div className="flex gap-3">
                                 <div className="flex-1">
                                     <label className={labelStyle}>जन्म मिति (Date of Birth)</label>
@@ -706,7 +880,7 @@ export default function JoinPage() {
                                     <span className="text-sm text-slate-900 font-medium">Public (सार्वजनिक)</span>
                                 </label>
                                 <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="radio" name="confidentiality" value="confidential" checked={formData.confidentiality === 'confidential'} onChange={handleChange} className="w-4 h-4 text-blue-700" />
+                                    <input type="radio" name="confidentiality" value="keep_private" checked={formData.confidentiality === 'keep_private'} onChange={handleChange} className="w-4 h-4 text-blue-700" />
                                     <span className="text-sm text-slate-900 font-medium">Confidential (गोप्य)</span>
                                 </label>
                             </div>

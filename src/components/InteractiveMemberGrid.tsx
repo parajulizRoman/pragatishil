@@ -4,11 +4,19 @@ import React, { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import { RealtimeMembersListener } from "@/app/members/RealtimeMembersListener";
 
+// ... imports
+import { X } from "lucide-react";
+
 interface Member {
     id: string;
     full_name_ne: string | null;
     full_name_en: string | null;
     photo_url: string | null;
+    gender_code?: string | null;
+    gender_label_ne?: string | null;
+    gender_label_en?: string | null;
+    inclusion_groups?: string[] | null;
+    inclusion_groups_ne?: Record<string, string> | null;
 }
 
 const PLACEHOLDERS = [
@@ -19,6 +27,7 @@ const PLACEHOLDERS = [
 export default function InteractiveMemberGrid({ members }: { members: Member[] }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
     // Handle mouse movement for background gradient
     useEffect(() => {
@@ -35,6 +44,8 @@ export default function InteractiveMemberGrid({ members }: { members: Member[] }
         window.addEventListener("mousemove", handleMouseMove);
         return () => window.removeEventListener("mousemove", handleMouseMove);
     }, []);
+
+    const closeDetail = () => setSelectedMember(null);
 
     return (
         <main
@@ -69,16 +80,89 @@ export default function InteractiveMemberGrid({ members }: { members: Member[] }
                 ) : (
                     <div className="flex flex-wrap justify-center gap-16 md:gap-24 perspective-1000">
                         {members.map((member, index) => (
-                            <MagneticBubble key={member.id} member={member} index={index} />
+                            <MagneticBubble
+                                key={member.id}
+                                member={member}
+                                index={index}
+                                onClick={() => setSelectedMember(member)}
+                            />
                         ))}
                     </div>
                 )}
             </div>
+
+            {/* Detail Overlay / Modal */}
+            {selectedMember && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={closeDetail}>
+                    <div
+                        className="bg-white rounded-2xl shadow-2xl max-w-sm w-full relative overflow-hidden border border-white/40 animate-in zoom-in-95 duration-200"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <button
+                            onClick={closeDetail}
+                            className="absolute top-3 right-3 p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600 transition-colors z-10"
+                        >
+                            <X size={20} />
+                        </button>
+
+                        <div className="h-32 bg-gradient-to-r from-brand-blue to-brand-red relative">
+                            {/* Header Background */}
+                        </div>
+
+                        <div className="px-6 pb-6 -mt-12 text-center relative">
+                            <div className="w-24 h-24 mx-auto rounded-full border-4 border-white shadow-md bg-brand-navy overflow-hidden relative">
+                                <Image
+                                    src={selectedMember.photo_url && selectedMember.photo_url !== "placeholder-no-photo" ? selectedMember.photo_url : PLACEHOLDERS[selectedMember.id.charCodeAt(0) % PLACEHOLDERS.length]}
+                                    alt={selectedMember.full_name_en || "Member"}
+                                    fill
+                                    className="object-cover"
+                                />
+                            </div>
+
+                            <h3 className="mt-4 text-xl font-bold text-slate-800">
+                                {selectedMember.full_name_ne}
+                            </h3>
+                            {selectedMember.full_name_en && (
+                                <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">
+                                    {selectedMember.full_name_en}
+                                </p>
+                            )}
+
+                            {/* Gender Pill */}
+                            {selectedMember.gender_label_ne && (
+                                <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-brand-navy/10 text-brand-navy border border-brand-navy/20">
+                                    {selectedMember.gender_label_ne}
+                                    {selectedMember.gender_label_en !== selectedMember.gender_label_ne && (
+                                        <span className="opacity-75 ml-1 font-normal">({selectedMember.gender_label_en})</span>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Inclusion Badges */}
+                            {selectedMember.inclusion_groups && selectedMember.inclusion_groups.length > 0 && (
+                                <div className="mt-4 space-y-2">
+                                    <p className="text-xs font-bold text-slate-400 uppercase">Inclusive Identity</p>
+                                    <div className="flex flex-wrap justify-center gap-2">
+                                        {selectedMember.inclusion_groups.map(code => (
+                                            <span
+                                                key={code}
+                                                className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-purple-50 text-purple-700 border border-purple-100"
+                                            >
+                                                {selectedMember.inclusion_groups_ne?.[code] || code}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }
 
-function MagneticBubble({ member }: { member: Member; index: number }) {
+function MagneticBubble({ member, onClick }: { member: Member; index: number; onClick: () => void }) {
     const ref = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 0 });
 
@@ -120,20 +204,22 @@ function MagneticBubble({ member }: { member: Member; index: number }) {
 
     // Deterministic placeholder
     const placeholderIndex = member.id.charCodeAt(0) % PLACEHOLDERS.length;
-    const photo = member.photo_url || PLACEHOLDERS[placeholderIndex];
+    const hasPhoto = member.photo_url && member.photo_url !== "placeholder-no-photo";
+    const photo = hasPhoto ? member.photo_url! : PLACEHOLDERS[placeholderIndex];
     const name = member.full_name_ne || member.full_name_en || "Anonymous";
 
     return (
         <div
             ref={ref}
-            className="group relative flex flex-col items-center transition-transform duration-300 ease-out will-change-transform"
+            onClick={onClick}
+            className="group relative flex flex-col items-center transition-transform duration-300 ease-out will-change-transform cursor-pointer"
             style={{
                 transform: `translate(${position.x}px, ${position.y}px)`,
                 zIndex: Math.abs(position.x) > 1 || Math.abs(position.y) > 1 ? 50 : 1 // Bring to front when moving
             }}
         >
             <div
-                className="member-bubble relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white/80 transition-all duration-300 group-hover:scale-110 group-hover:border-blue-400 cursor-pointer bg-brand-navy"
+                className="member-bubble relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white/80 transition-all duration-300 group-hover:scale-110 group-hover:border-blue-400 bg-brand-navy shadow-lg"
             >
                 <Image
                     src={photo}

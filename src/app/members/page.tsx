@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic'; // Always fresh data
 export default async function MembersGalleryPage() {
     const { data: members, error } = await supabaseAdmin
         .from("members")
-        .select("id, full_name_ne, full_name_en, photo_url")
+        .select("id, full_name_ne, full_name_en, photo_url, gender_code, inclusion_groups, gender_label_ne, gender_label_en, inclusion_groups_ne, inclusion_groups_en")
         .in("status", ["approved"])
         .eq("confidentiality", "public_ok");
 

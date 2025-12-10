@@ -1,5 +1,13 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+
+// Basic chat message type
+export interface ChatMessage {
+    role: "user" | "model";
+    parts: { text: string }[];
+}
+
 // -- Types --
 export interface VoterIdResult {
     full_name: string | null;
@@ -11,40 +19,38 @@ export interface VoterIdResult {
     district: string | null;
     municipality: string | null;
     ward: string | null;
+
+    // New Fields
+    gender_raw: string | null;
+    gender_code: 'male' | 'female' | 'third_gender' | 'other' | null;
+    inclusion_clues: string[] | null; // Inferred from surname or context
+
     raw_text: string | null;
 }
 
-export interface ChatMessage {
-    role: 'user' | 'model';
-    text: string;
-}
+// ... existing code ...
 
-// -- Configuration --
-const apiKey = process.env.GEMINI_API_KEY;
-const ai = new GoogleGenAI({ apiKey: apiKey || '' });
-
-// -- Functions --
-
-/**
- * Parses a Nepali Voter ID or Citizenship card image.
- * @param base64Image Base64 encoded image string (without data prefix if possible, or handle it)
- * @param mimeType Mime type of the image (e.g. image/jpeg)
- */
-export async function parseVoterId(base64Image: string, mimeType: string): Promise<VoterIdResult> {
-    if (!apiKey) throw new Error("GEMINI_API_KEY is not set");
-
-    const model = "gemini-2.5-flash";
-
-    const prompt = `You are reading a Nepali national identity document (citizenship card or voter ID).
-     Extract the following fields if present:
-       - full_name
-       - date_of_birth
-       - citizenship_number or voter_id_number
+export async function parseVoterId(base64Image: string, imgMimeType: string): Promise<VoterIdResult> {
+    const prompt = `You are a Nepali document reader AI. Read the attached ID Card (Citizenship or Voter ID) carefully.
+     Extract the following details as valid JSON:
+       - name_ne
+       - name_en
+       - dob_bs (e.g. 2045/10/12)
+       - dob_ad (if available)
+       - citizenship_number
+       - voter_id_number
+       - father_name
+       - mother_name
+       - spouse_name
        - address_full
        - province
        - district
        - municipality
        - ward
+       - gender_raw (Exact text for gender e.g. 'Male', 'Female', 'Purush', 'Mahila')
+       - gender_code (Normalize to: 'male', 'female', 'third_gender', 'other')
+       - inclusion_clues (Array of strings: any derived ethnicity/caste context from Surname or direct text, e.g. 'Tharu', 'Yadav', 'Sherpa')
+
      Return only strict JSON with snake_case keys, no extra text.
      If a field is missing, set it to null.`;
 
@@ -60,6 +66,11 @@ export async function parseVoterId(base64Image: string, mimeType: string): Promi
             district: { type: Type.STRING, nullable: true },
             municipality: { type: Type.STRING, nullable: true },
             ward: { type: Type.STRING, nullable: true },
+
+            gender_raw: { type: Type.STRING, nullable: true },
+            gender_code: { type: Type.STRING, enum: ['male', 'female', 'third_gender', 'other'], nullable: true },
+            inclusion_clues: { type: Type.ARRAY, items: { type: Type.STRING }, nullable: true },
+
             raw_text: { type: Type.STRING, nullable: true, description: "All text found on the card" },
         },
         required: ["full_name"], // Soft requirement
@@ -70,11 +81,11 @@ export async function parseVoterId(base64Image: string, mimeType: string): Promi
         const cleanBase64 = base64Image.replace(/^data:image\/\w+;base64,/, "");
 
         const result = await ai.models.generateContent({
-            model,
+            model: "gemini-2.0-flash",
             contents: {
                 parts: [
                     { text: prompt },
-                    { inlineData: { mimeType, data: cleanBase64 } }
+                    { inlineData: { mimeType: imgMimeType, data: cleanBase64 } }
                 ]
             },
             config: {
@@ -96,21 +107,30 @@ export async function parseVoterId(base64Image: string, mimeType: string): Promi
 /**
  * Single turn or multi-turn chat.
  * @param messages List of history { role, text }
- * @param locale Optional locale like 'ne' or 'en'
+// Basic chat message type
+export interface ChatMessage {
+    role: "user" | "model";
+    parts: { text: string }[];
+}
+
+/**
+ * Chat with Gemini
  */
 export async function chat(messages: ChatMessage[], locale: string = 'en'): Promise<{ reply: string }> {
-    if (!apiKey) throw new Error("GEMINI_API_KEY is not set");
+    if (!process.env.GEMINI_API_KEY) throw new Error("GEMINI_API_KEY is not set");
 
-    const model = 'gemini-2.5-flash';
+    const model = 'gemini-2.0-flash';
 
-    // Transform messages to SDK format
+    // Convert history to SDK format
     const history = messages.slice(0, -1).map(m => ({
         role: m.role,
-        parts: [{ text: m.text }]
+        parts: m.parts
     }));
 
     const lastMessage = messages[messages.length - 1];
-    if (!lastMessage) throw new Error("No messages provided");
+    if (!lastMessage || !lastMessage.parts[0]?.text) {
+        throw new Error("No valid message provided");
+    }
 
     const systemInstruction = locale === 'ne'
         ? "You are a helpful assistant for Pragatisheel. Answer in Nepali."
@@ -119,12 +139,11 @@ export async function chat(messages: ChatMessage[], locale: string = 'en'): Prom
     const chatSession = ai.chats.create({
         model,
         history,
-        config: {
-            systemInstruction
-        }
+        config: { systemInstruction }
     });
 
-    const result = await chatSession.sendMessage({ message: lastMessage.text });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await chatSession.sendMessage(lastMessage.parts[0].text as any);
 
     return {
         reply: result.text || ""
