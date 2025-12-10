@@ -65,7 +65,7 @@ export async function createMembershipApplication(payload: MembershipRequestPayl
         full_name_ne: names.full_name_ne,
         full_name_en: names.full_name_en, // Normalized
 
-        gender: personal.gender || null,
+        gender: normalizeGender(personal.gender || null),
 
         date_of_birth: dob.dateOfBirth, // Normalized AD or null
         dob_original: dob.dobOriginal,
@@ -200,4 +200,20 @@ function normalizeDob(dobOriginal: string, dobCalendar: "AD" | "BS" | "unknown")
     // TODO: Implementation for BS -> AD conversion
 
     return { dateOfBirth, dobOriginal, dobCalendar: calendar };
+}
+
+function normalizeGender(input: string | null): "male" | "female" | "lgbtqi_plus" | "prefer_not_to_say" | "other" | null {
+    if (!input) return null;
+
+    const lower = input.toLowerCase();
+
+    // specific migrations
+    if (lower === "third_gender" || lower === "diverse") return "lgbtqi_plus";
+
+    // allowed values
+    if (["male", "female", "lgbtqi_plus", "prefer_not_to_say", "other"].includes(lower)) {
+        return lower as "male" | "female" | "lgbtqi_plus" | "prefer_not_to_say" | "other";
+    }
+
+    return "other"; // Fallback for unknown strings
 }
