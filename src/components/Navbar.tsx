@@ -1,22 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { BrandButton } from "./BrandButton";
 import { siteContent } from "@/config/siteContent";
 import { useLanguage } from "@/context/LanguageContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
-// import { Menu, X } from "lucide-react"; // Removed to use raw SVGs if package missing 
-// If lucide-react not present, I'll fallback to SVG. Next.js usually ships with basic SVGs or icons.
-// I will use SVGs to be safe and avoid dependency errors if lucide not installed.
+import { createBrowserClient } from "@supabase/ssr";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [user, setUser] = useState<any>(null);
     const { t } = useLanguage();
+
+    useEffect(() => {
+        const supabase = createBrowserClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        supabase.auth.getUser().then(({ data }) => {
+            setUser(data.user);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            setUser((session as any)?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     const navLinks = [
         { name: t(siteContent.nav.home.en, siteContent.nav.home.ne), href: "/" },
-        { name: t(siteContent.nav.news.en, siteContent.nav.news.ne), href: "/news" },
         { name: t(siteContent.nav.media.en, siteContent.nav.media.ne), href: "/media" },
         { name: t(siteContent.nav.about.en, siteContent.nav.about.ne), href: "/about" },
         { name: t(siteContent.nav.contact.en, siteContent.nav.contact.ne), href: "/contact" },
@@ -51,9 +67,44 @@ export default function Navbar() {
                             >
                                 {t(siteContent.nav.members.en, siteContent.nav.members.ne)}
                             </Link>
-                            <BrandButton href="/join" variant="primary" className="px-4 py-2 text-sm">
-                                {t(siteContent.nav.join.en, siteContent.nav.join.ne)}
-                            </BrandButton>
+                            <Link
+                                href="/commune"
+                                className="text-slate-700 hover:text-brand-blue px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                            >
+                                Community
+                            </Link>
+                            {user ? (
+                                <div className="flex items-center gap-4">
+                                    <Link
+                                        href={`/members/${user.id}`}
+                                        className="text-sm font-medium text-slate-700 hover:text-brand-blue"
+                                    >
+                                        My Profile
+                                    </Link>
+                                    <button
+                                        onClick={async () => {
+                                            const supabase = createBrowserClient(
+                                                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                                                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+                                            );
+                                            await supabase.auth.signOut();
+                                            window.location.href = "/"; // Force reload/redirect
+                                        }}
+                                        className="text-sm font-medium text-slate-500 hover:text-brand-red"
+                                    >
+                                        Sign Out
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <BrandButton href="/join" variant="primary" className="px-4 py-2 text-sm">
+                                        {t(siteContent.nav.join.en, siteContent.nav.join.ne)}
+                                    </BrandButton>
+                                    <Link href="/auth/login" className="text-sm font-medium text-slate-500 hover:text-brand-blue">
+                                        Sign In
+                                    </Link>
+                                </>
+                            )}
 
                             <div className="ml-4 border-l pl-4 border-slate-200">
                                 <LanguageSwitcher />
@@ -107,14 +158,39 @@ export default function Navbar() {
                         >
                             {t(siteContent.nav.members.en, siteContent.nav.members.ne)}
                         </Link>
-                        <BrandButton
-                            href="/join"
-                            variant="primary"
-                            className="w-full text-center mt-4 justify-center"
-                            onClick={() => setIsOpen(false)}
-                        >
-                            {t(siteContent.nav.join.en, siteContent.nav.join.ne)}
-                        </BrandButton>
+                        {user ? (
+                            <>
+                                <Link
+                                    href={`/members/${user.id}`}
+                                    className="text-slate-700 hover:text-brand-blue block px-3 py-2 rounded-md text-base font-medium"
+                                    onClick={() => setIsOpen(false)}
+                                >
+                                    My Profile
+                                </Link>
+                                <button
+                                    onClick={async () => {
+                                        const supabase = createBrowserClient(
+                                            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                                            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+                                        );
+                                        await supabase.auth.signOut();
+                                        window.location.href = "/";
+                                    }}
+                                    className="w-full text-center mt-4 justify-center text-red-600 font-medium py-2 rounded-md hover:bg-slate-50"
+                                >
+                                    Sign Out
+                                </button>
+                            </>
+                        ) : (
+                            <BrandButton
+                                href="/join"
+                                variant="primary"
+                                className="w-full text-center mt-4 justify-center"
+                                onClick={() => setIsOpen(false)}
+                            >
+                                {t(siteContent.nav.join.en, siteContent.nav.join.ne)}
+                            </BrandButton>
+                        )}
                     </div>
                 </div>
             )}

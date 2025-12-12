@@ -584,7 +584,7 @@ export default function JoinPage() {
 
     // Styles
     const labelStyle = "block text-sm font-medium mb-1 text-slate-800";
-    const inputStyle = "w-full border border-gray-300 p-2.5 rounded text-gray-900 bg-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors";
+    const inputStyle = "w-full border border-gray-300 p-2.5 rounded text-slate-900 bg-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors";
     const sectionTitleStyle = "text-xl font-bold text-slate-900 border-b border-gray-200 pb-2 mb-6";
 
     return (

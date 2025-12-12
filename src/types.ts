@@ -1,267 +1,196 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-export type AppMode = 'VOTER_ID' | 'CHAT' | 'IMAGE_STUDIO' | 'LIVE' | 'AUDIO' | 'DASHBOARD';
+export type UserRole =
+    | 'anonymous_visitor'
+    | 'supporter'
+    | 'party_member'
+    | 'team_member'
+    | 'central_committee'
+    | 'admin_party'
+    | 'yantrik';
 
-// -- Supabase Tables --
+export const ROLE_HIERARCHY: Record<UserRole, number> = {
+    'anonymous_visitor': 0,
+    'supporter': 10,
+    'party_member': 20,
+    'team_member': 30,
+    'central_committee': 40,
+    'admin_party': 90, // Political Admin
+    'yantrik': 90,     // Tech Admin (Yantrik)
+};
 
-/*
-Supabase table: members
-columns:
-  id: uuid, primary key, default gen_random_uuid()
-  capacity: text, not null -- 'party_member' | 'volunteer' | 'other'
-  full_name_ne: text, not null
-  full_name_en: text, nullable
-  gender: text, nullable -- 'male' | 'female' | 'diverse' | 'prefer_not_to_say' | 'other'
-  
-  date_of_birth: date, nullable -- canonical AD date
-  dob_original: text, not null -- as provided
-  dob_calendar: text, not null -- 'AD' | 'BS' | 'unknown'
-  
-  province_ne: text, nullable
-  district_ne: text, nullable
-  local_level_ne: text, nullable
-  address_ne: text, nullable
-  
-  province_en: text, nullable
-  district_en: text, nullable
-  local_level_en: text, nullable
-  address_en: text, nullable
-  
-  phone: text, not null
-  email: text, not null
-  
-  photo_url: text, nullable
-  
-  citizenship_number: text, not null
-  inspired_by: text, nullable
-  confidentiality: text, nullable -- 'confidential' | 'public_ok'
-  
-  skills_text: text, nullable
-  past_affiliations: text, nullable
-  motivation_text_ne: text, nullable
-  motivation_text_en: text, nullable
-  
-  status: text, not null default 'pending' -- 'pending' | 'approved' | 'rejected'
-  meta: jsonb, nullable
-  created_at: timestamptz, default now()
-  updated_at: timestamptz, default now()
-*/
-// Domain Types
-
-export type GenderCode = 'male' | 'female' | 'third_gender' | 'prefer_not_to_say' | 'self_described';
-
-export type InclusionGroupCode =
-    | 'khas_arya'
-    | 'adivasi_janajati'
-    | 'madhesi'
-    | 'tharu'
-    | 'dalit'
-    | 'muslim'
-    | 'person_with_disability'
-    | 'senior_citizen'
-    | 'women'
-    | 'sexual_gender_minority'
-    | 'other_minority'
-    | 'other_specified';
-
-export interface Member {
-    id: string;
-    capacity: 'party_member' | 'volunteer' | 'other';
-    full_name_ne: string;
-    full_name_en?: string | null;
-    // Gender (New Robust Fields)
-    gender_code?: 'male' | 'female' | 'third_gender' | 'prefer_not_to_say' | 'self_described' | null;
-    gender_label_ne?: string | null;
-    gender_label_en?: string | null;
-    gender_raw?: string | null; // From user input or OCR
-
-    // Inclusion / Identity
-    inclusion_groups?: string[] | null; // Array of InclusionGroupCode
-    inclusion_groups_ne?: Record<string, string> | null;
-    inclusion_groups_en?: Record<string, string> | null;
-    inclusion_raw?: string | null;
-
-    // Deprecated or Legacy
-    gender?: string | null;
-
-    date_of_birth?: string | null; // ISO Date "YYYY-MM-DD"
-    dob_original: string;
-    dob_calendar: 'AD' | 'BS' | 'unknown';
-
-    province_ne?: string | null;
-    district_ne?: string | null;
-    local_level_ne?: string | null;
-    address_ne?: string | null;
-
-    province_en?: string | null;
-    district_en?: string | null;
-    local_level_en?: string | null;
-    address_en?: string | null;
-
-    phone: string;
-    email: string;
-
-    photo_url?: string | null;
-
-    citizenship_number: string;
-    inspired_by?: string | null;
-    confidentiality?: 'confidential' | 'public_ok' | null;
-
-    skills_text?: string | null;
-    past_affiliations?: string | null;
-    motivation_text_ne?: string | null;
-    motivation_text_en?: string | null;
-
-    status: 'pending' | 'approved' | 'rejected';
-    meta?: any | null;
-    created_at?: string;
-    updated_at?: string;
+export function hasRole(currentRole: UserRole | undefined | null, requiredRole: UserRole): boolean {
+    const current = currentRole || 'anonymous_visitor';
+    return ROLE_HIERARCHY[current] >= ROLE_HIERARCHY[requiredRole];
 }
 
-/*
-Supabase table: departments
-columns:
-  id: uuid, pk, default gen_random_uuid()
-  slug: text, unique, not null
-  name_ne: text, not null
-  name_en: text, not null
-  is_active: boolean, default true
-  sort_order: integer, default 0
-  created_at: timestamptz, default now()
-*/
-export interface Department {
+export function isAtLeast(currentRole: UserRole | undefined | null, requiredRole: UserRole): boolean {
+    return hasRole(currentRole, requiredRole);
+}
+
+// Add Database Types Extension
+export interface Profile {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+    role: UserRole;
+    is_public: boolean;
+    bio: string | null;
+    location: string | null;
+    expertise: string[];
+    contact_email_public: string | null;
+    contact_phone_public: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface AdminCouncilMember {
+    id: string;
+    profile_id: string;
+    profile?: Profile;
+    is_active: boolean;
+    is_veto_holder: boolean;
+    term_start: string;
+    term_end: string | null;
+}
+
+export type ActionType =
+    | 'CREATE_CHANNEL' | 'UPDATE_CHANNEL' | 'DELETE_CHANNEL'
+    | 'BAN_USER' | 'UNBAN_USER'
+    | 'HIDE_POST' | 'RESTORE_POST'
+    | 'UPDATE_ROLE'
+    | 'ROTATE_VETO'
+    | 'UPDATE_SETTINGS';
+
+export interface AuditLog {
+    id: string;
+    actor_id: string | null;
+    actor?: Profile;
+    action_type: ActionType;
+    target_type: string;
+    target_id: string;
+    metadata: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+    created_at: string;
+}
+
+export type ChannelVisibility = 'public' | 'logged_in' | 'party_only' | 'leadership' | 'internal';
+
+export interface DiscussionChannel {
     id: string;
     slug: string;
-    name_ne: string;
-    name_en: string;
-    is_active: boolean;
-    sort_order: number;
-    created_at?: string;
+    name: string;
+    name_ne?: string;
+    description: string | null;
+    description_en?: string;
+    description_ne?: string;
+    guidelines_en?: string;
+    guidelines_ne?: string;
+    visibility: ChannelVisibility;
+    allow_anonymous_posts: boolean;
+    min_role_to_post: UserRole;
+    min_role_to_create_threads: UserRole;
+    min_role_to_comment: UserRole;
+    min_role_to_vote: UserRole;
+    created_at: string;
+    // Resources
+    docs_url?: string | null;
+    video_playlist_url?: string | null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    impact_stats?: Record<string, any>;
+    readme_content?: string | null;
 }
 
-/*
-Supabase table: member_departments
-columns:
-  member_id: uuid, not null, fk -> members.id
-  department_id: uuid, not null, fk -> departments.id
-  created_at: timestamptz, default now()
-  primary key (member_id, department_id)
-*/
-export interface MemberDepartment {
-    member_id: string;
-    department_id: string;
-    created_at?: string;
-}
-
-/*
-Supabase table: member_documents
-columns:
-  id: uuid, pk, default gen_random_uuid()
-  member_id: uuid, not null, fk -> members.id
-  doc_type: text, not null -- 'citizenship' | 'voter_id' | 'other'
-  image_url: text, not null -- storage path
-  extracted_json: jsonb, nullable
-  extracted_name_raw: text, nullable
-  extracted_address_raw: text, nullable
-  created_at: timestamptz, default now()
-*/
-export interface MemberDocument {
+export interface DiscussionThread {
     id: string;
-    member_id: string;
-    doc_type: 'citizenship' | 'voter_id' | 'other';
-    image_url: string;
-    extracted_json?: any | null;
-    extracted_name_raw?: string | null;
-    extracted_address_raw?: string | null;
-    created_at?: string;
+    channel_id: string;
+    title: string;
+    created_by: string | null; // Null if Anonymous
+    is_anonymous: boolean;
+    buried_at: string | null;
+    created_at: string;
+    updated_at: string;
+    meta: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    author?: Profile; // Joined
+    reactions?: Reaction[];
+    user_reactions?: string[]; // Emojis user has reacted with
+    summary?: string | null; // AI Summary
+    total_posts?: number;
+    upvotes?: number;
+    downvotes?: number;
+    first_post_id?: string;
+    channel?: DiscussionChannel;
+    first_post_content?: string;
 }
 
+export interface Reaction {
+    id: string;
+    post_id: string;
+    user_id: string;
+    emoji: string;
+    created_at: string;
+}
 
-// -- API Payloads --
+export interface ThreadUserMeta {
+    is_followed: boolean;
+    is_saved: boolean;
+    is_hidden: boolean;
+}
+
+export interface DiscussionPost {
+    id: string;
+    thread_id: string;
+    content: string;
+    author_id: string | null;
+    is_anonymous: boolean;
+    is_anon?: boolean; // Legacy compat
+    buried_at: string | null;
+    created_at: string;
+    updated_at: string;
+    meta: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    author?: Profile; // Joined
+    upvotes: number;
+    downvotes: number;
+    user_vote: number; // 0, 1, or -1 (if current user voted)
+}
 
 export interface MembershipRequestPayload {
     id?: string;
     personal: {
-        capacity?: "party_member" | "volunteer" | "other" | null;
         fullNameNe: string;
         fullNameEn?: string | null;
-
-        gender?: string | null; // Legacy
-
-        // New Gender Fields
-        genderCode?: 'male' | 'female' | 'third_gender' | 'prefer_not_to_say' | 'self_described' | null;
-        genderLabelNe?: string | null;
-        genderLabelEn?: string | null;
-        genderRaw?: string | null;
-
-        // Inclusion
-        inclusionGroups?: string[];
-        inclusionGroupsNe?: Record<string, string>;
-        inclusionGroupsEn?: Record<string, string>;
-        inclusionRaw?: string | null;
-
         dobOriginal: string;
         dobCalendar: "AD" | "BS" | "unknown";
-        dobCanonicalAd?: string | null; // ISO date string if already converted
-
+        gender?: string | null;
+        capacity?: string;
         provinceNe?: string | null;
         districtNe?: string | null;
         localLevelNe?: string | null;
         addressNe?: string | null;
-
         provinceEn?: string | null;
         districtEn?: string | null;
         localLevelEn?: string | null;
         addressEn?: string | null;
     };
-
     contact: {
         phone: string;
         email: string;
     };
-
     party: {
+        inspiredBy?: string | null;
+        confidentiality?: string;
         skillsText?: string | null;
         pastAffiliations?: string | null;
         motivationTextNe: string;
         motivationTextEn?: string | null;
-
-        departmentIds: string[]; // uuid[]
-
-        inspiredBy?: string | null;
-        confidentiality: "confidential" | "public_ok";
+        departmentIds?: string[];
     };
-
     documents: {
         idDocument?: {
-            docType: "citizenship" | "voter_id" | "other";
+            docType: string;
             imageUrl: string;
-            extracted?: {
-                rawText?: string | null;
-                fullNameRaw?: string | null;
-                addressRaw?: string | null;
-                dateOfBirthRaw?: string | null;
-                citizenshipNumberRaw?: string | null;
-                voterIdNumberRaw?: string | null;
-                provinceNe?: string | null;
-                districtNe?: string | null;
-                localLevelNe?: string | null;
-                wardRaw?: string | null;
-            } | null;
-            aiModel?: string | null;
-            aiRunId?: string | null;
+            extracted?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
         };
         profilePhoto?: {
             imageUrl: string;
         };
     };
-
-    meta?: {
-        source?: string | null;
-        locale?: string | null;
-        userAgent?: string | null;
-        referrer?: string | null;
-        aiUsedForPrefill?: boolean | null;
-        ward?: string | number | null;
-        authUserId?: string | null;
-    } | null;
+    meta?: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 }

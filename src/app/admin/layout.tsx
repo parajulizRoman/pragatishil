@@ -12,7 +12,10 @@ import {
     Image,
     LogOut,
     Menu,
-    X
+    X,
+    Users,
+    Shield,
+    Skull
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -36,6 +39,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const navItems = [
         { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+        { name: "Council", href: "/admin/council", icon: Users },
+        { name: "Audit Logs", href: "/admin/audit", icon: Shield },
+        { name: "Graveyard", href: "/admin/graveyard", icon: Skull },
         { name: "General Settings", href: "/admin/settings", icon: Settings },
         { name: "Pages Content", href: "/admin/pages", icon: FileText },
         { name: "News Room", href: "/admin/news", icon: Newspaper },
@@ -76,8 +82,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                 key={item.href}
                                 href={item.href}
                                 className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                        ? "bg-brand-blue/20 text-brand-blue font-medium"
-                                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                                    ? "bg-brand-blue/20 text-brand-blue font-medium"
+                                    : "text-slate-400 hover:bg-slate-800 hover:text-white"
                                     }`}
                             >
                                 <Icon size={20} />

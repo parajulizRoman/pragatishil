@@ -46,7 +46,7 @@ export default function Footer() {
                         <h4 className="text-lg font-semibold text-brand-red">{t("Quick Links", "द्रुत लिङ्कहरू")}</h4>
                         <div className="flex flex-col space-y-2">
                             <Link href="/about" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.about.en, siteContent.nav.about.ne)}</Link>
-                            <Link href="/news" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.news.en, siteContent.nav.news.ne)}</Link>
+                            <Link href="/media" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.media.en, siteContent.nav.media.ne)}</Link>
                             <Link href="/members" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.members.en, siteContent.nav.members.ne)}</Link>
                             <Link href="/join" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.join.en, siteContent.nav.join.ne)}</Link>
                         </div>

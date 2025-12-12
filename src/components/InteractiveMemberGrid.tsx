@@ -2,41 +2,41 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import Image from "next/image";
-import { RealtimeMembersListener } from "@/app/members/RealtimeMembersListener";
-
-// ... imports
-import { X } from "lucide-react";
-
-interface Member {
-    id: string;
-    full_name_ne: string | null;
-    full_name_en: string | null;
-    photo_url: string | null;
-    gender_code?: string | null;
-    gender_label_ne?: string | null;
-    gender_label_en?: string | null;
-    inclusion_groups?: string[] | null;
-    inclusion_groups_ne?: Record<string, string> | null;
-}
+// import { RealtimeMembersListener } from "@/app/members/RealtimeMembersListener"; // Disable for now as we switched tables
+import { X, Shield, User, Crown } from "lucide-react";
+import { Profile, UserRole } from "@/types";
 
 const PLACEHOLDERS = [
     "/placeholders/eye-red.svg",
     "/placeholders/eye-blue.svg",
 ];
 
-export default function InteractiveMemberGrid({ members }: { members: Member[] }) {
+// Helper to get role badge color/icon
+const getRoleBadge = (role: UserRole) => {
+    switch (role) {
+        case 'admin_party': return { color: "bg-red-100 text-red-700 border-red-200", icon: <Crown size={12} fill="currentColor" /> };
+        case 'yantrik': return { color: "bg-slate-100 text-slate-700 border-slate-200", icon: <Shield size={12} /> };
+        case 'central_committee': return { color: "bg-blue-100 text-blue-700 border-blue-200", icon: <Shield size={12} fill="currentColor" /> };
+        case 'team_member': return { color: "bg-green-100 text-green-700 border-green-200", icon: <User size={12} /> };
+        case 'party_member': return { color: "bg-brand-red/10 text-brand-red border-brand-red/20", icon: <User size={12} /> };
+        default: return null; // Supporter/Guest
+    }
+};
+
+export default function InteractiveMemberGrid({ members }: { members: Profile[] }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+    const [selectedMember, setSelectedMember] = useState<Profile | null>(null);
 
     // Handle mouse movement for background gradient
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!containerRef.current) return;
             const { clientX, clientY } = e;
-            const { innerWidth, innerHeight } = window;
-            const xPct = (clientX / innerWidth) * 100;
-            const yPct = (clientY / innerHeight) * 100;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { innerWidth, innerHeight } = window; // Keep for ref if needed
+            const xPct = (clientX / window.innerWidth) * 100;
+            const yPct = (clientY / window.innerHeight) * 100;
 
             setMousePos({ x: xPct, y: yPct });
         };
@@ -56,8 +56,6 @@ export default function InteractiveMemberGrid({ members }: { members: Member[] }
                 "--mouse-y": `${mousePos.y}%`
             } as React.CSSProperties}
         >
-            <RealtimeMembersListener />
-
             {/* Texture Overlay */}
             <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none mix-blend-overlay"></div>
 
@@ -112,48 +110,42 @@ export default function InteractiveMemberGrid({ members }: { members: Member[] }
                         <div className="px-6 pb-6 -mt-12 text-center relative">
                             <div className="w-24 h-24 mx-auto rounded-full border-4 border-white shadow-md bg-brand-navy overflow-hidden relative">
                                 <Image
-                                    src={selectedMember.photo_url && selectedMember.photo_url !== "placeholder-no-photo" ? selectedMember.photo_url : PLACEHOLDERS[selectedMember.id.charCodeAt(0) % PLACEHOLDERS.length]}
-                                    alt={selectedMember.full_name_en || "Member"}
+                                    src={selectedMember.avatar_url || PLACEHOLDERS[selectedMember.id.charCodeAt(0) % PLACEHOLDERS.length]}
+                                    alt={selectedMember.full_name || "Member"}
                                     fill
                                     className="object-cover"
                                 />
                             </div>
 
                             <h3 className="mt-4 text-xl font-bold text-slate-800">
-                                {selectedMember.full_name_ne}
+                                {selectedMember.full_name || "Anonymous User"}
                             </h3>
-                            {selectedMember.full_name_en && (
-                                <p className="text-sm font-medium text-slate-500 uppercase tracking-wider">
-                                    {selectedMember.full_name_en}
+
+                            {/* Role Label */}
+                            {(() => {
+                                const badge = getRoleBadge(selectedMember.role);
+                                return badge ? (
+                                    <div className={`mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${badge.color}`}>
+                                        {badge.icon}
+                                        {selectedMember.role.replace('_', ' ')}
+                                    </div>
+                                ) : (
+                                    <span className="mt-1 block text-slate-400 text-xs uppercase tracking-widest">Supporter</span>
+                                );
+                            })()}
+
+                            {selectedMember.bio && (
+                                <p className="mt-4 text-sm text-slate-600 italic line-clamp-4">
+                                    &quot;{selectedMember.bio}&quot;
                                 </p>
                             )}
 
-                            {/* Gender Pill */}
-                            {selectedMember.gender_label_ne && (
-                                <div className="mt-4 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-brand-navy/10 text-brand-navy border border-brand-navy/20">
-                                    {selectedMember.gender_label_ne}
-                                    {selectedMember.gender_label_en !== selectedMember.gender_label_ne && (
-                                        <span className="opacity-75 ml-1 font-normal">({selectedMember.gender_label_en})</span>
-                                    )}
-                                </div>
+                            {selectedMember.location && (
+                                <p className="mt-2 text-xs text-slate-500 font-medium">
+                                    📍 {selectedMember.location}
+                                </p>
                             )}
 
-                            {/* Inclusion Badges */}
-                            {selectedMember.inclusion_groups && selectedMember.inclusion_groups.length > 0 && (
-                                <div className="mt-4 space-y-2">
-                                    <p className="text-xs font-bold text-slate-400 uppercase">Inclusive Identity</p>
-                                    <div className="flex flex-wrap justify-center gap-2">
-                                        {selectedMember.inclusion_groups.map(code => (
-                                            <span
-                                                key={code}
-                                                className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-purple-50 text-purple-700 border border-purple-100"
-                                            >
-                                                {selectedMember.inclusion_groups_ne?.[code] || code}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
@@ -162,7 +154,7 @@ export default function InteractiveMemberGrid({ members }: { members: Member[] }
     );
 }
 
-function MagneticBubble({ member, onClick }: { member: Member; index: number; onClick: () => void }) {
+function MagneticBubble({ member, onClick }: { member: Profile; index: number; onClick: () => void }) {
     const ref = useRef<HTMLDivElement>(null);
     const [position, setPosition] = useState({ x: 0, y: 0 });
 
@@ -204,9 +196,16 @@ function MagneticBubble({ member, onClick }: { member: Member; index: number; on
 
     // Deterministic placeholder
     const placeholderIndex = member.id.charCodeAt(0) % PLACEHOLDERS.length;
-    const hasPhoto = member.photo_url && member.photo_url !== "placeholder-no-photo";
-    const photo = hasPhoto ? member.photo_url! : PLACEHOLDERS[placeholderIndex];
-    const name = member.full_name_ne || member.full_name_en || "Anonymous";
+    const photo = member.avatar_url || PLACEHOLDERS[placeholderIndex];
+    const name = member.full_name || "Member";
+
+    // Ring color based on role
+    const getRingColor = (role: UserRole) => {
+        if (role.startsWith('admin')) return 'border-amber-400';
+        if (role === 'central_committee') return 'border-brand-blue';
+        if (role === 'party_member') return 'border-brand-red';
+        return 'border-white/80';
+    };
 
     return (
         <div
@@ -219,7 +218,7 @@ function MagneticBubble({ member, onClick }: { member: Member; index: number; on
             }}
         >
             <div
-                className="member-bubble relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-white/80 transition-all duration-300 group-hover:scale-110 group-hover:border-blue-400 bg-brand-navy shadow-lg"
+                className={`member-bubble relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 transition-all duration-300 group-hover:scale-110 shadow-lg bg-brand-navy ${getRingColor(member.role)}`}
             >
                 <Image
                     src={photo}

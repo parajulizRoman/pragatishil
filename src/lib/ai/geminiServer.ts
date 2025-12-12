@@ -142,10 +142,32 @@ export async function chat(messages: ChatMessage[], locale: string = 'en'): Prom
         config: { systemInstruction }
     });
 
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result = await chatSession.sendMessage(lastMessage.parts[0].text as any);
 
     return {
         reply: result.text || ""
     };
+}
+
+export async function summarizeThread(title: string, content: string): Promise<string> {
+    const prompt = `You are a helpful community moderator. Summarize the following discussion thread into a concise, neutral paragraph (max 3-4 sentences). 
+    Focus on the main arguments and consensus if any.
+    
+    Thread Title: ${title}
+    
+    Discussion Content:
+    ${content}
+    
+    Summary:`;
+
+    const result = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: {
+            parts: [{ text: prompt }]
+        }
+    });
+
+    return result.text || "Could not generate summary.";
 }
