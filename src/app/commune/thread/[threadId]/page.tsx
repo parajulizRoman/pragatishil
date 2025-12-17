@@ -11,6 +11,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { X, Shield, User, Crown, Paperclip, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
 import TextareaAutosize from 'react-textarea-autosize';
+import { Skeleton } from "@/components/ui/skeleton";
+import PostActions from "@/components/PostActions";
 
 // Helpers
 const PLACEHOLDERS = [
@@ -285,7 +287,36 @@ export default function ThreadPage() {
         finally { setIsFlagging(false); }
     };
 
-    if (loading) return <div className="p-20 text-center">Loading discussion...</div>;
+    if (loading) {
+        return (
+            <div className="container mx-auto px-4 py-8 max-w-4xl">
+                <div className="mb-8 space-y-4">
+                    <Skeleton className="h-8 w-3/4 mb-4" />
+                    <div className="flex gap-4">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-4 w-20" />
+                    </div>
+                </div>
+                <div className="space-y-6">
+                    {[1, 2, 3].map(i => (
+                        <div key={i} className="flex gap-3">
+                            <div className="w-10">
+                                <Skeleton className="h-10 w-10 rounded-full" />
+                            </div>
+                            <div className="flex-1 space-y-2">
+                                <div className="flex items-center gap-2">
+                                    <Skeleton className="h-4 w-24" />
+                                    <Skeleton className="h-3 w-16" />
+                                </div>
+                                <Skeleton className="h-24 w-full rounded-xl" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
     if (error || !thread) return <div className="p-20 text-center text-red-500">Error: {error || "Thread not found"}</div>;
 
     const canReply = isAuthenticated || channelConfig?.allow_anonymous_posts;
@@ -479,7 +510,24 @@ export default function ThreadPage() {
 
                                     {/* Footer Actions */}
                                     <div className="flex items-center gap-4 mt-4 pt-3 border-t border-slate-100">
-                                        <div className="flex-grow"></div>
+                                        {/* Post Actions (Edit/Delete) */}
+                                        <div className="flex-grow">
+                                            {isMe && (
+                                                <PostActions
+                                                    postId={post.id}
+                                                    postContent={post.content}
+                                                    isAuthor={isMe}
+                                                    onDelete={() => {
+                                                        // Optimistic remove
+                                                        setPosts(prev => prev.filter(p => p.id !== post.id));
+                                                    }}
+                                                    onUpdate={(newContent) => {
+                                                        // Optimistic update
+                                                        setPosts(prev => prev.map(p => p.id === post.id ? { ...p, content: newContent } : p));
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
                                         {/* Flag/Options */}
                                         <button onClick={() => setFlagPostId(post.id)} className="text-slate-400 hover:text-red-500 transition-colors" title="Report">
                                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 21v-8a2 2 0 01-2-2V5a2 2 0 012-2h6.24c.48 0 .93.2 1.25.56l.82 1.1h5.69c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2h-7.76l-.82-1.1A2.02 2.02 0 008 16H3zM3 21h1" /></svg>

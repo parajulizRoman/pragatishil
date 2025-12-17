@@ -176,3 +176,61 @@ export async function toggleReaction(postId: string, emoji: string) {
         return { success: true, status: 'added' };
     }
 }
+
+export async function deleteContent(targetId: string, targetType: 'post' | 'thread') {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error("Must be logged in to delete");
+
+    const table = targetType === 'post' ? 'discussion_posts' : 'discussion_threads';
+    const ownerCol = targetType === 'post' ? 'author_id' : 'created_by';
+
+    const { data: item, error: fetchError } = await supabase
+        .from(table)
+        .select(`id, ${ownerCol}`)
+        .eq('id', targetId)
+        .single();
+
+    if (fetchError || !item) throw new Error("Content not found");
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if ((item as any)[ownerCol] !== user.id) {
+        throw new Error("You do not have permission to delete this.");
+    }
+
+    const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq('id', targetId);
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath("/commune");
+    return { success: true };
+}
+
+export async function updateContent(targetId: string, targetType: 'post' | 'thread', newContent: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error("Must be logged in to edit");
+
+    const table = targetType === 'post' ? 'discussion_posts' : 'discussion_threads';
+    const ownerCol = targetType === 'post' ? 'author_id' : 'created_by';
+
+    const updateData: Record<string, string> = {};
+    if (targetType === 'post') updateData.content = newContent;
+    else updateData.title = newContent;
+
+    const { error } = await supabase
+        .from(table)
+        .update(updateData)
+        .eq('id', targetId)
+        .eq(ownerCol, user.id);
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath("/commune");
+    return { success: true };
+}

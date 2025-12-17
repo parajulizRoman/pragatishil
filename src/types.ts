@@ -156,6 +156,7 @@ export interface DiscussionThread {
     first_post_id?: string;
     channel?: DiscussionChannel;
     first_post_content?: string;
+    user_vote?: number; // 0, 1, -1 for current user on first post
 }
 
 export interface Reaction {

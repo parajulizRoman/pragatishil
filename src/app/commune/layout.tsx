@@ -7,6 +7,24 @@ import { DiscussionChannel, UserRole } from "@/types";
 import { createBrowserClient } from "@supabase/ssr";
 import ChannelModal from "./ChannelModal";
 import { canManageChannels } from "@/lib/permissions";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function SidebarSkeleton() {
+    return (
+        <div className="space-y-6 animate-in fade-in">
+            {[1, 2, 3].map((i) => (
+                <div key={i} className="px-2">
+                    <Skeleton className="h-3 w-24 mb-3" />
+                    <div className="space-y-2 pl-2 border-l-2 border-slate-100 ml-1">
+                        <Skeleton className="h-6 w-full" />
+                        <Skeleton className="h-6 w-[80%]" />
+                        <Skeleton className="h-6 w-[90%]" />
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+}
 
 export default function CommuneLayout({
     children,
@@ -16,6 +34,7 @@ export default function CommuneLayout({
     const pathname = usePathname();
     const [channels, setChannels] = useState<DiscussionChannel[]>([]);
     const [userRole, setUserRole] = useState<UserRole | null>(null);
+    const [loading, setLoading] = useState(true);
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,6 +70,8 @@ export default function CommuneLayout({
             }
         } catch (err) {
             console.error("Failed to load sidebar channels", err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -169,7 +190,11 @@ export default function CommuneLayout({
                     </div>
 
                     <div className="space-y-2">
-                        {sortedCategories.map(renderCategoryGroup)}
+                        {loading ? (
+                            <SidebarSkeleton />
+                        ) : (
+                            sortedCategories.map(renderCategoryGroup)
+                        )}
 
                         {/* Fallback if no channels */}
                         {channels.length === 0 && (

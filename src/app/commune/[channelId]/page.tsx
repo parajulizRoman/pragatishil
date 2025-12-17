@@ -9,6 +9,8 @@ import { createBrowserClient } from "@supabase/ssr";
 import { flagContent } from "@/app/commune/actions";
 import TextareaAutosize from 'react-textarea-autosize';
 import { Paperclip, X, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
+import { votePost } from "@/app/commune/actions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ChannelPage() {
     const params = useParams();
@@ -98,7 +100,7 @@ export default function ChannelPage() {
 
         setIsUploading(true);
         try {
-            const newAttachments = [];
+            const newAttachments: { file: File, meta: any }[] = [];
             for (const file of files) {
                 // 1. Get Signed URL
                 const res = await fetch("/api/discussions/attachments/sign-url", {
@@ -143,6 +145,40 @@ export default function ChannelPage() {
 
     const removeAttachment = (idx: number) => {
         setAttachments(prev => prev.filter((_, i) => i !== idx));
+    };
+
+    // -- Voting Logic --
+    const handleVote = async (threadId: string, postId: string, voteType: number) => {
+        if (!isAuthenticated) return alert("Please sign in to vote!");
+
+        // Optimistic Update
+        setThreads(prev => prev.map(t => {
+            if (t.id !== threadId) return t;
+
+            // Logic similar to ThreadPage but operating on Thread object stats
+            const oldVote = t.user_vote || 0;
+            let uv = t.upvotes || 0;
+            let dv = t.downvotes || 0;
+
+            if (oldVote === 1) uv--;
+            if (oldVote === -1) dv--;
+
+            let newVote = voteType;
+            if (oldVote === voteType) newVote = 0; // Toggle off
+            else {
+                if (voteType === 1) uv++;
+                if (voteType === -1) dv++;
+            }
+            return { ...t, upvotes: uv, downvotes: dv, user_vote: newVote };
+        }));
+
+        try {
+            await votePost(postId, voteType);
+        } catch (e) {
+            console.error(e);
+            alert("Failed to vote. Please try again.");
+            fetchData(); // Rollback/Refresh
+        }
     };
 
 
@@ -198,7 +234,20 @@ export default function ChannelPage() {
         }
     };
 
-    if (loading) return <div className="p-10 text-center">Loading...</div>;
+    if (loading) {
+        return (
+            <div className="container mx-auto px-4 py-8 max-w-5xl">
+                <div className="mb-6 space-y-4">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-8 w-64" />
+                    <Skeleton className="h-4 w-96" />
+                </div>
+                <div className="space-y-4">
+                    {[1, 2, 3].map(i => <ThreadCardSkeleton key={i} />)}
+                </div>
+            </div>
+        );
+    }
     if (error || !channel) return <div className="p-10 text-center text-red-500">Error: {error || "Channel Not Found"}</div>;
 
     const canCreateThread = isAuthenticated || channel.min_role_to_create_threads === 'anonymous_visitor';
@@ -239,7 +288,7 @@ export default function ChannelPage() {
             {/* Create Thread Form */}
             {showForm && (
                 <div className="bg-white border border-slate-200 p-6 rounded-xl shadow-sm mb-8 animate-in slide-in-from-top-2">
-                    <h3 className="font-bold text-lg mb-4">Create New Thread</h3>
+                    <h3 className="font-bold text-lg mb-4 text-brand-navy">Create New Thread</h3>
                     {!isAuthenticated && channel.min_role_to_create_threads !== 'anonymous_visitor' && (
                         <div className="text-red-500 text-sm mb-2">You must be logged in to create a thread here.</div>
                     )}
@@ -252,7 +301,7 @@ export default function ChannelPage() {
                                 value={newTitle}
                                 maxLength={140}
                                 onChange={(e) => setNewTitle(e.target.value)}
-                                className="form-input text-lg font-semibold"
+                                className="form-input text-lg font-semibold text-slate-900"
                                 placeholder={channel.allow_anonymous_posts ? "Topic of discussion..." : "What's on your mind?"}
                                 required
                             />
@@ -265,7 +314,7 @@ export default function ChannelPage() {
                                 minRows={5}
                                 value={newBody}
                                 onChange={(e) => setNewBody(e.target.value)}
-                                className="form-input resize-none"
+                                className="form-input resize-none text-slate-900"
                                 placeholder="Share your detailed thoughts, arguments, or questions..."
                                 required
                             />
@@ -385,9 +434,24 @@ export default function ChannelPage() {
                                             </div>
                                             {/* Stats (Votes/Comments) */}
                                             <div className="flex items-center gap-4 text-slate-500 text-sm ml-4">
-                                                <div className="flex items-center gap-1" title="Votes">
-                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" /></svg>
-                                                    <span className="font-medium text-slate-700">{(thread.upvotes || 0) - (thread.downvotes || 0)}</span>
+                                                <div className="flex items-center gap-1 bg-slate-50 rounded-lg border border-slate-200 p-0.5" onClick={(e) => e.preventDefault()}>
+                                                    <button
+                                                        onClick={(e) => { e.preventDefault(); handleVote(thread.id, thread.first_post_id!, 1); }}
+                                                        className={`p-1 rounded hover:bg-slate-200 transition-colors ${thread.user_vote === 1 ? 'text-orange-600 bg-orange-50' : 'text-slate-400'}`}
+                                                        title="Upvote"
+                                                    >
+                                                        <svg className="w-4 h-4" fill={thread.user_vote === 1 ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7" /></svg>
+                                                    </button>
+                                                    <span className={`text-sm font-bold min-w-[1.5em] text-center ${(thread.upvotes || 0) - (thread.downvotes || 0) > 0 ? "text-orange-600" : (thread.upvotes || 0) - (thread.downvotes || 0) < 0 ? "text-blue-600" : "text-slate-600"}`}>
+                                                        {(thread.upvotes || 0) - (thread.downvotes || 0)}
+                                                    </span>
+                                                    <button
+                                                        onClick={(e) => { e.preventDefault(); handleVote(thread.id, thread.first_post_id!, -1); }}
+                                                        className={`p-1 rounded hover:bg-slate-200 transition-colors ${thread.user_vote === -1 ? 'text-blue-600 bg-blue-50' : 'text-slate-400'}`}
+                                                        title="Downvote"
+                                                    >
+                                                        <svg className="w-4 h-4" fill={thread.user_vote === -1 ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                                    </button>
                                                 </div>
                                                 <div className="flex items-center gap-1" title="Comments">
                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
@@ -525,10 +589,10 @@ export default function ChannelPage() {
             {flagThreadId && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-xl p-6 w-full max-w-sm">
-                        <h3 className="text-lg font-bold mb-4">Report Thread</h3>
+                        <h3 className="text-lg font-bold mb-4 text-slate-900">Report Thread</h3>
                         <form onSubmit={handleFlag}>
                             <select
-                                className="w-full border rounded p-2 mb-4"
+                                className="w-full border rounded p-2 mb-4 text-slate-900 bg-white"
                                 value={flagReason}
                                 onChange={e => setFlagReason(e.target.value)}
                             >
@@ -544,6 +608,28 @@ export default function ChannelPage() {
                     </div>
                 </div>
             )}
+        </div>
+    );
+}
+
+function ThreadCardSkeleton() {
+    return (
+        <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm mb-4">
+            <div className="flex justify-between items-start">
+                <div className="flex-1 space-y-2">
+                    <Skeleton className="h-6 w-3/4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-2/3" />
+                    <div className="flex gap-4 mt-2">
+                        <Skeleton className="h-3 w-24" />
+                        <Skeleton className="h-3 w-16" />
+                    </div>
+                </div>
+                <div className="flex gap-2 ml-4">
+                    <Skeleton className="h-8 w-16 rounded-lg" />
+                    <Skeleton className="h-8 w-8 rounded-lg" />
+                </div>
+            </div>
         </div>
     );
 }

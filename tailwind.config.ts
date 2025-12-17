@@ -12,8 +12,8 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
         brand: {
-          red: "#E53935",   // Official Pragatishil Red
-          blue: "#2563EB",  // Official Loktantrik Blue
+          red: "#EA1B23",   // Vivid Red (High Contrast)
+          blue: "#0056D2",  // Vibrant Blue (High Contrast)
           navy: "#0f172a",  // Dark theme base
           white: "#FFFFFF", // Standard White
         },

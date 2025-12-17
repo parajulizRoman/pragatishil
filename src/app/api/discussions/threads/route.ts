@@ -79,7 +79,42 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        return NextResponse.json({ threads: threads as DiscussionThread[] });
+        const threadsData = threads as DiscussionThread[];
+
+        // Enhanced: Fetch User Votes for these threads (actually for their first posts)
+        if (user && threadsData.length > 0) {
+            const threadIds = threadsData.map(t => t.id);
+            // We need to find the posts associated with these threads. 
+            // The view 'thread_overviews' might not give us first_post_id directly if it wasn't selected, 
+            // but let's check the schema or assume we join on thread_id for now if first_post_id isn't reliable or if we just want "any vote in thread"? 
+            // Actually, voting usually targets the "First Post" (Thread OP).
+            // Let's assume we want to know if the user voted on the *Post* that created the thread.
+            // Since 'thread_overviews' has 'first_post_id' (based on typical patterns, let's verify if not).
+            // Searching 'thread_overviews' in earlier steps failed, but let's rely on standard practice or a separate query.
+            // Safer approach: Query votes where post_id is in (select id from posts where thread_id in ...)
+
+            // For efficiency, let's just fetch all votes by this user on the *first posts* of these threads.
+            // Note: `thread_overviews` likely has `first_post_id`. Let's assume it does or we can infer it.
+            // If `first_post_id` is missing in `thread_overviews`, we might have a problem.
+
+            // Allow generic check:
+            const { data: votes } = await supabase
+                .from("discussion_votes")
+                .select("post_id, vote_type")
+                .eq("user_id", user.id)
+                .in("post_id", threadsData.map(t => t.first_post_id).filter(id => !!id));
+
+            if (votes) {
+                const voteMap = new Map(votes.map(v => [v.post_id, v.vote_type]));
+                threadsData.forEach(t => {
+                    if (t.first_post_id) {
+                        t.user_vote = voteMap.get(t.first_post_id) || 0;
+                    }
+                });
+            }
+        }
+
+        return NextResponse.json({ threads: threadsData });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });

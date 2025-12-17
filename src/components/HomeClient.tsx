@@ -48,7 +48,7 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
                                 if (lower.includes("pragatishil") || lower.includes("प्रगतिशील")) colorClass = "text-brand-red";
                                 else if (lower.includes("loktantrik") || lower.includes("लोकतान्त्रिक")) colorClass = "text-brand-blue";
                                 else if (lower.includes("party") || lower.includes("पार्टी")) colorClass = "text-brand-red";
-                                else if (lower.includes("welcome")) colorClass = "text-slate-700"; // Make 'Welcome to' subtle if present
+                                else if (lower.includes("welcome") || lower.includes("स्वागत") || lower.includes("छ")) colorClass = "text-brand-blue";
 
                                 return (
                                     <span key={i} className={`${colorClass} inline-block mr-2 md:mr-3`}>
