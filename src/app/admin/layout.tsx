@@ -14,6 +14,7 @@ import {
     Menu,
     X,
     Users,
+    UserCog,
     Shield,
     Skull
 } from "lucide-react";
@@ -39,6 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
     const navItems = [
         { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+        { name: "User Management", href: "/admin/users", icon: UserCog },
         { name: "Council", href: "/admin/council", icon: Users },
         { name: "Audit Logs", href: "/admin/audit", icon: Shield },
         { name: "Graveyard", href: "/admin/graveyard", icon: Skull },

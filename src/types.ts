@@ -1,28 +1,42 @@
 export type UserRole =
-    | 'anonymous_visitor'
-    | 'supporter'
-    | 'party_member'
+    | 'guest'               // not logged in
+    | 'member'              // basic member who signed up
+    | 'party_member'        // verified party member
+    | 'volunteer'
     | 'team_member'
-    | 'central_committee'
-    | 'admin_party'
-    | 'yantrik';
+    | 'central_committee'   // central committee member
+    | 'board'               // board / chief board member
+    | 'admin_party'         // political admin
+    | 'yantrik'             // technical admin (renamed from admin_tech)
+    | 'admin';              // System Admin (Top)
 
+// Role Hierarchy
 export const ROLE_HIERARCHY: Record<UserRole, number> = {
-    'anonymous_visitor': 0,
-    'supporter': 10,
-    'party_member': 20,
-    'team_member': 30,
-    'central_committee': 40,
-    'admin_party': 90, // Political Admin
-    'yantrik': 90,     // Tech Admin (Yantrik)
+    'guest': 0,
+    'member': 1,
+    'volunteer': 2,
+    'party_member': 2,
+    'team_member': 3,
+    'central_committee': 4,
+    'admin_party': 5,
+    'yantrik': 6,
+    'board': 7,
+    'admin': 8
 };
 
-export function hasRole(currentRole: UserRole | undefined | null, requiredRole: UserRole): boolean {
-    const current = currentRole || 'anonymous_visitor';
-    return ROLE_HIERARCHY[current] >= ROLE_HIERARCHY[requiredRole];
+export function getRoleLevel(role: UserRole | string | null | undefined): number {
+    if (!role) return ROLE_HIERARCHY.guest;
+    // Normalize string to UserRole if possible, else guest
+    return ROLE_HIERARCHY[role as UserRole] ?? ROLE_HIERARCHY.guest;
 }
 
-export function isAtLeast(currentRole: UserRole | undefined | null, requiredRole: UserRole): boolean {
+export function hasRole(userRole: UserRole | string | undefined | null, requiredRole: UserRole | string): boolean {
+    const userLevel = getRoleLevel(userRole);
+    const reqLevel = getRoleLevel(requiredRole);
+    return userLevel >= reqLevel;
+}
+
+export function isAtLeast(currentRole: UserRole | string | undefined | null, requiredRole: UserRole | string): boolean {
     return hasRole(currentRole, requiredRole);
 }
 
@@ -40,6 +54,12 @@ export interface Profile {
     contact_phone_public: string | null;
     created_at: string;
     updated_at: string;
+    // Ban System
+    is_banned?: boolean;
+    banned_at?: string | null;
+    banned_by?: string | null;
+    ban_reason?: string | null;
+    ban_expires_at?: string | null;
 }
 
 export interface AdminCouncilMember {
@@ -73,29 +93,47 @@ export interface AuditLog {
 
 export type ChannelVisibility = 'public' | 'logged_in' | 'party_only' | 'leadership' | 'internal';
 
+export interface ChannelResource {
+    id: string;
+    channel_id: string;
+    title: string;
+    type: 'doc' | 'video' | 'link' | 'impact' | 'other';
+    url: string;
+    description?: string;
+    created_at: string;
+}
+
 export interface DiscussionChannel {
     id: string;
     slug: string;
     name: string;
     name_ne?: string;
-    description: string | null;
+    description?: string;
     description_en?: string;
     description_ne?: string;
-    guidelines_en?: string;
-    guidelines_ne?: string;
+    icon?: string;
+    category?: string; // e.g. "Public Space", "Organizational"
     visibility: ChannelVisibility;
     allow_anonymous_posts: boolean;
-    min_role_to_post: UserRole;
-    min_role_to_create_threads: UserRole;
-    min_role_to_comment: UserRole;
-    min_role_to_vote: UserRole;
+
+    // Role Requirements (using UserRole enum)
+    min_role_to_post: UserRole | string;
+    min_role_to_create_threads: UserRole | string;
+    min_role_to_comment: UserRole | string;
+    min_role_to_vote: UserRole | string;
+
+    // Advanced Content
+    docs_url?: string; // Legacy simple link
+    video_playlist_url?: string; // Legacy simple link
+    impact_stats?: Record<string, string | number>;
+    readme_content?: string; // New: Markdown
+    is_archived?: boolean; // New: Archive status
+    resources?: ChannelResource[]; // New: Rich resources
+    // Guidelines (Optional)
+    guidelines_en?: string;
+    guidelines_ne?: string;
+
     created_at: string;
-    // Resources
-    docs_url?: string | null;
-    video_playlist_url?: string | null;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    impact_stats?: Record<string, any>;
-    readme_content?: string | null;
 }
 
 export interface DiscussionThread {
@@ -149,6 +187,18 @@ export interface DiscussionPost {
     upvotes: number;
     downvotes: number;
     user_vote: number; // 0, 1, or -1 (if current user voted)
+    attachments?: DiscussionAttachment[];
+}
+
+export interface DiscussionAttachment {
+    id: string;
+    post_id: string;
+    storage_path: string;
+    file_name: string;
+    mime_type: string;
+    size_bytes: number;
+    type: 'image' | 'pdf' | 'file';
+    created_at: string;
 }
 
 export interface MembershipRequestPayload {

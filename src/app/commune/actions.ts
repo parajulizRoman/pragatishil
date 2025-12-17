@@ -1,15 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export async function flagContent(targetId: string, targetType: 'post' | 'thread', reason: string) {
+    console.log(`[flagContent] START: targetId=${targetId}, type=${targetType}, reason=${reason}`);
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
+        console.error("[flagContent] ERROR: User not logged in");
         throw new Error("You must be logged in to report content.");
     }
+    console.log(`[flagContent] User: ${user.id}`);
 
     // 1. Insert Flag
     const { error } = await supabase.from("discussion_flags").insert({
@@ -21,9 +25,11 @@ export async function flagContent(targetId: string, targetType: 'post' | 'thread
     });
 
     if (error) {
-        console.error("Flag error:", error);
-        throw new Error("Failed to report content.");
+        // Detailed error logging
+        console.error("[flagContent] SUPABASE INSERT ERROR:", JSON.stringify(error, null, 2));
+        throw new Error(error.message || "Failed to report content.");
     }
+    console.log("[flagContent] SUCCESS: Flag inserted");
 
     // 2. Automod Logic: Count flags
     // If > threshold, hide content (bury it)

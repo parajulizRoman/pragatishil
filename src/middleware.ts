@@ -55,27 +55,37 @@ export async function middleware(request: NextRequest) {
     )
 
     // Refresh session if needed
-    const { data: { user } } = await supabase.auth.getUser()
+    // IMPORTANT: using getSession() is faster (no DB call) but less secure than getUser().
+    // For general middleware routing/session refreshing, getSession is acceptable if RLS handles data security.
+    // For general middleware routing/session refreshing, getSession is acceptable if RLS handles data security.
+    await supabase.auth.getSession()
+    // const user = session?.user // Unused
 
     // Protected Route Logic
     if (request.nextUrl.pathname.startsWith('/admin')) {
-        if (!user) {
-            console.log("Middleware: No user session found for /admin")
-            return NextResponse.redirect(new URL('/join', request.url)) // Or a dedicated /login page
+        // For Admin routes, we MUST verify with getUser() to ensure the user isn't banned/deleted
+        const { data: { user: verifiedUser }, error } = await supabase.auth.getUser()
+
+        if (!verifiedUser || error) {
+            console.log("Middleware: No verified user session found for /admin")
+            return NextResponse.redirect(new URL('/join', request.url))
         }
 
         // Check ADMIN role
         const { data: profile } = await supabase
             .from('profiles')
             .select('role')
-            .eq('id', user.id)
+            .eq('id', verifiedUser.id)
             .single()
 
-        console.log(`Middleware: User ${user.email} (ID: ${user.id}) has role: ${profile?.role}`)
+        console.log(`Middleware: User ${verifiedUser.email} (ID: ${verifiedUser.id}) has role: ${profile?.role}`)
 
-        if (!profile || profile.role !== 'admin') {
-            console.warn(`Unauthorized access attempt to admin by ${user.email}`)
-            return NextResponse.redirect(new URL('/', request.url)) // Redirect non-admins to home
+        if (!profile || profile.role !== 'admin_party') { // Fixed: role is 'admin_party' in types
+            // Allow 'yantrik' too if needed, but strict admin check usually means admin_party
+            if (profile?.role !== 'yantrik') {
+                console.warn(`Unauthorized access attempt to admin by ${verifiedUser.email}`)
+                return NextResponse.redirect(new URL('/', request.url))
+            }
         }
     }
 

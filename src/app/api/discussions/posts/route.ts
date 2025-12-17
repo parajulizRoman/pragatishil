@@ -7,21 +7,28 @@ export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const threadId = searchParams.get("thread_id");
+        const userId = searchParams.get("user_id");
 
-        if (!threadId) {
-            return NextResponse.json({ error: "Missing thread_id" }, { status: 400 });
+        if (!threadId && !userId) {
+            return NextResponse.json({ error: "Missing thread_id or user_id" }, { status: 400 });
         }
 
         const supabase = await createClient();
         const { data: { user } } = await supabase.auth.getUser();
 
         // 1. Fetch Posts
-        const { data: posts, error } = await supabase
+        let query = supabase
             .from("discussion_posts")
-            .select("*")
-            .eq("thread_id", threadId)
-            .is("deleted_at", null) // Exclude soft-deleted
-            .order("created_at", { ascending: true });
+            .select("*, attachments:discussion_post_attachments(id, storage_path, file_name, type), author:profiles!author_id(full_name, avatar_url, role), thread:discussion_threads(title, id)")
+            .is("deleted_at", null);
+
+        if (threadId) {
+            query = query.eq("thread_id", threadId).order("created_at", { ascending: true });
+        } else if (userId) {
+            query = query.eq("author_id", userId).order("created_at", { ascending: false });
+        }
+
+        const { data: posts, error } = await query;
 
         if (error) {
             console.error("Error fetching posts:", error);

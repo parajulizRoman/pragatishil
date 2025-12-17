@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -5,6 +7,7 @@ import Link from "next/link";
 import { DiscussionChannel, UserRole } from "@/types";
 import ChannelModal from "./ChannelModal";
 import { createBrowserClient } from "@supabase/ssr";
+import { canManageChannels, canManageUsers } from "@/lib/permissions";
 
 export default function CommunityPage() {
     const [channels, setChannels] = useState<DiscussionChannel[]>([]);
@@ -73,7 +76,9 @@ export default function CommunityPage() {
     if (loading) return <div className="p-10 text-center">Loading community...</div>;
     if (error) return <div className="p-10 text-center text-red-500">Error: {error}</div>;
 
-    const isAdmin = userRole === 'admin_party' || userRole === 'yantrik';
+    // Use Capability Helpers
+    const canEditChannels = canManageChannels(userRole);
+    const canManageAll = canManageUsers(userRole); // For broader admin
 
     // Grouping Logic
     const grouped = {
@@ -85,7 +90,7 @@ export default function CommunityPage() {
     const renderChannelCard = (channel: DiscussionChannel) => (
         <Link key={channel.id} href={`/commune/${channel.slug || channel.id}`} className="block group h-full relative">
             <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all hover:border-brand-blue/50 h-full flex flex-col relative">
-                {isAdmin && (
+                {canEditChannels && (
                     <button
                         onClick={(e) => handleEdit(e, channel)}
                         className="absolute top-2 right-2 p-1.5 text-slate-300 hover:text-brand-blue hover:bg-blue-50 rounded-full transition-colors z-10"
@@ -179,7 +184,7 @@ export default function CommunityPage() {
             )}
 
             {/* Admin Create Action */}
-            {isAdmin && (
+            {canEditChannels && (
                 <div className="mt-12 text-center">
                     <button
                         onClick={handleCreate}

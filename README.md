@@ -44,8 +44,41 @@ Open [http://localhost:3000](http://localhost:3000).
 ### 4. Build & Production
 ```bash
 npm run build
+npm run build
 npm start
 ```
+
+## Supabase: Migrations & CLI
+
+We use the standard Supabase CLI structure. Migrations are stored in `supabase/migrations/`.
+
+### Quickstart for New Devs
+
+```bash
+# 1. Login to Supabase CLI (if not already logged in)
+npx supabase login
+
+# 2. Link to the Remote Project (First time only)
+# Project Ref: ivlpnaxrefpihtgdlidc
+npx supabase link --project-ref ivlpnaxrefpihtgdlidc
+
+# 3. Push Migrations
+# This applies local SQL files to the remote database
+npx supabase db push
+```
+
+### Production Safety Notes
+> [!IMPORTANT]  
+> **Never run destructive SQL directly in the Supabase Dashboard.**
+
+1.  **Always Backup**: Backup your production DB via the dashboard before applying major changes.
+2.  **Use Migrations**: All schema changes must be written as SQL files in `supabase/migrations/`.
+3.  **Review Changes**: Use `npx supabase db diff` (if local Docker is running) or carefully review SQL files before pushing.
+
+### Common Commands
+- **`npx supabase db push`**: Applies pending migrations to the linked remote project.
+- **`npx supabase start`**: Starts a local Supabase instance (requires Docker) for testing.
+- **`npx supabase stop`**: Stops the local instance.
 
 ## Engineering Standards
 

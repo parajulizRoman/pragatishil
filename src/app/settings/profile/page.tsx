@@ -1,7 +1,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+// import Link from "next/link";
 import ProfileForm from "./ProfileForm";
+import MyPosts from "./MyPosts";
 import { Profile } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -67,6 +69,9 @@ export default async function SettingsProfilePage() {
     }
 
     return (
-        <ProfileForm profile={profile as Profile} />
+        <div className="max-w-4xl mx-auto">
+            <ProfileForm profile={profile as Profile} />
+            <MyPosts userId={user.id} />
+        </div>
     );
 }

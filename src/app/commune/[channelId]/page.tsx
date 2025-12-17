@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -6,6 +7,8 @@ import { useParams } from "next/navigation";
 import { DiscussionThread, DiscussionChannel } from "@/types";
 import { createBrowserClient } from "@supabase/ssr";
 import { flagContent } from "@/app/commune/actions";
+import TextareaAutosize from 'react-textarea-autosize';
+import { Paperclip, X, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
 
 export default function ChannelPage() {
     const params = useParams();
@@ -15,34 +18,25 @@ export default function ChannelPage() {
     const [threads, setThreads] = useState<DiscussionThread[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Thread Creation State
+    const [showForm, setShowForm] = useState(false);
+    const [newTitle, setNewTitle] = useState("");
+    const [newBody, setNewBody] = useState("");
+    const [isNewThreadAnon, setIsNewThreadAnon] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
+
+    // Attachments State
+    const [attachments, setAttachments] = useState<{ file: File, meta: any }[]>([]);
+    const [isUploading, setIsUploading] = useState(false);
+
+    // UI Tabs
     const [activeTab, setActiveTab] = useState<'discussions' | 'resources' | 'impact'>('discussions');
 
     // Flagging
     const [flagThreadId, setFlagThreadId] = useState<string | null>(null);
     const [flagReason, setFlagReason] = useState("other");
     const [isFlagging, setIsFlagging] = useState(false);
-
-    // New Thread Form State - Re-adding strictly as declared variables even if unused to avoid breaks, 
-    // though previously I removed them. 
-    // Wait, the previous edit REMOVED showForm, newTitle etc state variables from the code!
-    // But the `handleCreateThread` function (which I elided in previous view but was in the file?) 
-    // actually, my previous REPLACE (Step 2667) removed them!
-    // But it kept `handleCreateThread`... wait, did it?
-    // In Step 2667, I replaced lines 17-216 (huge block).
-    // And in the replacement content, I had `// ... existing handleCreateThread ...`
-    // THIS IS BAD. I replaced the actual code with a comment!
-    // I need to RESTORE the missing code.
-
-    // ...
-    // Since I cannot know exactly what I deleted without undoing (which I can't easily), I must RE-WRITE the missing logic.
-    // I know what it was (Create Thread Form logic). I will restore it.
-
-    // New Thread Form State
-    const [showForm, setShowForm] = useState(false);
-    const [newTitle, setNewTitle] = useState("");
-    const [newBody, setNewBody] = useState("");
-    const [isNewThreadAnon, setIsNewThreadAnon] = useState(false);
 
     // Auth check
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -62,34 +56,26 @@ export default function ChannelPage() {
         try {
             // Determine if channelId is UUID or Slug
             const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(channelId);
-            const channelQuery = isUuid ? `id=${channelId}` : `slug=${channelId}`;
 
-            // Paralell fetch
-            const [channelRes, threadRes] = await Promise.all([
+            // Construct queries for parallel fetching
+            const channelQuery = isUuid ? `id=${channelId}` : `slug=${channelId}`;
+            const threadsQuery = isUuid ? `channel_id=${channelId}` : `channel_slug=${channelId}`;
+
+            // Parallel fetch: Get Channel Info AND Threads Query
+            const [cRes, tRes] = await Promise.all([
                 fetch(`/api/discussions/channels?${channelQuery}`),
-                // We initially fetch threads by channel ID, but if we only have slug, we need channel data first.
-                // However, fetching concurrently is faster.
-                // Does `api/discussions/threads` support slug? Let's check. 
-                // Likely not. So we might need sequential fetch if slug is used.
-                // Or update threads API. But let's actally chain them if slug.
-                // Actually, let's keep it simple: fetch channel first, then threads using the channel's ID.
-                fetch(`/api/discussions/channels?${channelQuery}`)
+                fetch(`/api/discussions/threads?${threadsQuery}`)
             ]);
 
-            // Wait, I can't do parallel if threads needs ID and I only have slug.
-            // Let's refactor to sequential for safety and simplicity with slugs.
-
-            const cRes = await fetch(`/api/discussions/channels?${channelQuery}`);
             if (!cRes.ok) throw new Error("Failed to load channel");
-            const cData = await cRes.json();
-            if (cData.channels.length === 0) throw new Error("Channel not found");
-            const fetchedChannel = cData.channels[0];
-            setChannel(fetchedChannel);
-
-            // Now fetch threads
-            const tRes = await fetch(`/api/discussions/threads?channel_id=${fetchedChannel.id}`);
             if (!tRes.ok) throw new Error("Failed to load threads");
+
+            const cData = await cRes.json();
             const tData = await tRes.json();
+
+            if (cData.channels.length === 0) throw new Error("Channel not found");
+
+            setChannel(cData.channels[0]);
             setThreads(tData.threads);
 
         } catch (err: any) {
@@ -105,21 +91,79 @@ export default function ChannelPage() {
         }
     }, [channelId, fetchData]);
 
+    // Attachment Helpers
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files) return;
+        const files = Array.from(e.target.files);
+
+        setIsUploading(true);
+        try {
+            const newAttachments = [];
+            for (const file of files) {
+                // 1. Get Signed URL
+                const res = await fetch("/api/discussions/attachments/sign-url", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        filename: file.name,
+                        fileType: file.type,
+                        sizeBytes: file.size
+                    })
+                });
+
+                if (!res.ok) throw new Error(await res.text());
+                const { uploadUrl, storagePath } = await res.json();
+
+                // 2. Upload to Storage
+                await fetch(uploadUrl, {
+                    method: "PUT",
+                    body: file,
+                    headers: { "Content-Type": file.type }
+                });
+
+                // 3. Add to local state
+                newAttachments.push({
+                    file,
+                    meta: {
+                        storagePath,
+                        fileName: file.name,
+                        mimeType: file.type,
+                        sizeBytes: file.size,
+                        type: file.type.startsWith("image/") ? "image" : (file.type === "application/pdf" ? "pdf" : "file")
+                    }
+                });
+            }
+            setAttachments(prev => [...prev, ...newAttachments]);
+        } catch (err: any) {
+            alert("Upload failed: " + err.message);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const removeAttachment = (idx: number) => {
+        setAttachments(prev => prev.filter((_, i) => i !== idx));
+    };
+
+
     const handleCreateThread = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newTitle.trim()) return;
 
         setIsCreating(true);
         try {
+            const payload = {
+                channelId,
+                title: newTitle,
+                content: newBody,
+                isAnon: isNewThreadAnon,
+                attachments: attachments.map(a => a.meta)
+            };
+
             const res = await fetch("/api/discussions/threads", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    channelId,
-                    title: newTitle,
-                    content: newBody,
-                    isAnon: isNewThreadAnon
-                }),
+                body: JSON.stringify(payload),
             });
 
             if (!res.ok) {
@@ -129,6 +173,7 @@ export default function ChannelPage() {
 
             setNewTitle("");
             setNewBody("");
+            setAttachments([]);
             setShowForm(false);
             fetchData(); // Refresh list
         } catch (err: any) {
@@ -160,6 +205,7 @@ export default function ChannelPage() {
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-5xl">
+            {/* Header */}
             <div className="mb-6">
                 <Link href="/commune" className="text-sm text-slate-500 hover:text-brand-blue mb-2 inline-block">
                     &larr; Back to Channels
@@ -206,7 +252,7 @@ export default function ChannelPage() {
                                 value={newTitle}
                                 maxLength={140}
                                 onChange={(e) => setNewTitle(e.target.value)}
-                                className="w-full border border-slate-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-brand-blue/20 focus:outline-none text-lg font-semibold placeholder:font-normal"
+                                className="form-input text-lg font-semibold"
                                 placeholder={channel.allow_anonymous_posts ? "Topic of discussion..." : "What's on your mind?"}
                                 required
                             />
@@ -215,13 +261,36 @@ export default function ChannelPage() {
                         {/* Body Input */}
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-slate-700 mb-1">Content <span className="text-slate-400 font-normal">(Markdown supported)</span></label>
-                            <textarea
+                            <TextareaAutosize
+                                minRows={5}
                                 value={newBody}
                                 onChange={(e) => setNewBody(e.target.value)}
-                                className="w-full border border-slate-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-brand-blue/20 focus:outline-none min-h-[160px] resize-y text-slate-800"
+                                className="form-input resize-none"
                                 placeholder="Share your detailed thoughts, arguments, or questions..."
                                 required
                             />
+
+                            {/* Attachment List */}
+                            {attachments.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                    {attachments.map((att, i) => (
+                                        <div key={i} className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-sm">
+                                            {att.meta.type === 'image' ? <ImageIcon size={14} className="text-blue-500" /> : <FileText size={14} className="text-orange-500" />}
+                                            <span className="truncate max-w-[150px]">{att.meta.fileName}</span>
+                                            <button type="button" onClick={() => removeAttachment(i)} className="text-slate-400 hover:text-red-500"><X size={14} /></button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Toolbar */}
+                            <div className="mt-2 flex items-center">
+                                <label className={`flex items-center gap-2 px-3 py-1.5 rounded hover:bg-slate-100 cursor-pointer text-slate-600 transition-colors ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                    <input type="file" multiple className="hidden" onChange={handleFileSelect} />
+                                    {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Paperclip size={16} />}
+                                    <span className="text-sm font-medium">Attach files</span>
+                                </label>
+                            </div>
                         </div>
 
                         {/* Actions Row */}
@@ -254,7 +323,7 @@ export default function ChannelPage() {
                                 <button
                                     type="submit"
                                     className="bg-brand-blue text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 shadow-sm"
-                                    disabled={isCreating}
+                                    disabled={isCreating || isUploading}
                                 >
                                     {isCreating ? "Publishing..." : "Publish Thread"}
                                 </button>
@@ -343,7 +412,7 @@ export default function ChannelPage() {
             )}
 
             {activeTab === 'resources' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in fade-in slide-in-from-bottom-2">
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
                     {/* Read Me / Guidelines */}
                     <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
                         <h3 className="text-lg font-bold text-brand-navy mb-4 flex items-center gap-2">
@@ -351,39 +420,81 @@ export default function ChannelPage() {
                             Key Documents & ReadMe
                         </h3>
                         {channel.readme_content ? (
-                            <div className="prose prose-sm text-slate-600 whitespace-pre-wrap">
+                            <div className="prose prose-sm text-slate-600 whitespace-pre-wrap max-w-none">
                                 {channel.readme_content}
                             </div>
                         ) : (
-                            <p className="text-slate-400 italic">No specific guidlines or readme content added yet.</p>
-                        )}
-
-                        {channel.docs_url && (
-                            <div className="mt-6 pt-4 border-t border-slate-100">
-                                <a href={channel.docs_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-brand-blue font-medium hover:underline">
-                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                                    Open External Documentation Drive/Folder
-                                </a>
-                            </div>
+                            <p className="text-slate-400 italic">No specific guidelines or readme content added yet.</p>
                         )}
                     </div>
 
-                    {/* Multimedia */}
-                    <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
-                        <h3 className="text-lg font-bold text-brand-navy mb-4 flex items-center gap-2">
-                            <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            Featured Videos
-                        </h3>
-                        {channel.video_playlist_url ? (
-                            <div>
-                                <p className="text-slate-600 mb-4">Watch curated content for this channel.</p>
-                                <a href={channel.video_playlist_url} target="_blank" rel="noopener noreferrer" className="block w-full bg-slate-100 p-8 rounded-lg text-center text-slate-500 hover:bg-slate-200 transition-colors">
-                                    ▶ Click to Watch Playlist
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Documents & Links Column */}
+                        <div className="space-y-6">
+                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                                <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                Documents & Links
+                            </h3>
+
+                            {/* Legacy Doc Link */}
+                            {channel.docs_url && (
+                                <a href={channel.docs_url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-blue-50 border border-blue-100 rounded-lg hover:shadow-md transition-all group">
+                                    <div className="font-semibold text-brand-blue flex items-center gap-2">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+                                        Main Drive Folder (Legacy)
+                                    </div>
+                                    <div className="text-xs text-slate-500 mt-1">External Link</div>
                                 </a>
-                            </div>
-                        ) : (
-                            <p className="text-slate-400 italic">No video content linked yet.</p>
-                        )}
+                            )}
+
+                            {/* Dynamic Resources (docs, links) */}
+                            {channel.resources?.filter(r => ['doc', 'link'].includes(r.type)).map(res => (
+                                <a key={res.id} href={res.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-brand-blue/50 hover:shadow-sm transition-all">
+                                    <div className="font-semibold text-slate-800 flex items-center gap-2">
+                                        {res.type === 'doc' ? '📄' : '🔗'} {res.title}
+                                    </div>
+                                    {/* @ts-ignore */}
+                                    {res.description && <div className="text-xs text-slate-500 mt-1">{res.description}</div>}
+                                </a>
+                            ))}
+
+                            {(!channel.docs_url && (!channel.resources || !channel.resources.some(r => ['doc', 'link'].includes(r.type)))) && (
+                                <p className="text-slate-400 italic text-sm">No documents found.</p>
+                            )}
+                        </div>
+
+                        {/* Videos Column */}
+                        <div className="space-y-6">
+                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                Featured Videos
+                            </h3>
+
+                            {/* Legacy Video Link */}
+                            {channel.video_playlist_url && (
+                                <a href={channel.video_playlist_url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-red-50 border border-red-100 rounded-lg hover:shadow-md transition-all">
+                                    <div className="font-semibold text-red-700 flex items-center gap-2">
+                                        ▶ Official Playlist (Legacy)
+                                    </div>
+                                    <div className="text-xs text-red-500 mt-1">YouTube Playlist</div>
+                                </a>
+                            )}
+
+                            {/* Dynamic Resources (video) */}
+                            {channel.resources?.filter(r => r.type === 'video').map(res => (
+                                <a key={res.id} href={res.url} target="_blank" rel="noopener noreferrer" className="block p-4 bg-white border border-slate-200 rounded-lg hover:border-red-300 hover:shadow-sm transition-all">
+                                    <div className="font-semibold text-slate-800 flex items-center gap-2">
+                                        📺 {res.title}
+                                    </div>
+                                    {/* @ts-ignore */}
+                                    {res.description && <div className="text-xs text-slate-500 mt-1">{res.description}</div>}
+                                </a>
+                            ))}
+
+                            {(!channel.video_playlist_url && (!channel.resources || !channel.resources.some(r => r.type === 'video'))) && (
+                                <p className="text-slate-400 italic text-sm">No videos found.</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
@@ -396,6 +507,7 @@ export default function ChannelPage() {
                             {Object.entries(channel.impact_stats).map(([key, value]) => (
                                 <div key={key} className="p-4 bg-slate-50 rounded-lg">
                                     <div className="text-3xl font-bold text-brand-blue mb-1">{String(value)}</div>
+                                    {/* @ts-ignore */}
                                     <div className="text-sm text-slate-600 uppercase tracking-wide font-medium">{key.replace(/_/g, ' ')}</div>
                                 </div>
                             ))}

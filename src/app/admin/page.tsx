@@ -39,7 +39,7 @@ export default function AdminDashboard() {
     const cards = [
         { label: "Total News Articles", value: stats.newsCount, icon: Newspaper, color: "bg-brand-blue", href: "/admin/news" },
         { label: "Media Items", value: stats.mediaCount, icon: Image, color: "bg-purple-500", href: "/admin/media" },
-        { label: "Total Members", value: stats.membersCount, icon: Users, color: "bg-brand-red", href: "#" }, // No members admin page widely exposed yet
+        { label: "Total Members", value: stats.membersCount, icon: Users, color: "bg-brand-red", href: "/admin/users" }, // Link to new User Portal
         { label: "Site Views (Est)", value: stats.views, icon: Eye, color: "bg-orange-500", href: "#" },
     ];
 
@@ -98,6 +98,9 @@ export default function AdminDashboard() {
                         </Link>
                         <Link href="/admin/settings" className="p-4 bg-slate-50 text-slate-700 rounded-lg text-center font-medium hover:bg-slate-100 transition-colors">
                             Settings
+                        </Link>
+                        <Link href="/admin/users" className="p-4 bg-red-50 text-brand-red rounded-lg text-center font-medium hover:bg-red-100 transition-colors">
+                            Manage Users
                         </Link>
                     </div>
                 </div>

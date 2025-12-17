@@ -1,4 +1,6 @@
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { createClient } from "@/lib/supabase/server"; // Use helper or direct
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -16,7 +18,7 @@ export default async function ProfilePage({ params }: { params: { id: string } }
     const { data: { user } } = await supabase.auth.getUser();
 
     // Fetch viewer profile to get role
-    let viewerRole: UserRole = 'anonymous_visitor';
+    let viewerRole: UserRole = 'guest';
     if (user) {
         const { data: viewerProfile } = await supabase
             .from('profiles')
@@ -288,7 +290,7 @@ async function ActivityFeed({ userId }: { userId: string }) {
                     {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {threads?.map((thread: any) => (
                         <div key={thread.id} className="group">
-                            <Link href={`/commune/${thread.channel?.slug}/thread/${thread.id}`} className="block">
+                            <Link href={`/commune/thread/${thread.id}`} className="block">
                                 <p className="font-medium text-slate-800 group-hover:text-brand-blue transition-colors line-clamp-1">
                                     {thread.title}
                                 </p>
@@ -321,7 +323,7 @@ async function ActivityFeed({ userId }: { userId: string }) {
 
                         return (
                             <div key={post.id} className="group">
-                                <Link href={`/commune/${channelSlug}/thread/${threadId}#post-${post.id}`} className="block">
+                                <Link href={`/commune/thread/${threadId}#post-${post.id}`} className="block">
                                     <p className="text-slate-600 text-sm group-hover:text-slate-900 transition-colors line-clamp-2 italic">
                                         &quot;{post.content}&quot;
                                     </p>
@@ -337,27 +339,33 @@ async function ActivityFeed({ userId }: { userId: string }) {
                     {(!posts || posts.length === 0) && <p className="text-slate-400 text-sm">No comments made.</p>}
                 </div>
             </div>
-        </div>
+        </div >
     );
 }
 
 function RoleBadge({ role }: { role: UserRole }) {
-    const config = {
+    const config: Record<string, { color: string; icon: any; label: string }> = {
         'admin_party': { color: 'bg-red-100 text-red-700 border-red-200', icon: Crown, label: "Political Admin" },
         'yantrik': { color: 'bg-slate-100 text-slate-700 border-slate-200', icon: Shield, label: "Yantrik" },
         'central_committee': { color: 'bg-blue-100 text-blue-700 border-blue-200', icon: Shield, label: "Central Committee" },
         'team_member': { color: 'bg-green-100 text-green-700 border-green-200', icon: User, label: "Team Member" },
         'party_member': { color: 'bg-brand-red/10 text-brand-red border-brand-red/20', icon: User, label: "Party Member" },
         'supporter': { color: 'bg-slate-100 text-slate-600 border-slate-200', icon: null, label: "Supporter" },
-        'anonymous_visitor': { color: 'bg-slate-50 text-slate-400 border-slate-100', icon: null, label: "Guest" },
-    }[role] || { color: 'bg-slate-100', icon: null, label: role };
+        'guest': { color: 'bg-slate-50 text-slate-400 border-slate-100', icon: null, label: "Guest" },
+        'member': { color: 'bg-slate-100 text-slate-600 border-slate-200', icon: User, label: "Member" },
+        'volunteer': { color: 'bg-green-50 text-green-600 border-green-100', icon: User, label: "Volunteer" },
+        'board': { color: 'bg-purple-100 text-purple-700 border-purple-200', icon: Crown, label: "Board Member" },
+        'admin': { color: 'bg-red-900 text-white border-red-800', icon: Shield, label: "System Admin" },
+    };
 
-    const Icon = config.icon;
+    const style = config[role] || { color: 'bg-slate-100', icon: null, label: role };
+
+    const Icon = style.icon;
 
     return (
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${config.color}`}>
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border ${style.color}`}>
             {Icon && <Icon size={12} strokeWidth={2.5} />}
-            {config.label}
+            {style.label}
         </span>
     );
 }
