@@ -599,7 +599,7 @@ export default function JoinPage() {
             <main className="min-h-screen flex items-center justify-center py-12 px-4 md:px-8 font-sans bg-gradient-to-br from-blue-50 to-red-50">
                 <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                     <div className="bg-brand-blue p-8 text-white text-center">
-                        <h1 className="text-2xl font-bold mb-2">Aaviyanमा सामेल हुनुहोस्</h1>
+                        <h1 className="text-2xl font-bold mb-2">आभियानमा सामेल हुनुहोस्</h1>
                         <p className="text-blue-100 text-lg">Join the Movement</p>
                     </div>
                     <div className="p-8 text-center space-y-6">
