@@ -40,3 +40,20 @@ SELECT
 FROM auth.users u
 WHERE NOT EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = u.id)
 ON CONFLICT (id) DO NOTHING;
+
+-- 4. FIX RLS: Add INSERT policy for profiles
+-- Problem: No INSERT policy existed, so trigger couldn't create profiles
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow trigger insert" ON public.profiles;
+DROP POLICY IF EXISTS "Profiles Insert Self" ON public.profiles;
+
+CREATE POLICY "Profiles Insert Self"
+ON public.profiles
+FOR INSERT
+TO authenticated
+WITH CHECK (id = auth.uid());
+
+-- Refresh PostgREST schema cache
+NOTIFY pgrst, 'reload schema';
+
