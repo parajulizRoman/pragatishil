@@ -131,8 +131,19 @@ export default function JoinPage() {
                     ...prev,
                     email: user.email || prev.email,
                     fullNameEn: user.user_metadata?.full_name || prev.fullNameEn,
-                    // If we wanted to map name to Nepali field we could, but better to keep separate
                 }));
+
+                // Check if user already has a membership application
+                const { data: existingMember } = await supabase
+                    .from('members')
+                    .select('id')
+                    .eq('auth_user_id', user.id)
+                    .maybeSingle();
+
+                if (existingMember) {
+                    // Already a member - redirect to community
+                    window.location.href = '/commune';
+                }
             }
         };
         checkUser();
