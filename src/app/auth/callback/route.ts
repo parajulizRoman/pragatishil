@@ -54,6 +54,7 @@ export async function GET(request: Request) {
                             .from('profiles')
                             .insert({
                                 id: user.id,
+                                email: user.email,
                                 full_name: fullName,
                                 avatar_url: avatarUrl,
                                 role: 'member',

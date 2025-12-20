@@ -9,7 +9,6 @@ import { User } from "@supabase/supabase-js";
 import { NestedProvince } from "@/lib/geo";
 import Cropper, { Area } from "react-easy-crop";
 import getCroppedImg from "@/lib/cropImage";
-import { devanagariToEnglish, englishToDevanagari } from "@/lib/transliterate";
 
 
 // Hardcoded departments matching DB schema where possible or generic list
@@ -600,7 +599,7 @@ export default function JoinPage() {
             <main className="min-h-screen flex items-center justify-center py-12 px-4 md:px-8 font-sans bg-gradient-to-br from-blue-50 to-red-50">
                 <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
                     <div className="bg-brand-blue p-8 text-white text-center">
-                        <h1 className="text-2xl font-bold mb-2">आभियानमा सामेल हुनुहोस्</h1>
+                        <h1 className="text-2xl font-bold mb-2">Aaviyanमा सामेल हुनुहोस्</h1>
                         <p className="text-blue-100 text-lg">Join the Movement</p>
                     </div>
                     <div className="p-8 text-center space-y-6">
@@ -703,59 +702,9 @@ export default function JoinPage() {
                         <h2 className={sectionTitleStyle}>२. व्यक्तिगत विवरण (Personal Details)</h2>
 
                         <div className="grid md:grid-cols-2 gap-6">
-                            <div className="md:col-span-2">
+                            <div>
                                 <label className={labelStyle}>नाम थर (Full Name) <span className="text-brand-red">*</span></label>
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    {/* Nepali Name */}
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            name="fullNameNe"
-                                            value={formData.fullNameNe}
-                                            onChange={handleChange}
-                                            className={inputStyle}
-                                            placeholder="नेपालीमा नाम"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                if (formData.fullNameNe) {
-                                                    setFormData(p => ({ ...p, fullNameEn: devanagariToEnglish(p.fullNameNe) }));
-                                                }
-                                            }}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded hover:bg-blue-200 transition-colors"
-                                            title="Transliterate to English"
-                                        >
-                                            → EN
-                                        </button>
-                                        <span className="text-xs text-slate-500 mt-1 block">नेपालीमा (Nepali)</span>
-                                    </div>
-                                    {/* English Name */}
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            name="fullNameEn"
-                                            value={formData.fullNameEn}
-                                            onChange={handleChange}
-                                            className={inputStyle}
-                                            placeholder="Name in English"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                if (formData.fullNameEn) {
-                                                    setFormData(p => ({ ...p, fullNameNe: englishToDevanagari(p.fullNameEn) }));
-                                                }
-                                            }}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 transition-colors"
-                                            title="Transliterate to Nepali"
-                                        >
-                                            → ने
-                                        </button>
-                                        <span className="text-xs text-slate-500 mt-1 block">English</span>
-                                    </div>
-                                </div>
+                                <input type="text" name="fullNameNe" value={formData.fullNameNe} onChange={handleChange} className={inputStyle} required />
                             </div>
                             <div>
                                 <label className={labelStyle}>लिङ्ग (Gender) <span className="text-brand-red">*</span></label>
