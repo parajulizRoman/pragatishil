@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { BrandButton } from "@/components/BrandButton";
+import { Button } from "@/components/ui/button";
+import { Typography } from "@/components/ui/typography";
 import { SectionHeader } from "@/components/SectionHeader";
 import { useLanguage } from "@/context/LanguageContext";
 import { SiteSettings, NewsItem, MediaVideo } from "@/types/cms";
 import { siteContent as fallbackContent } from "@/config/siteContent";
+import { cn } from "@/lib/utils";
 
 interface HomeClientProps {
     content: SiteSettings;
@@ -16,8 +18,20 @@ interface HomeClientProps {
 export default function HomeClient({ content, news, videos }: HomeClientProps) {
     const { t } = useLanguage();
 
-    // Fallback if fetch failed completely and content is null (shouldn't happen with getSiteSettings logic but safe)
-    const c = content || fallbackContent;
+    // Defensive Merge: Ensure every section has defaults even if DB returns partial objects
+    const c = {
+        ...fallbackContent,
+        ...content,
+        hero: { ...fallbackContent.hero, ...content?.hero },
+        vision: { ...fallbackContent.vision, ...content?.vision, pillars: content?.vision?.pillars || fallbackContent.vision.pillars },
+        nav: { ...fallbackContent.nav, ...content?.nav },
+        about: { ...fallbackContent.about, ...content?.about },
+        contact: { ...fallbackContent.contact, ...content?.contact },
+        // Arrays are harder to merge deeply, we usually take DB if it exists and has length, else default
+        social: (content?.social && content.social.length > 0) ? content.social : fallbackContent.social,
+        footer: { ...fallbackContent.footer, ...content?.footer },
+    };
+
     const n = news && news.length > 0 ? news : fallbackContent.news;
     const v = videos && videos.length > 0 ? videos : fallbackContent.videos;
 
@@ -25,25 +39,27 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
         <main className="flex flex-col min-h-screen">
 
             {/* Hero Section */}
-            <section className="relative w-full h-[85vh] flex items-center justify-center overflow-hidden text-white">
+            <section className="relative w-full min-h-[90vh] flex items-center justify-center overflow-hidden text-center pb-20 pt-32">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.03] z-0 pointer-events-none"></div>
 
-                {/* Background Tri-color Gradient - Managed by body globally */}
-                <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10 z-0"></div>
+                {/* Ambient Glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-white/40 blur-[120px] rounded-full -z-10"></div>
 
-                <div className="relative z-10 container mx-auto px-4 text-center">
+                <div className="relative z-10 container mx-auto px-4 flex flex-col items-center max-w-5xl">
                     {/* Slogan Pill */}
-                    <div className="inline-block mb-6 px-4 py-1.5 border border-brand-navy/20 bg-white/10 backdrop-blur-sm rounded-full text-brand-navy text-sm md:text-base font-bold tracking-wide shadow-sm">
+                    <div className="inline-flex items-center justify-center px-6 py-2 mb-8 border border-brand-navy/10 bg-white/60 backdrop-blur-md rounded-full text-brand-navy text-sm md:text-base font-bold tracking-wide shadow-sm animate-fade-in-up">
                         {t(c.nav.brand.firstEn + " " + c.nav.brand.secondEn, c.hero.pillNe)}
                     </div>
 
-                    {/* Main Title (Bilingual) */}
-                    <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 drop-shadow-xl leading-tight text-slate-900">
+                    {/* Main Title */}
+                    <Typography as="h1" variant="h1" className="mb-6 drop-shadow-sm leading-[1.1] !text-5xl md:!text-7xl lg:!text-8xl">
                         {(() => {
                             const text = t(c.hero.titleEn, c.hero.titleNe);
                             const words = text.split(" ");
                             return words.map((word, i) => {
-                                const lower = word.toLowerCase().replace(/[^a-z\u0900-\u097f]/g, ""); // Keep mainly letters
-                                let colorClass = "text-slate-900"; // Default
+                                const lower = word.toLowerCase().replace(/[^a-z\u0900-\u097f]/g, "");
+                                let colorClass = "text-brand-navy";
 
                                 if (lower.includes("pragatishil") || lower.includes("प्रगतिशील")) colorClass = "text-brand-red";
                                 else if (lower.includes("loktantrik") || lower.includes("लोकतान्त्रिक")) colorClass = "text-brand-blue";
@@ -51,38 +67,42 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
                                 else if (lower.includes("welcome") || lower.includes("स्वागत") || lower.includes("छ")) colorClass = "text-brand-blue";
 
                                 return (
-                                    <span key={i} className={`${colorClass} inline-block mr-2 md:mr-3`}>
+                                    <span key={i} className={`${colorClass} inline-block mx-1.5`}>
                                         {word}
                                     </span>
                                 );
                             });
                         })()}
-                    </h1>
+                    </Typography>
 
-                    {/* Secondary Line (Bilingual) */}
-                    <h2 className="text-2xl md:text-3xl font-bold text-blue-900 mb-6 drop-shadow-md">
+                    {/* Secondary Line */}
+                    <Typography variant="h2" className="!text-2xl md:!text-4xl text-brand-blue/90 mb-8 font-bold border-none !pb-0">
                         {t(c.hero.subtitleEnLine1, c.hero.subtitleNe)}
-                    </h2>
+                    </Typography>
 
-                    {/* English/Nepali Support Text */}
-                    <div className="max-w-3xl mx-auto mb-10 text-blue-950 font-medium text-lg md:text-xl space-y-1">
-                        <p>{t(c.hero.subtitleEnLine2, "")}</p>
-                    </div>
+                    {/* Support Text */}
+                    <Typography variant="lead" className="max-w-2xl mx-auto mb-12 text-brand-navy/70 text-lg md:text-xl font-medium">
+                        {t(c.hero.subtitleEnLine2, "")}
+                    </Typography>
 
                     {/* Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-5 justify-center items-center">
-                        <BrandButton href="/join" variant="primary" className="px-8 py-4 text-lg">
-                            {t(c.hero.ctaPrimary, c.nav.join.ne)}
-                        </BrandButton>
-                        <BrandButton href="/members" variant="secondary" className="px-8 py-4 text-lg border-slate-400 text-slate-100 hover:text-white hover:border-white">
-                            {t(c.hero.ctaSecondary, c.nav.members.ne)}
-                        </BrandButton>
+                    <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto">
+                        <Button asChild size="lg" className="px-10 py-7 text-lg shadow-xl shadow-brand-red/20 bg-brand-red hover:bg-brand-red/90 rounded-full transition-transform hover:-translate-y-1">
+                            <Link href="/join">
+                                {t(c.hero.ctaPrimary, c.nav.join.ne)}
+                            </Link>
+                        </Button>
+                        <Button asChild variant="outline" size="lg" className="px-10 py-7 text-lg border-brand-navy/20 text-brand-navy hover:bg-white/80 backdrop-blur-sm rounded-full transition-transform hover:-translate-y-1">
+                            <Link href="/members">
+                                {t(c.hero.ctaSecondary, c.nav.members.ne)}
+                            </Link>
+                        </Button>
                     </div>
                 </div>
             </section>
 
             {/* Vision Section */}
-            <section className="py-24 bg-white/60 backdrop-blur-sm">
+            <section className="py-24 bg-white/60 backdrop-blur-sm relative z-20">
                 <div className="container mx-auto px-4">
                     <div className="text-center max-w-4xl mx-auto mb-16">
                         <SectionHeader
@@ -95,9 +115,9 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {c.vision.pillars.map((pillar, idx) => (
-                            <div key={idx} className="p-8 bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group">
-                                <div className="text-5xl mb-6 transform group-hover:scale-110 transition-transform duration-300">{pillar.icon}</div>
-                                <h4 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-blue transition-colors">
+                            <div key={idx} className="p-8 bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group hover:-translate-y-1">
+                                <div className="text-5xl mb-6 transform group-hover:scale-110 transition-transform duration-300 drop-shadow-md">{pillar.icon}</div>
+                                <h4 className="text-xl font-bold text-brand-navy mb-3 group-hover:text-brand-blue transition-colors">
                                     {t(pillar.titleEn, pillar.titleNe)}
                                 </h4>
                                 <p className="text-slate-600 leading-relaxed text-sm">
@@ -110,73 +130,97 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
             </section>
 
             {/* Latest News Section */}
-            <section className="py-20 bg-white/80 backdrop-blur-md">
+            <section className="py-24 bg-brand-bg relative z-20 border-t border-brand-navy/5">
                 <div className="container mx-auto px-4">
-                    <div className="flex justify-between items-end mb-12 border-b border-slate-100 pb-4">
+                    <div className="flex justify-between items-end mb-12 border-b border-slate-200 pb-4">
                         <div>
-                            <h2 className="text-3xl font-bold text-slate-900">{t("Latest News & Media", "ताजा समाचार र मिडिया")}</h2>
+                            <Typography variant="h2" className="border-none !pb-0 mb-1">{t("Latest News", "ताजा समाचार")}</Typography>
+                            <Typography variant="muted">{t("Updates from the party", "पार्टीका गतिविधिहरु")}</Typography>
                         </div>
-                        <Link href="/news" className="text-brand-blue font-semibold hover:underline hidden md:block">
-                            {t("View all news", "सबै समाचार हेर्नुहोस्")} &rarr;
-                        </Link>
+                        <Button variant="link" asChild className="hidden md:flex text-brand-blue font-semibold">
+                            <Link href="/news">
+                                {t("View all news", "सबै समाचार हेर्नुहोस्")} &rarr;
+                            </Link>
+                        </Button>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {n.slice(0, 3).map((item) => (
                             <Link key={item.id} href={item.link} className="block group h-full">
-                                <div className="bg-slate-50 rounded-xl overflow-hidden hover:shadow-lg transition-all border border-slate-100 flex flex-col h-full">
+                                <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full hover:-translate-y-1">
                                     {/* Image */}
-                                    {item.image && (
-                                        <div className="relative h-48 w-full overflow-hidden">
+                                    {(item.image_url || item.image) && (
+                                        <div className="relative h-56 w-full overflow-hidden">
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img
-                                                src={item.image}
+                                                src={item.image_url || item.image}
                                                 alt={item.title}
-                                                className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-500"
+                                                className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-700"
                                             />
+                                            <div className="absolute top-3 left-3">
+                                                <span className={cn(
+                                                    "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide",
+                                                    item.type === 'Video' ? 'bg-brand-red text-white shadow-md' : 'bg-brand-blue text-white shadow-md'
+                                                )}>
+                                                    {item.type}
+                                                </span>
+                                            </div>
                                         </div>
                                     )}
                                     <div className="p-6 flex-1 flex flex-col">
-                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3 self-start
-                                      ${item.type === 'Video' ? 'bg-red-50 text-brand-red border border-red-100' : 'bg-blue-50 text-brand-blue border border-blue-100'}`}>
-                                            {item.type}
-                                        </span>
-                                        <h3 className="text-lg font-bold text-slate-800 mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors">{item.title}</h3>
-                                        <p className="text-sm text-slate-500 mt-auto">{item.source} • {item.date}</p>
+                                        <h3 className="text-lg font-bold text-brand-navy mb-3 line-clamp-2 group-hover:text-brand-blue transition-colors">
+                                            {t(item.title, item.title_ne || item.title)}
+                                        </h3>
+                                        {(item.summary_en || item.summary_ne) && (
+                                            <p className="text-sm text-slate-500 line-clamp-3 mb-4 leading-relaxed">
+                                                {t(item.summary_en || "", item.summary_ne || "")}
+                                            </p>
+                                        )}
+                                        <div className="mt-auto pt-4 border-t border-slate-50 flex justify-between items-center text-xs text-slate-400 font-medium uppercase tracking-wider">
+                                            <span>{item.source}</span>
+                                            <span>{item.date}</span>
+                                        </div>
                                     </div>
-                                </div>
+                                </article>
                             </Link>
                         ))}
                     </div>
                     <div className="mt-8 text-center md:hidden">
-                        <Link href="/news" className="text-brand-blue font-semibold hover:underline">
-                            {t("View all news", "सबै समाचार हेर्नुहोस्")} &rarr;
-                        </Link>
+                        <Button variant="outline" className="w-full" asChild>
+                            <Link href="/news">
+                                {t("View all news", "सबै समाचार हेर्नुहोस्")}
+                            </Link>
+                        </Button>
                     </div>
                 </div>
             </section>
 
             {/* Watch & Follow Section */}
-            <section className="py-24 text-white overflow-hidden relative">
+            <section className="py-24 bg-brand-navy text-white overflow-hidden relative">
                 {/* Subtle Ambient Background */}
-                <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-blue-900/10 blur-[120px] rounded-full pointer-events-none"></div>
+                <div className="absolute top-0 left-1/4 w-1/2 h-1/2 bg-brand-blue/20 blur-[150px] rounded-full pointer-events-none"></div>
 
                 <div className="container mx-auto px-4 text-center relative z-10">
-                    <h2 className="text-3xl font-bold mb-16">Watch & Follow</h2>
+                    <Typography variant="h2" className="text-white border-none mb-16 !text-4xl">
+                        {t("Watch & Follow", "हेर्नुहोस् र पछ्याउनुहोस्")}
+                    </Typography>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-20">
-                        {/* Embedded Video Placeholder */}
                         {v.map((video) => (
-                            <div key={video.id} className="aspect-video bg-black rounded-xl overflow-hidden shadow-2xl border border-slate-700/50 hover:border-slate-500 transition-colors">
-                                <iframe
-                                    width="100%"
-                                    height="100%"
-                                    src={video.url}
-                                    title={video.title}
-                                    frameBorder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    allowFullScreen
-                                ></iframe>
+                            <div key={video.id} className="group">
+                                <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 group-hover:border-brand-blue transition-all duration-300 relative">
+                                    <iframe
+                                        width="100%"
+                                        height="100%"
+                                        src={video.embed_url || video.url}
+                                        title={video.title || "Video"}
+                                        frameBorder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowFullScreen
+                                        className="absolute inset-0 w-full h-full"
+                                    ></iframe>
+                                </div>
+                                <h3 className="mt-5 text-base font-bold text-slate-300 group-hover:text-white transition-colors line-clamp-2">{video.title}</h3>
                             </div>
                         ))}
                     </div>

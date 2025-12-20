@@ -584,7 +584,7 @@ export default function JoinPage() {
 
     // Styles
     const labelStyle = "block text-sm font-medium mb-1 text-slate-800";
-    const inputStyle = "w-full border border-gray-300 p-2.5 rounded text-slate-900 bg-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors";
+    const inputStyle = "form-input";
     const sectionTitleStyle = "text-xl font-bold text-slate-900 border-b border-gray-200 pb-2 mb-6";
 
     return (
@@ -625,7 +625,7 @@ export default function JoinPage() {
                         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 flex flex-col md:flex-row gap-6 items-center">
                             <div className="flex-1 w-full">
                                 <label className={labelStyle}>परिचयपत्रको फोटो (Upload ID Image)</label>
-                                <input id="id-scan-input" type="file" accept="image/*" className="block w-full text-sm text-slate-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-700 file:text-white hover:file:bg-blue-800" />
+                                <input id="id-scan-input" type="file" accept="image/*" className="block w-full text-sm text-slate-950 font-medium file:mr-4 file:py-2.5 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-700 file:text-white hover:file:bg-blue-800" />
                             </div>
                             <button
                                 type="button"

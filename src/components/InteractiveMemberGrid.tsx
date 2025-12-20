@@ -2,24 +2,27 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import Image from "next/image";
-// import { RealtimeMembersListener } from "@/app/members/RealtimeMembersListener"; // Disable for now as we switched tables
 import { X, Shield, User, Crown } from "lucide-react";
 import { Profile, UserRole } from "@/types";
+import { Badge } from "@/components/ui/badge";
+import { Typography } from "@/components/ui/typography";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const PLACEHOLDERS = [
     "/placeholders/eye-red.svg",
     "/placeholders/eye-blue.svg",
 ];
 
-// Helper to get role badge color/icon
-const getRoleBadge = (role: UserRole) => {
+// Helper to get role badge variant/icon
+const getRoleObj = (role: UserRole) => {
     switch (role) {
-        case 'admin_party': return { color: "bg-red-100 text-red-700 border-red-200", icon: <Crown size={12} fill="currentColor" /> };
-        case 'yantrik': return { color: "bg-slate-100 text-slate-700 border-slate-200", icon: <Shield size={12} /> };
-        case 'central_committee': return { color: "bg-blue-100 text-blue-700 border-blue-200", icon: <Shield size={12} fill="currentColor" /> };
-        case 'team_member': return { color: "bg-green-100 text-green-700 border-green-200", icon: <User size={12} /> };
-        case 'party_member': return { color: "bg-brand-red/10 text-brand-red border-brand-red/20", icon: <User size={12} /> };
-        default: return null; // Supporter/Guest
+        case 'admin_party': return { variant: "red" as const, icon: <Crown size={12} className="mr-1" />, label: "Admin" };
+        case 'yantrik': return { variant: "secondary" as const, icon: <Shield size={12} className="mr-1" />, label: "Technical" };
+        case 'central_committee': return { variant: "default" as const, icon: <Shield size={12} className="mr-1" />, label: "Central Committee" };
+        case 'team_member': return { variant: "outline" as const, icon: <User size={12} className="mr-1" />, label: "Team Member" };
+        case 'party_member': return { variant: "party" as const, icon: <User size={12} className="mr-1" />, label: "Member" };
+        default: return { variant: "outline" as const, icon: null, label: "Supporter" };
     }
 };
 
@@ -33,8 +36,6 @@ export default function InteractiveMemberGrid({ members }: { members: Profile[] 
         const handleMouseMove = (e: MouseEvent) => {
             if (!containerRef.current) return;
             const { clientX, clientY } = e;
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { innerWidth, innerHeight } = window; // Keep for ref if needed
             const xPct = (clientX / window.innerWidth) * 100;
             const yPct = (clientY / window.innerHeight) * 100;
 
@@ -57,26 +58,32 @@ export default function InteractiveMemberGrid({ members }: { members: Profile[] 
             } as React.CSSProperties}
         >
             {/* Texture Overlay */}
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none mix-blend-overlay"></div>
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 pointer-events-none mix-blend-overlay"></div>
 
             <div className="container mx-auto px-4 py-20 relative z-10">
                 <div className="text-center mb-16 relative z-10">
-                    <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
-                        <span className="text-brand-blue">Progressive</span> <span className="text-brand-red">Commune</span> <span className="block text-2xl md:text-4xl mt-2 font-bold text-brand-red">प्रगतिशील कम्युन</span>
-                    </h1>
-                    <p className="text-lg max-w-2xl mx-auto font-medium drop-shadow-md bg-white/80 backdrop-blur-sm py-2 px-6 rounded-full inline-block">
-                        <span className="text-brand-blue">Meet The</span> <span className="text-brand-red">Progressives</span> <br />
-                        <span className="text-base mt-1 block"><span className="text-brand-red">प्रगतिशील</span> <span className="text-brand-blue">व्यक्तित्व</span></span>
-                    </p>
+                    <Typography as="h1" variant="h1" className="mb-4 drop-shadow-md">
+                        <span className="text-brand-blue">Progressive</span> <span className="text-brand-red">Commune</span>
+                    </Typography>
+                    <div className="inline-block bg-white/60 backdrop-blur-sm py-2 px-6 rounded-full shadow-sm border border-brand-navy/5">
+                        <Typography variant="large" className="text-brand-navy">
+                            Meet The Progressives
+                        </Typography>
+                        <Typography variant="small" className="text-brand-muted">
+                            प्रगतिशील व्यक्तित्वहरु
+                        </Typography>
+                    </div>
                 </div>
 
                 {members.length === 0 ? (
-                    <div className="text-center text-slate-600 py-20 bg-white/60 backdrop-blur-md rounded-xl shadow-lg border border-white/40">
-                        <p className="text-xl font-medium">No public members found yet.</p>
-                        <p className="text-sm mt-2 opacity-80">Join us to be the first!</p>
-                    </div>
+                    <Card className="max-w-md mx-auto text-center p-10 bg-white/60 backdrop-blur-md">
+                        <CardContent>
+                            <Typography variant="h4" className="mb-2">No public members found yet.</Typography>
+                            <Typography variant="muted">Join us to be the first!</Typography>
+                        </CardContent>
+                    </Card>
                 ) : (
-                    <div className="flex flex-wrap justify-center gap-16 md:gap-24 perspective-1000">
+                    <div className="flex flex-wrap justify-center gap-12 md:gap-16 lg:gap-20 perspective-1000">
                         {members.map((member, index) => (
                             <MagneticBubble
                                 key={member.id}
@@ -91,24 +98,24 @@ export default function InteractiveMemberGrid({ members }: { members: Profile[] 
 
             {/* Detail Overlay / Modal */}
             {selectedMember && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={closeDetail}>
-                    <div
-                        className="bg-white rounded-2xl shadow-2xl max-w-sm w-full relative overflow-hidden border border-white/40 animate-in zoom-in-95 duration-200"
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-in fade-in duration-200" onClick={closeDetail}>
+                    <Card
+                        className="w-full max-w-[350px] overflow-hidden animate-in zoom-in-95 duration-200 shadow-2xl border-none ring-1 ring-white/20"
                         onClick={e => e.stopPropagation()}
                     >
                         <button
                             onClick={closeDetail}
-                            className="absolute top-3 right-3 p-2 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-600 transition-colors z-10"
+                            className="absolute top-3 right-3 p-1.5 bg-white/20 hover:bg-white/40 rounded-full text-white transition-colors z-20"
                         >
-                            <X size={20} />
+                            <X size={16} />
                         </button>
 
-                        <div className="h-32 bg-gradient-to-r from-brand-blue to-brand-red relative">
-                            {/* Header Background */}
+                        <div className="h-28 bg-brand-tricolor relative">
+                            <div className="absolute inset-0 bg-black/10"></div>
                         </div>
 
-                        <div className="px-6 pb-6 -mt-12 text-center relative">
-                            <div className="w-24 h-24 mx-auto rounded-full border-4 border-white shadow-md bg-brand-navy overflow-hidden relative">
+                        <div className="px-6 pb-8 -mt-14 relative text-center">
+                            <div className="w-28 h-28 mx-auto rounded-full border-[4px] border-white shadow-lg bg-brand-navy overflow-hidden relative mb-4">
                                 <Image
                                     src={selectedMember.avatar_url || PLACEHOLDERS[selectedMember.id.charCodeAt(0) % PLACEHOLDERS.length]}
                                     alt={selectedMember.full_name || "Member"}
@@ -117,37 +124,34 @@ export default function InteractiveMemberGrid({ members }: { members: Profile[] 
                                 />
                             </div>
 
-                            <h3 className="mt-4 text-xl font-bold text-slate-800">
-                                {selectedMember.full_name || "Anonymous User"}
-                            </h3>
+                            <Typography variant="h3" className="mb-1">
+                                {selectedMember.full_name || "Anonymous"}
+                            </Typography>
 
-                            {/* Role Label */}
                             {(() => {
-                                const badge = getRoleBadge(selectedMember.role);
-                                return badge ? (
-                                    <div className={`mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${badge.color}`}>
-                                        {badge.icon}
-                                        {selectedMember.role.replace('_', ' ')}
-                                    </div>
-                                ) : (
-                                    <span className="mt-1 block text-slate-400 text-xs uppercase tracking-widest">Supporter</span>
+                                const { variant, icon, label } = getRoleObj(selectedMember.role);
+                                return (
+                                    <Badge variant={variant} className="mb-4">
+                                        {icon} {label}
+                                    </Badge>
                                 );
                             })()}
 
                             {selectedMember.bio && (
-                                <p className="mt-4 text-sm text-slate-600 italic line-clamp-4">
-                                    &quot;{selectedMember.bio}&quot;
-                                </p>
+                                <div className="mt-2 bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4">
+                                    <p className="text-sm text-slate-600 italic leading-relaxed">
+                                        &quot;{selectedMember.bio}&quot;
+                                    </p>
+                                </div>
                             )}
 
                             {selectedMember.location && (
-                                <p className="mt-2 text-xs text-slate-500 font-medium">
-                                    📍 {selectedMember.location}
-                                </p>
+                                <div className="flex items-center justify-center text-xs text-slate-500 font-medium bg-slate-100 py-1.5 px-3 rounded-full inline-block">
+                                    📍 <span className="ml-1">{selectedMember.location}</span>
+                                </div>
                             )}
-
                         </div>
-                    </div>
+                    </Card>
                 </div>
             )}
         </main>
@@ -201,9 +205,9 @@ function MagneticBubble({ member, onClick }: { member: Profile; index: number; o
 
     // Ring color based on role
     const getRingColor = (role: UserRole) => {
-        if (role.startsWith('admin')) return 'border-amber-400';
-        if (role === 'central_committee') return 'border-brand-blue';
-        if (role === 'party_member') return 'border-brand-red';
+        if (role?.startsWith('admin')) return 'border-amber-400 ring-4 ring-amber-400/20';
+        if (role === 'central_committee') return 'border-brand-blue ring-4 ring-brand-blue/20';
+        if (role === 'party_member') return 'border-brand-red ring-4 ring-brand-red/20';
         return 'border-white/80';
     };
 
@@ -218,22 +222,24 @@ function MagneticBubble({ member, onClick }: { member: Profile; index: number; o
             }}
         >
             <div
-                className={`member-bubble relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 transition-all duration-300 group-hover:scale-110 shadow-lg bg-brand-navy ${getRingColor(member.role)}`}
+                className={cn(
+                    "member-bubble relative w-20 h-20 md:w-28 md:h-28 rounded-full overflow-hidden border-2 transition-all duration-300 group-hover:scale-110 shadow-lg bg-brand-navy",
+                    getRingColor(member.role)
+                )}
             >
                 <Image
                     src={photo}
                     alt={name}
                     fill
-                    sizes="(max-width: 768px) 96px, 128px"
+                    sizes="(max-width: 768px) 80px, 112px"
                     className="object-cover"
                 />
             </div>
 
             {/* Tooltip Name */}
-            <div className="absolute -bottom-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-slate-900/90 text-white text-sm px-3 py-1 rounded-full shadow-lg whitespace-nowrap pointer-events-none backdrop-blur-sm border border-slate-700">
+            <div className="absolute -bottom-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-brand-navy/90 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg whitespace-nowrap pointer-events-none backdrop-blur-sm">
                 {name}
             </div>
         </div>
     );
 }
-

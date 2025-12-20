@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/serverAdmin";
 import { revalidatePath } from "next/cache";
 import { hasRole, UserRole } from "@/types";
 
@@ -48,7 +49,7 @@ export async function rotateVeto(currentHolderId: string, newHolderMemberId: str
     }
 
     // 3. Log Audit
-    await supabase.from("audit_logs").insert({
+    await supabaseAdmin.from("audit_logs").insert({
         actor_id: user.id,
         action_type: "ROTATE_VETO",
         target_type: "admin_council_member",

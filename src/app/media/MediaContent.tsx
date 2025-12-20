@@ -1,14 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { siteContent } from "@/config/siteContent";
+import Link from "next/link";
+import { siteContent as fallbackContent } from "@/config/siteContent";
+import { useLanguage } from "@/context/LanguageContext";
+import { NewsItem, MediaItem } from "@/types";
 /* eslint-disable @next/next/no-img-element */
 
-export default function MediaContent() {
+interface MediaContentProps {
+    initialNews: NewsItem[];
+    initialMedia: MediaItem[];
+}
+
+export default function MediaContent({ initialNews, initialMedia }: MediaContentProps) {
+    const { t } = useLanguage();
     const [newsFilter, setNewsFilter] = useState("All");
 
+    // Fallback logic
+    const news = initialNews.length > 0 ? initialNews : (fallbackContent.news as unknown as NewsItem[]);
+    const media = initialMedia.length > 0 ? initialMedia : [];
+
+    // Gallery split
+    const galleryImages = media.length > 0 ? media.filter(m => m.media_type === 'image') : (fallbackContent.galleryImages as unknown as MediaItem[]);
+    const videos = media.length > 0 ? media.filter(m => m.media_type === 'video') : (fallbackContent.videos as unknown as MediaItem[]);
+
     // News Filtering Logic
-    const filteredNews = siteContent.news.filter(item => {
+    const filteredNews = news.filter(item => {
         if (newsFilter === "All") return true;
         if (newsFilter === "Articles") return item.type === "Article" || item.type === "Interview";
         if (newsFilter === "Videos") return item.type === "Video";
@@ -19,8 +36,8 @@ export default function MediaContent() {
         <div className="container mx-auto px-4 max-w-7xl">
             {/* Header */}
             <div className="text-center mb-16">
-                <h1 className="text-4xl font-bold text-slate-900 mb-4">Media Center</h1>
-                <p className="text-slate-600 max-w-2xl mx-auto">
+                <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Media Center</h1>
+                <p className="text-slate-600 max-w-2xl mx-auto font-medium">
                     Explore our journey through press coverage, speeches, and photo galleries.
                 </p>
             </div>
@@ -30,8 +47,8 @@ export default function MediaContent() {
                 <section>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-6 border-b border-slate-200">
                         <div>
-                            <h2 className="text-3xl font-bold text-slate-800 border-l-4 border-brand-red pl-4">News & Media Coverage</h2>
-                            <p className="text-slate-500 mt-2 pl-5">Latest updates from press and digital media.</p>
+                            <h2 className="text-3xl font-black text-slate-800 border-l-8 border-brand-red pl-4">News & Media Coverage</h2>
+                            <p className="text-slate-500 mt-2 pl-5 font-bold uppercase text-[10px] tracking-widest">Latest updates from press and digital media.</p>
                         </div>
 
                         {/* News Filters */}
@@ -40,48 +57,69 @@ export default function MediaContent() {
                                 <button
                                     key={f}
                                     onClick={() => setNewsFilter(f)}
-                                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all border ${newsFilter === f
-                                        ? "bg-slate-900 text-white border-slate-900"
-                                        : "bg-white text-slate-500 border-slate-200 hover:border-slate-300"
+                                    className={`px-5 py-2 rounded-xl text-xs font-black transition-all border-2 ${newsFilter === f
+                                        ? "bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-200"
+                                        : "bg-white text-slate-500 border-slate-100 hover:border-slate-300"
                                         }`}
                                 >
-                                    {f}
+                                    {f.toUpperCase()}
                                 </button>
                             ))}
+                            <Link
+                                href="/news"
+                                className="px-5 py-2 rounded-xl text-xs font-black transition-all border-2 bg-brand-blue text-white border-brand-blue hover:bg-brand-navy hover:border-brand-navy"
+                            >
+                                VIEW ALL NEWS →
+                            </Link>
                         </div>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
                         {filteredNews.map((item) => (
-                            <div key={item.id} className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow border border-slate-100 flex flex-col justify-between group">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <span className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-md ${item.type === 'Video' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'
-                                            }`}>
-                                            {item.type}
-                                        </span>
-                                        <span className="text-xs text-slate-400 font-medium">{item.date}</span>
+                            <Link
+                                key={item.id}
+                                href={`/news/${item.slug || item.id}`}
+                                className="bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col md:flex-row overflow-hidden group"
+                            >
+                                {(item.image_url || item.image) && (
+                                    <div className="md:w-1/3 aspect-video md:aspect-auto overflow-hidden">
+                                        <img
+                                            src={item.image_url || item.image}
+                                            alt={item.title}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                        />
                                     </div>
-                                    <h3 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-brand-blue transition-colors leading-tight">
-                                        {item.title}
-                                    </h3>
-                                    <p className="text-sm text-slate-500 font-medium mb-4">Source: {item.source}</p>
+                                )}
+                                <div className="p-8 flex-1 flex flex-col justify-between">
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <span className={`text-[10px] uppercase tracking-widest font-black px-3 py-1 rounded-full border ${item.type === 'Video' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-blue-50 text-blue-600 border-blue-100'
+                                                }`}>
+                                                {item.type}
+                                            </span>
+                                            <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{item.date}</span>
+                                        </div>
+                                        <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-brand-blue transition-colors leading-tight">
+                                            {t(item.title, item.title_ne || item.title)}
+                                        </h3>
+                                        {(item.summary_en || item.summary_ne) && (
+                                            <p className="text-sm text-slate-500 line-clamp-2 mb-6 font-medium">
+                                                {t(item.summary_en || "", item.summary_ne || "")}
+                                            </p>
+                                        )}
+                                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-4">Source: {item.source}</p>
+                                    </div>
+                                    <span className="inline-flex items-center text-xs font-black text-brand-blue group-hover:text-brand-red transition-all uppercase tracking-widest">
+                                        Read Full Article
+                                        <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                    </span>
                                 </div>
-                                <a
-                                    href={item.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center text-sm font-bold text-brand-blue hover:text-brand-red transition-colors"
-                                >
-                                    Read or Watch
-                                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                </a>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                     {filteredNews.length === 0 && (
-                        <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-300">
-                            <p className="text-slate-500">No news items found for this filter.</p>
+                        <div className="text-center py-16 bg-slate-50 rounded-3xl border-4 border-dashed border-slate-100">
+                            <p className="text-slate-400 font-bold uppercase tracking-widest">No news items found for this filter.</p>
                         </div>
                     )}
                 </section>
@@ -89,26 +127,26 @@ export default function MediaContent() {
                 {/* --- SECTION 2: VIDEOS --- */}
                 <section>
                     <div className="mb-10 pb-6 border-b border-slate-200">
-                        <h2 className="text-3xl font-bold text-slate-800 border-l-4 border-brand-blue pl-4">Interviews & Speeches</h2>
-                        <p className="text-slate-500 mt-2 pl-5">Selected video highlights from our campaigns.</p>
+                        <h2 className="text-3xl font-black text-slate-800 border-l-8 border-brand-blue pl-4">Interviews & Speeches</h2>
+                        <p className="text-slate-500 mt-2 pl-5 font-bold uppercase text-[10px] tracking-widest">Selected video highlights from our campaigns.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {siteContent.videos.map((video) => (
+                        {videos.map((video) => (
                             <div key={video.id} className="group">
-                                <div className="aspect-video bg-black rounded-xl overflow-hidden shadow-lg border border-slate-200 mb-4 transition-transform group-hover:-translate-y-1 duration-300 relative">
+                                <div className="aspect-video bg-black rounded-3xl overflow-hidden shadow-xl border-4 border-white mb-6 transition-all group-hover:shadow-2xl group-hover:-translate-y-2 duration-300 relative">
                                     <iframe
                                         width="100%"
                                         height="100%"
-                                        src={video.url}
-                                        title={video.title}
+                                        src={video.embed_url || video.url}
+                                        title={video.title || "Video"}
                                         frameBorder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowFullScreen
                                         className="w-full h-full"
                                     ></iframe>
                                 </div>
-                                <h3 className="font-bold text-slate-800 group-hover:text-brand-blue transition-colors px-1 text-lg leading-snug">{video.title}</h3>
+                                <h3 className="font-bold text-slate-800 group-hover:text-brand-blue transition-colors px-2 text-lg leading-snug">{video.title}</h3>
                             </div>
                         ))}
                     </div>
@@ -117,21 +155,23 @@ export default function MediaContent() {
                 {/* --- SECTION 3: PHOTO GALLERY --- */}
                 <section>
                     <div className="mb-10 pb-6 border-b border-slate-200">
-                        <h2 className="text-3xl font-bold text-slate-800 border-l-4 border-brand-red pl-4">Photo Gallery</h2>
-                        <p className="text-slate-500 mt-2 pl-5">Capturing moments with the community.</p>
+                        <h2 className="text-3xl font-black text-slate-800 border-l-8 border-brand-red pl-4">Photo Gallery</h2>
+                        <p className="text-slate-500 mt-2 pl-5 font-bold uppercase text-[10px] tracking-widest">Capturing moments with the community.</p>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {siteContent.galleryImages.map((img) => (
-                            <div key={img.id} className="relative group aspect-square overflow-hidden rounded-xl bg-slate-100 shadow-sm hover:shadow-lg transition-all cursor-pointer">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {galleryImages.map((img) => (
+                            <div key={img.id} className="relative group aspect-square overflow-hidden rounded-3xl bg-slate-100 shadow-sm hover:shadow-2xl transition-all cursor-pointer border-4 border-white">
                                 <img
                                     src={img.url}
-                                    alt={img.caption}
+                                    alt={img.alt_text || img.caption || ''}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     loading="lazy"
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                                    <p className="text-white text-sm font-medium translate-y-2 group-hover:translate-y-0 transition-transform duration-300">{img.caption}</p>
+                                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-6">
+                                    <p className="text-white text-xs font-black uppercase tracking-widest translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                        {t(img.caption || '', img.caption_ne || img.caption || '')}
+                                    </p>
                                 </div>
                             </div>
                         ))}

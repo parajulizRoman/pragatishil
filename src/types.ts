@@ -78,7 +78,10 @@ export type ActionType =
     | 'HIDE_POST' | 'RESTORE_POST'
     | 'UPDATE_ROLE'
     | 'ROTATE_VETO'
-    | 'UPDATE_SETTINGS';
+    | 'UPDATE_SETTINGS'
+    | 'UPDATE_SITE_CONTENT'
+    | 'MANAGE_NEWS'
+    | 'MANAGE_MEDIA';
 
 export interface AuditLog {
     id: string;
@@ -88,6 +91,9 @@ export interface AuditLog {
     target_type: string;
     target_id: string;
     metadata: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+    old_data?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    new_data?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    reason?: string;
     created_at: string;
 }
 
@@ -244,4 +250,88 @@ export interface MembershipRequestPayload {
         };
     };
     meta?: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+}
+
+// --- CMS Types ---
+
+export type NewsStatus = 'draft' | 'published' | 'archived';
+export type NewsType = 'Article' | 'Video' | 'Interview';
+
+export interface NewsReference {
+    label?: string;
+    url: string;
+}
+
+export interface NewsAttachment {
+    label?: string;
+    url: string;
+    // Optional metadata
+    storage_path?: string;
+    name?: string;
+    mime_type?: string;
+    size_bytes?: number;
+}
+
+export interface NewsItem {
+    id: number;
+    slug: string | null; // SEO-friendly URL slug
+    title: string;
+    title_ne: string | null;
+    summary_en: string | null;
+    summary_ne: string | null;
+
+    // New Content Fields
+    body_en: string | null;
+    body_ne: string | null;
+    attachments: NewsAttachment[] | null; // Array of objects { label?, url }
+    references: NewsReference[] | null;   // Array of objects { label?, url }
+    thread_id?: string | null; // Discussion Thread ID
+
+    source: string;
+    date: string;
+    date_bs?: string;
+    type: NewsType;
+
+    link: string;
+    image_url: string | null;
+    image?: string; // legacy fallback
+    status: NewsStatus;
+    published_at: string | null;
+    author_name: string | null;
+    created_at: string;
+    updated_by: string | null;
+
+    // Content Types & Author System
+    content_type: 'official' | 'article';
+    author_id: string | null;
+    visibility: 'public' | 'party' | 'team';
+}
+
+export type MediaType = 'image' | 'video' | 'document';
+
+export interface MediaAlbum {
+    id: number;
+    name: string;
+    name_ne: string | null;
+    description: string | null;
+    cover_image_url: string | null;
+    created_by: string | null;
+    created_at: string;
+}
+
+export interface MediaItem {
+    id: number;
+    title: string | null;
+    type: string; // legacy column
+    media_type: MediaType;
+    url: string;
+    embed_url: string | null;
+    caption: string | null;
+    caption_ne: string | null;
+    alt_text: string | null;
+    thumbnail_url: string | null;
+    created_at: string;
+    updated_by: string | null;
+    album_id: number | null;
+    uploaded_by: string | null;
 }

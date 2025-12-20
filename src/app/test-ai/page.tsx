@@ -129,7 +129,7 @@ export default function TestAIPage() {
                 <h1 className="text-xl font-bold">Test AI Chat</h1>
                 <div className="flex gap-2">
                     <input
-                        className="border px-2 py-1 flex-1 text-slate-900"
+                        className="form-input flex-1"
                         value={chatInput}
                         onChange={(e) => setChatInput(e.target.value)}
                         placeholder="Type a question in Nepali..."

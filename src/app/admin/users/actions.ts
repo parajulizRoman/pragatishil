@@ -3,7 +3,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/serverAdmin";
-import { UserRole } from "@/types";
+import { UserRole, Profile } from "@/types";
 import { revalidatePath } from "next/cache";
 import { canManageUsers } from "@/lib/permissions";
 
@@ -14,10 +14,17 @@ export async function getUsers(page = 1, search = "") {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Unauthorized");
 
-    // We can use supabaseAdmin to fetch users/profiles to bypass RLS if needed, 
-    // but standard client with 'Admins view all' policy is better. 
-    // Assuming we have such policy or using admin for listing.
-    // Let's use standard client but ensure RLS is correct, OR use admin for reliability in Admin Dashboard.
+    // Verify admin
+    const { data: currentUserProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+    if (!currentUserProfile || !canManageUsers(currentUserProfile.role)) {
+        throw new Error("Forbidden: Insufficient permissions");
+    }
+
     // Using admin here for "God Mode" view.
 
     const PER_PAGE = 20;
@@ -56,8 +63,11 @@ export async function updateUserRole(userId: string, newRole: string) {
         .eq('id', user.id)
         .single();
 
-    if (!canManageUsers(currentUserProfile?.role)) {
-        throw new Error("Forbidden: Insufficient permissions");
+    // STRICT: Only admin and admin_party can change roles
+    const allowed = ['admin', 'admin_party'];
+
+    if (!currentUserProfile || !allowed.includes(currentUserProfile.role)) {
+        throw new Error("Forbidden: Only Political Admins and System Admins can change roles.");
     }
 
     // Update Profile
@@ -67,20 +77,6 @@ export async function updateUserRole(userId: string, newRole: string) {
         .eq('id', userId);
 
     if (profileError) throw new Error("Failed to update profile role");
-
-    // Update user_roles table (sync)
-    // First check if exists
-    const { data: existingRoleVal } = await supabaseAdmin
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
-
-    if (existingRoleVal) {
-        await supabaseAdmin.from('user_roles').update({ role: newRole }).eq('user_id', userId);
-    } else {
-        await supabaseAdmin.from('user_roles').insert({ user_id: userId, role: newRole });
-    }
 
     revalidatePath("/admin/users");
     return { success: true };
@@ -138,5 +134,139 @@ export async function toggleBanUser(userId: string, isBanned: boolean, reason: s
     }
 
     revalidatePath("/admin/users");
+    return { success: true };
+}
+
+export async function adminUpdateProfile(userId: string, updates: Partial<Profile>) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
+
+    // Verify admin
+    const { data: currentUserProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+    if (!canManageUsers(currentUserProfile?.role)) {
+        throw new Error("Forbidden: Insufficient permissions");
+    }
+
+    // Prepare update data
+    const payload: any = {
+        updated_at: new Date().toISOString(),
+    };
+
+    if (updates.full_name !== undefined) payload.full_name = updates.full_name;
+    if (updates.bio !== undefined) payload.bio = updates.bio;
+    if (updates.location !== undefined) payload.location = updates.location;
+    if (updates.contact_email_public !== undefined) payload.contact_email_public = updates.contact_email_public;
+    if (updates.contact_phone_public !== undefined) payload.contact_phone_public = updates.contact_phone_public;
+    if (updates.is_public !== undefined) payload.is_public = updates.is_public;
+    if (updates.avatar_url !== undefined) payload.avatar_url = updates.avatar_url;
+
+    if (updates.expertise) {
+        payload.expertise = updates.expertise;
+    }
+
+    const { error } = await supabaseAdmin
+        .from('profiles')
+        .update(payload)
+        .eq('id', userId);
+
+    if (error) {
+        console.error("Admin profile update error:", error);
+        throw new Error("Failed to update profile");
+    }
+
+    // Update Role if provided (special handling because it syncs with user_roles)
+    if (updates.role) {
+        await updateUserRole(userId, updates.role);
+    }
+
+    // Audit Log
+    try {
+        await supabaseAdmin.from('audit_logs').insert({
+            actor_id: user.id,
+            action_type: 'UPDATE_SETTINGS',
+            target_type: 'user',
+            target_id: userId,
+            metadata: { updates: Object.keys(payload) }
+        });
+    } catch (e) {
+        console.error("Audit log failed", e);
+    }
+
+    revalidatePath("/admin/users");
+    revalidatePath(`/members/${userId}`);
+    return { success: true };
+}
+
+export async function deactivateUser(userId: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error("Unauthorized");
+
+    // Verify admin
+    const { data: currentUserProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+    if (!['yantrik', 'admin_party', 'admin'].includes(currentUserProfile?.role as string)) {
+        throw new Error("Forbidden: Insufficient permissions to deactivate users");
+    }
+
+    if (user.id === userId) {
+        throw new Error("Cannot deactivate your own account");
+    }
+
+    // 1. Permanently Ban in Auth (876000h = 100 years)
+    const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(
+        userId,
+        { ban_duration: '876000h' }
+    );
+
+    if (authError) {
+        console.error("Auth deactivation error:", authError);
+        throw new Error(`Failed to block access in Auth: ${authError.message}`);
+    }
+
+    // 2. Clear Roles & Mark Deactivated in Profile
+    const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .update({
+            role: 'member', // Strip higher roles
+            is_public: false, // Hide from gallery
+            updated_at: new Date().toISOString(),
+            // Add a flag or just rely on 'banned' status if we add a column later
+            // For now, we use audit logs and the role strip.
+            ban_reason: 'ACCOUNT_DEACTIVATED_BY_ADMIN'
+        })
+        .eq('id', userId);
+
+    if (profileError) {
+        console.error("Profile deactivation error:", profileError);
+    }
+
+
+    // 3. Audit Log
+    try {
+        await supabaseAdmin.from('audit_logs').insert({
+            actor_id: user.id,
+            action_type: 'BAN_USER',
+            target_type: 'user',
+            target_id: userId,
+            metadata: { action: 'PERMANENT_DEACTIVATION', history_preserved: true }
+        });
+    } catch (e) {
+        console.error("Audit log failed", e);
+    }
+
+    revalidatePath("/admin/users");
+    revalidatePath("/members");
+    revalidatePath(`/members/${userId}`);
     return { success: true };
 }

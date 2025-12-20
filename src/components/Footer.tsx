@@ -49,6 +49,7 @@ export default function Footer() {
                             <Link href="/media" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.media.en, siteContent.nav.media.ne)}</Link>
                             <Link href="/members" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.members.en, siteContent.nav.members.ne)}</Link>
                             <Link href="/join" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.join.en, siteContent.nav.join.ne)}</Link>
+                            <Link href="/tools/date-converter" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.tools.dateConverter.en, siteContent.nav.tools.dateConverter.ne)}</Link>
                         </div>
                     </div>
 

@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   },
 };
 
-import Navbar from "@/components/Navbar";
+import SafeNavbar from "@/components/SafeNavbar";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -39,7 +39,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <LanguageProvider>
-          <Navbar />
+          <SafeNavbar />
           <div className="pt-16 min-h-screen">
             {children}
           </div>

@@ -8,6 +8,9 @@ import { UserRole, hasRole, Profile } from "@/types";
 import { Shield, MapPin, Mail, Phone, Crown, User } from "lucide-react";
 import Link from "next/link";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"; // For public/admin fetch
+import AdminProfileActions from "./AdminProfileActions";
+import { canManageUsers } from "@/lib/permissions";
+import { canManageCms } from "@/lib/cms-utils";
 
 // Force dynamic to ensure we check auth every time
 export const dynamic = "force-dynamic";
@@ -157,14 +160,25 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                                     />
                                 </div>
                             </div>
-                            {isOwner && (
-                                <Link
-                                    href="/settings/profile"
-                                    className="mb-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors"
-                                >
-                                    Edit Profile
-                                </Link>
-                            )}
+                            <div className="flex gap-2 mb-4">
+                                {(canManageUsers(viewerRole) || canManageCms(viewerRole)) && (
+                                    <Link
+                                        href="/admin"
+                                        className="px-4 py-2 bg-brand-navy text-white hover:bg-slate-800 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
+                                    >
+                                        <Shield size={16} />
+                                        CMS Admin
+                                    </Link>
+                                )}
+                                {isOwner && (
+                                    <Link
+                                        href="/settings/profile"
+                                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors border border-slate-200"
+                                    >
+                                        Edit Profile
+                                    </Link>
+                                )}
+                            </div>
                         </div>
 
                         <div>
@@ -222,21 +236,15 @@ export default async function ProfilePage({ params }: { params: { id: string } }
 
                             {/* Admin Section */}
                             {isAdmin && (
-                                <div className="mt-8 pt-8 border-t border-red-100 bg-red-50/50 -mx-8 px-8 pb-4">
-                                    <div className="flex items-center gap-2 mb-4 text-red-700 font-semibold">
-                                        <Shield size={18} />
-                                        Admin Controls
-                                    </div>
-                                    <div className="flex gap-4">
-                                        <Link href={`/admin/audit?actor=${target.id}`} className="text-sm text-red-600 hover:underline">
-                                            View Audit Logs
-                                        </Link>
-                                        <Link href={`/admin/users/${target.id}`} className="text-sm text-red-600 hover:underline">
-                                            Manage Role
-                                        </Link>
-                                    </div>
-                                </div>
+                                <AdminProfileActions profile={target} />
                             )}
+
+                            {/* Publications Section */}
+                            <PublicationsSection
+                                authorId={target.id}
+                                viewerRole={viewerRole}
+                                showSensitive={showSensitive}
+                            />
 
                             {/* Activity Section - Visible to Owner or if Public */}
                             {(showSensitive || target.is_public) && (
@@ -343,7 +351,106 @@ async function ActivityFeed({ userId }: { userId: string }) {
     );
 }
 
+// Publications Section - Shows articles authored by member
+async function PublicationsSection({
+    authorId,
+    viewerRole,
+    showSensitive
+}: {
+    authorId: string;
+    viewerRole: UserRole;
+    showSensitive: boolean;
+}) {
+    const supabase = await createClient();
+
+    // Build visibility filter based on viewer role
+    const visibilityFilter = ['public']; // Everyone sees public articles
+    if (showSensitive || hasRole(viewerRole, 'party_member')) {
+        visibilityFilter.push('party');
+    }
+    if (hasRole(viewerRole, 'team_member')) {
+        visibilityFilter.push('team');
+    }
+
+    // Fetch articles by this author
+    const { data: articles } = await supabase
+        .from('news_items')
+        .select('id, slug, title, title_ne, summary_en, date, image_url, type, visibility')
+        .eq('content_type', 'article')
+        .eq('author_id', authorId)
+        .eq('status', 'published')
+        .in('visibility', visibilityFilter)
+        .order('date', { ascending: false })
+        .limit(6);
+
+    if (!articles || articles.length === 0) {
+        return null; // Don't show section if no publications
+    }
+
+    return (
+        <div className="mt-12 pt-8 border-t border-slate-200">
+            <h2 className="text-xl font-bold text-slate-800 mb-6 font-heading flex items-center gap-2">
+                📝 Publications
+                <span className="text-sm font-normal text-slate-500">({articles.length})</span>
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {articles.map((article: any) => (
+                    <Link
+                        key={article.id}
+                        href={`/news/${article.slug || article.id}`}
+                        className="group bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-all"
+                    >
+                        {/* Only show image if it's not a video URL */}
+                        {article.image_url &&
+                            !article.image_url.includes('youtube.com') &&
+                            !article.image_url.includes('youtu.be') &&
+                            article.type !== 'Video' && (
+                                <div className="relative h-32 bg-slate-100">
+                                    <Image
+                                        src={article.image_url}
+                                        alt={article.title}
+                                        fill
+                                        className="object-cover group-hover:scale-105 transition-transform"
+                                    />
+                                </div>
+                            )}
+                        {/* Show video placeholder for videos */}
+                        {(article.type === 'Video' ||
+                            article.image_url?.includes('youtube.com') ||
+                            article.image_url?.includes('youtu.be')) && (
+                                <div className="relative h-32 bg-slate-900 flex items-center justify-center">
+                                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                                        <span className="text-white text-2xl">▶</span>
+                                    </div>
+                                </div>
+                            )}
+                        <div className="p-4">
+                            <span className="text-xs text-slate-400 font-medium">
+                                {new Date(article.date).toLocaleDateString()} • {article.type}
+                            </span>
+                            <h3 className="font-semibold text-slate-800 group-hover:text-brand-blue transition-colors line-clamp-2 mt-1">
+                                {article.title}
+                            </h3>
+                            {article.visibility !== 'public' && (
+                                <span className={`text-xs px-2 py-0.5 rounded mt-2 inline-block ${article.visibility === 'party'
+                                    ? 'bg-blue-50 text-blue-600'
+                                    : 'bg-green-50 text-green-600'
+                                    }`}>
+                                    {article.visibility === 'party' ? '🏛️ Party Only' : '👥 Team Only'}
+                                </span>
+                            )}
+                        </div>
+                    </Link>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function RoleBadge({ role }: { role: UserRole }) {
+    // Admin role is hidden - displays as Yantrik to everyone
+    const displayRole = role === 'admin' ? 'yantrik' : role;
+
     const config: Record<string, { color: string; icon: any; label: string }> = {
         'admin_party': { color: 'bg-red-100 text-red-700 border-red-200', icon: Crown, label: "Political Admin" },
         'yantrik': { color: 'bg-slate-100 text-slate-700 border-slate-200', icon: Shield, label: "Yantrik" },
@@ -355,10 +462,9 @@ function RoleBadge({ role }: { role: UserRole }) {
         'member': { color: 'bg-slate-100 text-slate-600 border-slate-200', icon: User, label: "Member" },
         'volunteer': { color: 'bg-green-50 text-green-600 border-green-100', icon: User, label: "Volunteer" },
         'board': { color: 'bg-purple-100 text-purple-700 border-purple-200', icon: Crown, label: "Board Member" },
-        'admin': { color: 'bg-red-900 text-white border-red-800', icon: Shield, label: "System Admin" },
     };
 
-    const style = config[role] || { color: 'bg-slate-100', icon: null, label: role };
+    const style = config[displayRole] || { color: 'bg-slate-100', icon: null, label: displayRole };
 
     const Icon = style.icon;
 

@@ -80,12 +80,10 @@ export async function middleware(request: NextRequest) {
 
         console.log(`Middleware: User ${verifiedUser.email} (ID: ${verifiedUser.id}) has role: ${profile?.role}`)
 
-        if (!profile || profile.role !== 'admin_party') { // Fixed: role is 'admin_party' in types
-            // Allow 'yantrik' too if needed, but strict admin check usually means admin_party
-            if (profile?.role !== 'yantrik') {
-                console.warn(`Unauthorized access attempt to admin by ${verifiedUser.email}`)
-                return NextResponse.redirect(new URL('/', request.url))
-            }
+        const adminRoles = ['admin_party', 'yantrik', 'admin', 'board', 'central_committee'];
+        if (!profile || !adminRoles.includes(profile.role)) {
+            console.warn(`Unauthorized access attempt to admin by ${verifiedUser.email} with role: ${profile?.role}`)
+            return NextResponse.redirect(new URL('/', request.url))
         }
     }
 

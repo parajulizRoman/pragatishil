@@ -46,7 +46,7 @@ export default async function Home() {
   const { data: newsItems } = await supabase
     .from('news_items')
     .select('*')
-    .eq('is_published', true)
+    .eq('status', 'published')
     .order('date', { ascending: false })
     .limit(3);
 
@@ -54,7 +54,7 @@ export default async function Home() {
   const { data: videos } = await supabase
     .from('media_gallery')
     .select('*')
-    .eq('type', 'video')
+    .eq('media_type', 'video')
     .limit(3);
 
   return (

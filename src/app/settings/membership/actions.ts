@@ -2,6 +2,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { supabaseAdmin } from "@/lib/supabase/serverAdmin";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -147,7 +148,7 @@ export async function updateMembership(formData: FormData) {
 
     console.log("Attempting Audit Log Insert:", { changes: Object.keys(changes) });
 
-    const { error: auditError } = await supabase
+    const { error: auditError } = await supabaseAdmin
         .from("audit_logs")
         .insert({
             table_name: "members",

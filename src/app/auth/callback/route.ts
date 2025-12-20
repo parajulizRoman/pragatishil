@@ -32,7 +32,7 @@ export async function GET(request: Request) {
                             full_name: fullName,
                             avatar_url: avatarUrl,
                             // Default to supporter if not checking specific emails
-                            role: 'supporter',
+                            role: 'member',
                             updated_at: new Date().toISOString()
                         }, { onConflict: 'id' });
 

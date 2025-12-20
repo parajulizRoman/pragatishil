@@ -61,23 +61,35 @@ export interface SiteSettings {
 }
 
 export interface NewsItem {
-    id: number; // DB will use number or UUID
+    id: number;
     title: string;
+    title_ne: string | null;
+    summary_en: string | null;
+    summary_ne: string | null;
     source: string;
     date: string;
     type: 'Article' | 'Video' | 'Interview';
-    link: string; // Internal or External
-    image?: string;
+    link: string;
+    image_url?: string;
+    image?: string; // legacy fallback
+    status: 'draft' | 'published' | 'archived';
+    published_at: string | null;
+    author_name: string | null;
 }
 
 export interface MediaVideo {
-    id: string; // YouTube ID or UUID
-    title: string;
+    id: string | number;
+    title: string | null;
     url: string;
+    embed_url?: string | null;
+    media_type: 'video';
 }
 
 export interface GalleryImage {
     id: number;
     url: string;
-    caption: string;
+    caption: string | null;
+    caption_ne: string | null;
+    alt_text: string | null;
+    media_type: 'image';
 }

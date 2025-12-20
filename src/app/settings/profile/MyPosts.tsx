@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import Link from "next/link";
 import { Loader2, Trash2, MessageSquare, FileText, AlertTriangle } from "lucide-react";
@@ -19,11 +19,7 @@ export default function MyPosts({ userId }: { userId: string }) {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    useEffect(() => {
-        fetchContent();
-    }, [activeTab]);
-
-    const fetchContent = async () => {
+    const fetchContent = useCallback(async () => {
         setLoading(true);
         setError(null);
         try {
@@ -37,9 +33,6 @@ export default function MyPosts({ userId }: { userId: string }) {
                 if (error) throw error;
                 setThreads(data || []);
             } else {
-                // Use the API we updated to include Context (Thread Title) if possible, 
-                // or just fetch raw and join. 
-                // Let's use Supabase directly for simplicity and to ensure we get what we need.
                 const { data, error } = await supabase
                     .from('discussion_posts')
                     .select('*, thread:discussion_threads(id, title)')
@@ -47,15 +40,20 @@ export default function MyPosts({ userId }: { userId: string }) {
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
-                setPosts(data as any || []); // Cast as any because of complex join typing
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                setPosts(data as any || []);
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error("Error fetching content:", err);
-            setError(err.message);
+            setError(err instanceof Error ? err.message : "Fetch failed");
         } finally {
             setLoading(false);
         }
-    };
+    }, [activeTab, userId, supabase]);
+
+    useEffect(() => {
+        fetchContent();
+    }, [fetchContent]);
 
     const handleDelete = async (id: string, type: 'thread' | 'post') => {
         if (!confirm("Are you sure you want to delete this? This cannot be undone.")) return;
@@ -66,9 +64,9 @@ export default function MyPosts({ userId }: { userId: string }) {
             if (error) throw error;
 
             alert("Deleted successfully.");
-            fetchContent(); // Refresh
-        } catch (err: any) {
-            alert("Delete failed: " + err.message);
+            fetchContent();
+        } catch (err: unknown) {
+            alert("Delete failed: " + (err instanceof Error ? err.message : "Unknown error"));
         }
     };
 

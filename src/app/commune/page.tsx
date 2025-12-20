@@ -8,6 +8,31 @@ import { DiscussionChannel, UserRole } from "@/types";
 import ChannelModal from "./ChannelModal";
 import { createBrowserClient } from "@supabase/ssr";
 import { canManageChannels, canManageUsers } from "@/lib/permissions";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Typography } from "@/components/ui/typography";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Plus, Edit2 } from "lucide-react";
+
+function ChannelCardSkeleton() {
+    return (
+        <Card className="h-full animate-pulse border-slate-200 shadow-sm">
+            <CardHeader className="pb-2">
+                <div className="flex justify-between items-start">
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-5 w-16" />
+                </div>
+                <Skeleton className="h-4 w-1/2" />
+            </CardHeader>
+            <CardContent>
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-5/6" />
+            </CardContent>
+        </Card>
+    );
+}
 
 export default function CommunityPage() {
     const [channels, setChannels] = useState<DiscussionChannel[]>([]);
@@ -72,13 +97,25 @@ export default function CommunityPage() {
         fetchChannels();
     };
 
-
-    if (loading) return <div className="p-10 text-center">Loading community...</div>;
-    if (error) return <div className="p-10 text-center text-red-500">Error: {error}</div>;
+    if (loading) {
+        return (
+            <div className="container mx-auto px-4 py-16 max-w-6xl">
+                <div className="mb-12 text-center">
+                    <Skeleton className="h-10 w-64 mx-auto mb-4" />
+                    <Skeleton className="h-5 w-48 mx-auto" />
+                </div>
+                <div className="space-y-16">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[1, 2, 3].map(i => <ChannelCardSkeleton key={i} />)}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    if (error) return <div className="p-10 text-center text-destructive font-medium">Error: {error}</div>;
 
     // Use Capability Helpers
     const canEditChannels = canManageChannels(userRole);
-    const canManageAll = canManageUsers(userRole); // For broader admin
 
     // Grouping Logic
     const grouped = {
@@ -87,64 +124,84 @@ export default function CommunityPage() {
         leadership: channels.filter(c => ['central_committee', 'board_only', 'leadership', 'internal'].includes(c.visibility)),
     };
 
-    const renderChannelCard = (channel: DiscussionChannel) => (
-        <Link key={channel.id} href={`/commune/${channel.slug || channel.id}`} className="block group h-full relative">
-            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all hover:border-brand-blue/50 h-full flex flex-col relative">
-                {canEditChannels && (
-                    <button
-                        onClick={(e) => handleEdit(e, channel)}
-                        className="absolute top-2 right-2 p-1.5 text-slate-300 hover:text-brand-blue hover:bg-blue-50 rounded-full transition-colors z-10"
-                        title="Edit Channel"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                    </button>
-                )}
-                <div className="flex justify-between items-start mb-2 pr-6">
-                    <h3 className="text-xl font-bold text-slate-800 group-hover:text-brand-blue transition-colors">
-                        {channel.name}
-                    </h3>
-                    <span className="text-xs px-2 py-1 bg-slate-100 rounded text-slate-500 uppercase font-semibold">
-                        {channel.visibility.replace('_', ' ')}
-                    </span>
-                </div>
-                {channel.name_ne && (
-                    <h4 className="text-sm font-medium text-slate-500 mb-2 font-nepali">{channel.name_ne}</h4>
-                )}
-                <div className="flex-grow">
-                    <p className="text-slate-600 text-sm mb-1 line-clamp-3">
-                        {channel.description_en || channel.description}
-                    </p>
-                    {channel.description_ne && (
-                        <p className="text-slate-500 text-xs italic font-nepali">
-                            {channel.description_ne}
-                        </p>
+    const renderChannelCard = (channel: DiscussionChannel) => {
+        let badgeVariant: "default" | "secondary" | "destructive" | "outline" | "party" | "leadership" = "outline";
+        if (channel.visibility === 'public') badgeVariant = "secondary";
+        else if (['members', 'logged_in', 'party_only'].includes(channel.visibility)) badgeVariant = "party";
+        else badgeVariant = "leadership";
+
+        return (
+            <Link key={channel.id} href={`/commune/${channel.slug || channel.id}`} className="block group h-full">
+                <Card className="h-full hover:shadow-md hover:border-brand-blue/30 transition-all duration-300 relative group-hover:-translate-y-1">
+                    {canEditChannels && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => handleEdit(e, channel)}
+                            className="absolute top-2 right-2 h-8 w-8 text-slate-400 hover:text-brand-blue z-10"
+                            title="Edit Channel"
+                        >
+                            <Edit2 size={14} />
+                        </Button>
                     )}
-                </div>
-            </div>
-        </Link>
-    );
+                    <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start mb-1 pr-6">
+                            <Typography variant="h4" className="text-xl group-hover:text-brand-blue transition-colors">
+                                {channel.name}
+                            </Typography>
+                        </div>
+                        <div className="flex gap-2 items-center mb-2">
+                            <Badge variant={badgeVariant} className="uppercase text-[10px] tracking-wider">
+                                {channel.visibility.replace('_', ' ')}
+                            </Badge>
+                            {channel.category && (
+                                <span className="text-xs text-slate-400 font-medium">
+                                    • {channel.category}
+                                </span>
+                            )}
+                        </div>
+                        {channel.name_ne && (
+                            <Typography variant="muted" className="text-sm font-nepali text-brand-blue/80 font-medium">
+                                {channel.name_ne}
+                            </Typography>
+                        )}
+                    </CardHeader>
+                    <CardContent>
+                        <Typography variant="p" className="text-sm text-slate-600 line-clamp-3 mt-0 leading-relaxed">
+                            {channel.description_en || channel.description}
+                        </Typography>
+                        {channel.description_ne && (
+                            <Typography variant="muted" className="text-xs italic font-nepali mt-2 opacity-80">
+                                {channel.description_ne}
+                            </Typography>
+                        )}
+                    </CardContent>
+                </Card>
+            </Link>
+        );
+    };
 
     return (
-        <div className="container mx-auto px-4 py-10 max-w-6xl">
-            <div className="mb-10 text-center relative">
-                <h1 className="text-4xl font-bold text-brand-navy mb-2">Community Discussions</h1>
-                <p className="text-slate-600">Join the conversation. Select a channel below.</p>
-
-                {/* Admin Create Button - Top Right or Centered? Let's put it floating fixed or inline. Inline bottom is safer. */}
+        <div className="container mx-auto px-4 py-16 max-w-6xl min-h-[80vh]">
+            <div className="mb-16 text-center">
+                <Typography variant="h1" className="mb-3 text-brand-navy">Community Discussions</Typography>
+                <Typography variant="lead">Join the conversation. Select a channel below.</Typography>
             </div>
 
             {channels.length === 0 ? (
-                <div className="text-center p-10 bg-slate-50 rounded-lg">
-                    <p>No discussion channels available to you yet.</p>
-                </div>
+                <Card className="max-w-md mx-auto p-8 text-center bg-slate-50/50">
+                    <CardContent>
+                        <Typography variant="p">No discussion channels available to you yet.</Typography>
+                    </CardContent>
+                </Card>
             ) : (
-                <div className="space-y-12">
+                <div className="space-y-16">
                     {/* Public Section */}
                     {grouped.public.length > 0 && (
                         <section>
-                            <div className="flex items-center gap-3 mb-6">
+                            <div className="flex items-center gap-4 mb-8">
                                 <div className="h-px bg-slate-200 flex-grow"></div>
-                                <h2 className="text-2xl font-bold text-brand-blue">Open Public Forum</h2>
+                                <Typography variant="h2" className="text-2xl text-brand-blue border-none !pb-0">Open Public Forum</Typography>
                                 <div className="h-px bg-slate-200 flex-grow"></div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -156,9 +213,9 @@ export default function CommunityPage() {
                     {/* Members Section */}
                     {grouped.members.length > 0 && (
                         <section>
-                            <div className="flex items-center gap-3 mb-6">
+                            <div className="flex items-center gap-4 mb-8">
                                 <div className="h-px bg-slate-200 flex-grow"></div>
-                                <h2 className="text-2xl font-bold text-brand-red">Members Area</h2>
+                                <Typography variant="h2" className="text-2xl text-brand-red border-none !pb-0">Members Area</Typography>
                                 <div className="h-px bg-slate-200 flex-grow"></div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -170,9 +227,9 @@ export default function CommunityPage() {
                     {/* Leadership Section */}
                     {grouped.leadership.length > 0 && (
                         <section>
-                            <div className="flex items-center gap-3 mb-6">
+                            <div className="flex items-center gap-4 mb-8">
                                 <div className="h-px bg-slate-200 flex-grow"></div>
-                                <h2 className="text-2xl font-bold text-slate-800">Leadership Circle</h2>
+                                <Typography variant="h2" className="text-2xl text-brand-navy border-none !pb-0">Leadership Circle</Typography>
                                 <div className="h-px bg-slate-200 flex-grow"></div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -185,15 +242,12 @@ export default function CommunityPage() {
 
             {/* Admin Create Action */}
             {canEditChannels && (
-                <div className="mt-12 text-center">
-                    <button
-                        onClick={handleCreate}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-brand-navy text-white rounded-full font-bold shadow-lg hover:bg-slate-800 hover:shadow-xl transition-all transform hover:-translate-y-1"
-                    >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                <div className="mt-20 text-center">
+                    <Button onClick={handleCreate} size="lg" className="rounded-full shadow-lg hover:shadow-xl px-8">
+                        <Plus className="mr-2 h-5 w-5" />
                         Create New Channel
-                    </button>
-                    <p className="text-xs text-slate-400 mt-2">Visible only to Admins & Yantriks</p>
+                    </Button>
+                    <Typography variant="muted" className="mt-3 text-xs">Visible only to Admins & Yantriks</Typography>
                 </div>
             )}
 

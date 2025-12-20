@@ -1,10 +1,31 @@
 /* eslint-disable */
-import { X } from "lucide-react";
+import { X, Plus, Trash2 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { DiscussionChannel, UserRole } from "@/types";
 import { createBrowserClient } from "@supabase/ssr";
 
 import CategoryManagerModal from "./CategoryManagerModal";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Typography } from "@/components/ui/typography";
+// import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
+// Since I don't have shadcn Select yet, I'll use a styled native select
+const NativeSelect = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement>>(({ className, ...props }, ref) => (
+    <div className="relative">
+        <select
+            className={`flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+            ref={ref}
+            {...props}
+        />
+    </div>
+));
+NativeSelect.displayName = "NativeSelect";
+
 
 interface ChannelModalProps {
     isOpen: boolean;
@@ -133,10 +154,6 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
         }
     };
 
-    // Auto-slugify name if creating (This useEffect is slightly redundant/conflicting with handleAutoSlug but let's keep handleAutoSlug as the driver)
-    // Actually, handleAutoSlug updates both name and slug. The useEffect at line 89 was redundant or conflicting. 
-    // I will remove the useEffect at lines 89-97 in favor of explicit handleAutoSlug logic.
-
     // Resource Handlers
     const handleAddResource = () => {
         setResources([...resources, { title: "", type: "link", url: "" }]);
@@ -210,18 +227,18 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full flex flex-col max-h-[90vh]">
-                <div className="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10 rounded-t-xl">
-                    <h2 className="text-xl font-bold text-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] overflow-hidden">
+                <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white z-10">
+                    <Typography variant="h3" className="text-lg font-bold text-slate-800">
                         {editChannel ? 'Edit Channel' : 'Create New Channel'}
-                    </h2>
-                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
-                        <X size={24} />
-                    </button>
+                    </Typography>
+                    <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                        <X size={20} />
+                    </Button>
                 </div>
 
-                <div className="flex border-b border-slate-200 px-6">
+                <div className="flex border-b border-slate-200 px-6 bg-slate-50/50">
                     <button
                         className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'details' ? 'border-brand-blue text-brand-blue' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
                         onClick={() => setActiveTab('details')}
@@ -236,9 +253,9 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                     </button>
                 </div>
 
-                <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+                <div className="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white">
                     {activeTab === 'details' ? (
-                        <form id="channel-form" onSubmit={handleSubmit} className="space-y-4">
+                        <form id="channel-form" onSubmit={handleSubmit} className="space-y-5">
                             {/* Existing Fields */}
                             <CategoryManagerModal
                                 isOpen={isCategoryModalOpen}
@@ -247,22 +264,21 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                 currentCategories={categoriesList.map(c => c.name)}
                             />
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-slate-700">Channel Name</label>
-                                    <input
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Channel Name</label>
+                                    <Input
                                         required
-                                        className="form-input"
                                         value={name}
                                         onChange={e => handleAutoSlug(e.target.value)}
                                         placeholder="e.g. Health Policy"
                                     />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-slate-700">Slug (URL)</label>
-                                    <input
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Slug (URL)</label>
+                                    <Input
                                         required
-                                        className="form-input bg-slate-50 font-mono text-slate-600"
+                                        className="bg-slate-50 font-mono text-slate-600"
                                         value={slug}
                                         onChange={e => setSlug(e.target.value)}
                                         placeholder="health-policy"
@@ -270,10 +286,9 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                 </div>
                             </div>
 
-                            <div className="space-y-1">
-                                <label className="text-sm font-medium text-slate-700">Description</label>
-                                <textarea
-                                    className="form-input"
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Description</label>
+                                <Textarea
                                     rows={3}
                                     value={description}
                                     onChange={e => setDescription(e.target.value)}
@@ -281,21 +296,20 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-slate-700">Visibility</label>
-                                    <select
-                                        className="form-input"
+                            <div className="grid grid-cols-2 gap-5">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Visibility</label>
+                                    <NativeSelect
                                         value={visibility}
                                         onChange={e => setVisibility(e.target.value as "public" | "logged_in" | "party_only")}
                                     >
                                         <option value="public">Public (Everyone)</option>
                                         <option value="logged_in">Members Only</option>
                                         <option value="party_only">Party Only</option>
-                                    </select>
+                                    </NativeSelect>
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-slate-700 flex justify-between">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex justify-between">
                                         Category
                                         <button
                                             type="button"
@@ -305,8 +319,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                             Manage
                                         </button>
                                     </label>
-                                    <select
-                                        className="form-input"
+                                    <NativeSelect
                                         value={category}
                                         onChange={e => setCategory(e.target.value)}
                                     >
@@ -314,7 +327,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                         {categoriesList.map(c => (
                                             <option key={c.name} value={c.name}>{c.name}</option>
                                         ))}
-                                    </select>
+                                    </NativeSelect>
                                 </div>
                             </div>
                         </form>
@@ -322,10 +335,10 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                         <div className="space-y-6">
                             {/* Readme Section */}
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">Readme Content (Markdown)</label>
-                                <p className="text-xs text-slate-500">Displayed in the "About" tab of the channel.</p>
-                                <textarea
-                                    className="w-full bg-white text-slate-900 border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none font-mono"
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Readme Content (Markdown)</label>
+                                <Typography variant="muted" className="text-xs">Displayed in the "About" tab of the channel.</Typography>
+                                <Textarea
+                                    className="font-mono text-sm"
                                     rows={6}
                                     value={readmeContent}
                                     onChange={e => setReadmeContent(e.target.value)}
@@ -335,21 +348,19 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
 
                             {/* Legacy URLs */}
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-slate-700">Legacy Docs URL</label>
-                                    <input
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Legacy Docs URL</label>
+                                    <Input
                                         type="url"
-                                        className="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none"
                                         value={docsUrl}
                                         onChange={e => setDocsUrl(e.target.value)}
                                         placeholder="https://..."
                                     />
                                 </div>
-                                <div className="space-y-1">
-                                    <label className="text-sm font-medium text-slate-700">Legacy Video URL</label>
-                                    <input
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Legacy Video URL</label>
+                                    <Input
                                         type="url"
-                                        className="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none"
                                         value={videoUrl}
                                         onChange={e => setVideoUrl(e.target.value)}
                                         placeholder="https://youtube.com/..."
@@ -358,53 +369,57 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                             </div>
 
                             {/* New Resources List */}
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <label className="text-sm font-medium text-slate-700">Additional Resources</label>
-                                    <button
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Additional Resources</label>
+                                    <Button
                                         type="button"
+                                        variant="outline"
+                                        size="sm"
                                         onClick={handleAddResource}
-                                        className="text-xs text-brand-blue hover:bg-blue-50 px-2 py-1 rounded"
+                                        className="h-7 text-xs"
                                     >
                                         + Add Resource
-                                    </button>
+                                    </Button>
                                 </div>
 
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     {resources.map((res, idx) => (
-                                        <div key={idx} className="flex gap-2 items-start border p-2 rounded-lg bg-slate-50">
+                                        <div key={idx} className="flex gap-2 items-start border p-3 rounded-lg bg-slate-50">
                                             <div className="grid grid-cols-3 gap-2 flex-grow">
-                                                <input
+                                                <Input
                                                     placeholder="Title"
                                                     value={res.title}
                                                     onChange={e => handleResourceChange(idx, 'title', e.target.value)}
-                                                    className="col-span-1 text-sm border rounded px-2 py-1"
+                                                    className="col-span-1 h-8 text-sm"
                                                 />
-                                                <select
+                                                <NativeSelect
                                                     value={res.type}
                                                     onChange={e => handleResourceChange(idx, 'type', e.target.value)}
-                                                    className="col-span-1 text-sm border rounded px-2 py-1"
+                                                    className="col-span-1 h-8 text-sm"
                                                 >
                                                     <option value="link">Link</option>
                                                     <option value="doc">Document</option>
                                                     <option value="video">Video</option>
                                                     <option value="impact">Impact</option>
-                                                </select>
-                                                <input
+                                                </NativeSelect>
+                                                <Input
                                                     type="url"
                                                     placeholder="URL"
                                                     value={res.url}
                                                     onChange={e => handleResourceChange(idx, 'url', e.target.value)}
-                                                    className="col-span-1 text-sm border rounded px-2 py-1"
+                                                    className="col-span-1 h-8 text-sm"
                                                 />
                                             </div>
-                                            <button
+                                            <Button
                                                 type="button"
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={() => handleRemoveResource(idx)}
-                                                className="text-slate-400 hover:text-red-500 p-1"
+                                                className="h-8 w-8 text-slate-400 hover:text-destructive"
                                             >
-                                                <X size={16} />
-                                            </button>
+                                                <Trash2 size={16} />
+                                            </Button>
                                         </div>
                                     ))}
                                     {resources.length === 0 && (
@@ -414,42 +429,46 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                             </div>
 
                             {/* Impact Stats Editor */}
-                            <div className="space-y-2 pt-4 border-t border-slate-100">
+                            <div className="space-y-3 pt-4 border-t border-slate-100">
                                 <div className="flex justify-between items-center">
-                                    <label className="text-sm font-medium text-slate-700">Impact Statistics</label>
-                                    <button
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Impact Statistics</label>
+                                    <Button
                                         type="button"
+                                        variant="outline"
+                                        size="sm"
                                         onClick={handleAddStat}
-                                        className="text-xs text-brand-blue hover:bg-blue-50 px-2 py-1 rounded"
+                                        className="h-7 text-xs"
                                     >
                                         + Add Stat
-                                    </button>
+                                    </Button>
                                 </div>
-                                <p className="text-xs text-slate-500">Key-Value pairs (e.g., &quot;Villages Reached&quot;: &quot;15&quot;)</p>
+                                <Typography variant="muted" className="text-xs">Key-Value pairs (e.g., &quot;Villages Reached&quot;: &quot;15&quot;)</Typography>
 
                                 <div className="space-y-2">
                                     {Object.entries(impactStats).map(([key, value], idx) => (
-                                        <div key={idx} className="flex gap-2 items-center border p-2 rounded-lg bg-emerald-50/50">
-                                            <input
+                                        <div key={idx} className="flex gap-2 items-center border p-2 rounded-lg bg-emerald-50/50 border-emerald-100">
+                                            <Input
                                                 placeholder="Label (e.g. Students)"
                                                 value={key}
                                                 onChange={e => handleStatChange(key, e.target.value, value)}
-                                                className="flex-1 bg-white text-slate-900 text-sm border rounded px-2 py-1"
+                                                className="flex-1 bg-white h-8 text-sm"
                                             />
                                             <span className="text-slate-400">:</span>
-                                            <input
+                                            <Input
                                                 placeholder="Value (e.g. 500)"
                                                 value={value}
                                                 onChange={e => handleStatChange(key, key, e.target.value)}
-                                                className="w-24 bg-white text-slate-900 text-sm border rounded px-2 py-1 font-mono"
+                                                className="w-24 bg-white h-8 text-sm font-mono"
                                             />
-                                            <button
+                                            <Button
                                                 type="button"
+                                                variant="ghost"
+                                                size="icon"
                                                 onClick={() => handleRemoveStat(key)}
-                                                className="text-slate-400 hover:text-red-500 p-1"
+                                                className="h-8 w-8 text-slate-400 hover:text-destructive"
                                             >
-                                                <X size={16} />
-                                            </button>
+                                                <Trash2 size={16} />
+                                            </Button>
                                         </div>
                                     ))}
                                     {Object.keys(impactStats).length === 0 && (
@@ -461,22 +480,22 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                     )}
                 </div>
 
-                <div className="p-6 border-t border-slate-100 flex justify-end gap-3 rounded-b-xl bg-slate-50">
-                    <button
+                <div className="p-5 border-t border-slate-100 flex justify-end gap-3 bg-slate-50">
+                    <Button
                         type="button"
+                        variant="ghost"
                         onClick={onClose}
-                        className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded-lg transition-colors"
                     >
                         Cancel
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         type="submit"
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="px-6 py-2 text-sm font-bold text-white bg-brand-blue hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-70 flex items-center gap-2"
+                        className="bg-brand-blue hover:bg-brand-blue/90 text-white"
                     >
                         {loading ? 'Saving...' : (editChannel ? 'Update Channel' : 'Create Channel')}
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

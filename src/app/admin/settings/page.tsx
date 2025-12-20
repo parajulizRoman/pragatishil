@@ -71,7 +71,7 @@ export default function GeneralSettings() {
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-slate-800">General Settings</h1>
+                <h1 className="text-2xl font-bold text-brand-navy">General Settings</h1>
                 <button
                     onClick={handleSave}
                     disabled={saving}
@@ -83,40 +83,40 @@ export default function GeneralSettings() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h2 className="text-lg font-semibold mb-4 border-b pb-2">Brand Names</h2>
+                <h2 className="text-lg font-bold text-brand-navy mb-4 border-b pb-2">Brand Names</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium mb-1">Brand First (EN)</label>
+                        <label className="form-label">Brand First (EN)</label>
                         <input
                             type="text"
-                            className="w-full p-2 border rounded"
+                            className="form-input"
                             value={settings.nav.brand.firstEn}
                             onChange={e => handleChange('nav.brand.firstEn', e.target.value)}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Brand Second (EN)</label>
+                        <label className="form-label">Brand Second (EN)</label>
                         <input
                             type="text"
-                            className="w-full p-2 border rounded"
+                            className="form-input"
                             value={settings.nav.brand.secondEn}
                             onChange={e => handleChange('nav.brand.secondEn', e.target.value)}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Brand First (NE)</label>
+                        <label className="form-label">Brand First (NE)</label>
                         <input
                             type="text"
-                            className="w-full p-2 border rounded"
+                            className="form-input"
                             value={settings.nav.brand.firstNe}
                             onChange={e => handleChange('nav.brand.firstNe', e.target.value)}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Brand Second (NE)</label>
+                        <label className="form-label">Brand Second (NE)</label>
                         <input
                             type="text"
-                            className="w-full p-2 border rounded"
+                            className="form-input"
                             value={settings.nav.brand.secondNe}
                             onChange={e => handleChange('nav.brand.secondNe', e.target.value)}
                         />
@@ -125,32 +125,32 @@ export default function GeneralSettings() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h2 className="text-lg font-semibold mb-4 border-b pb-2">Contact Information</h2>
+                <h2 className="text-lg font-bold text-brand-navy mb-4 border-b pb-2">Contact Information</h2>
                 <div className="grid grid-cols-1 gap-4">
                     <div>
-                        <label className="block text-sm font-medium mb-1">Address</label>
+                        <label className="form-label">Address</label>
                         <input
                             type="text"
-                            className="w-full p-2 border rounded"
+                            className="form-input"
                             value={settings.contact.address}
                             onChange={e => handleChange('contact.address', e.target.value)}
                         />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1">Email</label>
+                            <label className="form-label">Email</label>
                             <input
                                 type="email"
-                                className="w-full p-2 border rounded"
+                                className="form-input"
                                 value={settings.contact.email}
                                 onChange={e => handleChange('contact.email', e.target.value)}
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium mb-1">Phone</label>
+                            <label className="form-label">Phone</label>
                             <input
                                 type="text"
-                                className="w-full p-2 border rounded"
+                                className="form-input"
                                 value={settings.contact.phone}
                                 onChange={e => handleChange('contact.phone', e.target.value)}
                             />
@@ -160,22 +160,22 @@ export default function GeneralSettings() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <h2 className="text-lg font-semibold mb-4 border-b pb-2">Footer Taglines</h2>
+                <h2 className="text-lg font-bold text-brand-navy mb-4 border-b pb-2">Footer Taglines</h2>
                 <div className="grid grid-cols-1 gap-4">
                     <div>
-                        <label className="block text-sm font-medium mb-1">Tagline (EN)</label>
+                        <label className="form-label">Tagline (EN)</label>
                         <input
                             type="text"
-                            className="w-full p-2 border rounded"
+                            className="form-input"
                             value={settings.footer.taglineEn}
                             onChange={e => handleChange('footer.taglineEn', e.target.value)}
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-1">Tagline (NE)</label>
+                        <label className="form-label">Tagline (NE)</label>
                         <input
                             type="text"
-                            className="w-full p-2 border rounded"
+                            className="form-input"
                             value={settings.footer.taglineNe}
                             onChange={e => handleChange('footer.taglineNe', e.target.value)}
                         />

@@ -1,7 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
 /* eslint-disable */
-import { X, Plus, Trash2 } from "lucide-react";
+import { X, Plus, Trash2, Edit2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Typography } from "@/components/ui/typography";
+import { Badge } from "@/components/ui/badge";
 
 interface CategoryManagerProps {
     isOpen: boolean;
@@ -68,9 +72,6 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
         }
     };
 
-    // Rename logic could be added here (double click?)
-    // For now, simpler: "Delete and Create" is not same as rename. 
-    // Let's add simple Rename via prompt? Or inline? Prompt is easiest for MVP.
     const handleRename = async (oldName: string) => {
         const newName = prompt("Rename category to:", oldName);
         if (!newName || newName === oldName) return;
@@ -91,44 +92,51 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden">
-                <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                    <h3 className="font-bold text-slate-800">Manage Categories</h3>
-                    <button onClick={onClose}>&times;</button>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col">
+                <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white">
+                    <Typography variant="h4" className="text-base font-bold text-slate-800">Manage Categories</Typography>
+                    <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-slate-400 hover:text-slate-600">
+                        <X size={18} />
+                    </Button>
                 </div>
                 <div className="p-4 max-h-[60vh] overflow-y-auto">
                     {/* List */}
                     <ul className="space-y-2 mb-4">
                         {categories.map(c => (
-                            <li key={c.name} className="flex justify-between items-center p-2 bg-slate-50 rounded group">
+                            <li key={c.name} className="flex justify-between items-center p-2 bg-slate-50 rounded group hover:bg-slate-100 transition-colors">
                                 <span className="text-sm font-medium text-slate-700">{c.name}</span>
-                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button onClick={() => handleRename(c.name)} className="text-xs text-blue-500 hover:underline">Rename</button>
-                                    <button onClick={() => handleDelete(c.name)} className="text-xs text-red-500 hover:underline">Delete</button>
+                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <Button variant="ghost" size="icon" onClick={() => handleRename(c.name)} className="h-7 w-7 text-blue-500 hover:text-blue-700 hover:bg-blue-50" title="Rename">
+                                        <Edit2 size={12} />
+                                    </Button>
+                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(c.name)} className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50" title="Delete">
+                                        <Trash2 size={12} />
+                                    </Button>
                                 </div>
                             </li>
                         ))}
                     </ul>
 
-                    {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
+                    {error && <Typography variant="muted" className="text-destructive mb-2 text-xs">{error}</Typography>}
 
                     {/* Add */}
                     <div className="flex gap-2">
-                        <input
+                        <Input
                             value={newCategory}
                             onChange={e => setNewCategory(e.target.value)}
                             placeholder="New category..."
-                            className="flex-1 border rounded px-2 py-1 text-sm"
+                            className="flex-1 h-9 text-sm"
                             onKeyDown={e => e.key === 'Enter' && handleCreate()}
                         />
-                        <button
+                        <Button
                             onClick={handleCreate}
                             disabled={loading}
-                            className="px-3 py-1 bg-brand-navy text-white text-sm rounded hover:bg-slate-800"
+                            size="sm"
+                            className="bg-brand-navy hover:bg-brand-navy/90 text-white"
                         >
-                            Add
-                        </button>
+                            <Plus size={16} />
+                        </Button>
                     </div>
                 </div>
             </div>

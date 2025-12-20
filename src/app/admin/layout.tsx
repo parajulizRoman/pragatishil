@@ -26,29 +26,49 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const router = useRouter();
     const supabase = createClient();
 
+    const [userRole, setUserRole] = useState<string | null>(null);
+
     useEffect(() => {
         const checkAuth = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
-                router.push("/join"); // Redirect to login/join if not authenticated
-                // Note: In a real app, we'd have a dedicated /login page for admins
+                router.push("/join");
+                return;
             }
+
+            // Fetch role
+            const { data: profile } = await supabase
+                .from("profiles")
+                .select("role")
+                .eq("id", user.id)
+                .single();
+
+            setUserRole(profile?.role || "guest");
             setLoading(false);
         };
         checkAuth();
     }, [router, supabase]);
 
-    const navItems = [
+    // Define Role-Based Access
+    const userManagementRoles = ['admin', 'yantrik', 'admin_party', 'board'];
+    const auditRoles = ['admin']; // STRICT ROOT ONLY
+
+    const canManageUsers = userRole && userManagementRoles.includes(userRole);
+    const canViewAudit = userRole && auditRoles.includes(userRole);
+
+    const allNavItems = [
         { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-        { name: "User Management", href: "/admin/users", icon: UserCog },
-        { name: "Council", href: "/admin/council", icon: Users },
-        { name: "Audit Logs", href: "/admin/audit", icon: Shield },
-        { name: "Graveyard", href: "/admin/graveyard", icon: Skull },
-        { name: "General Settings", href: "/admin/settings", icon: Settings },
-        { name: "Pages Content", href: "/admin/pages", icon: FileText },
+        { name: "User Management", href: "/admin/users", icon: UserCog, restricted: true, allowIf: canManageUsers },
+        { name: "Council", href: "/admin/council", icon: Users, restricted: true, allowIf: canManageUsers },
+        { name: "Audit Logs", href: "/admin/audit", icon: Shield, restricted: true, allowIf: canViewAudit },
+        { name: "Graveyard", href: "/admin/graveyard", icon: Skull, restricted: true, allowIf: canManageUsers },
+        { name: "General Settings", href: "/admin/settings", icon: Settings, restricted: true, allowIf: canManageUsers },
+        { name: "Pages Content", href: "/admin/pages", icon: FileText, restricted: true, allowIf: canManageUsers }, // Restricted to admins/party/yantrik
         { name: "News Room", href: "/admin/news", icon: Newspaper },
         { name: "Media Gallery", href: "/admin/media", icon: Image },
     ];
+
+    const navItems = allNavItems.filter(item => !item.restricted || item.allowIf);
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();

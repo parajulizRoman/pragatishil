@@ -56,8 +56,8 @@ export async function POST(request: Request) {
             token: verify.data.token
         });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Sign URL Error:", error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: (error as Error).message }, { status: 500 });
     }
 }

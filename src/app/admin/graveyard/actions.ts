@@ -1,6 +1,7 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { supabaseAdmin } from '@/lib/supabase/serverAdmin';
 import { revalidatePath } from 'next/cache';
 
 export async function restorePost(postId: string) {
@@ -35,7 +36,7 @@ export async function restorePost(postId: string) {
     }
 
     // 3. Log Audit
-    await supabase.from('audit_logs').insert({
+    await supabaseAdmin.from('audit_logs').insert({
         actor_id: user.id,
         action_type: 'RESTORE_POST',
         target_type: 'post',

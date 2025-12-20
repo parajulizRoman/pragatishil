@@ -1,17 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { upsertMediaItem, deleteMediaItem } from "@/actions/cms";
-import { Plus, Trash2, X, PlayCircle, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, X, PlayCircle, Image as ImageIcon, FileText, CheckCircle2, Globe, AlertCircle } from "lucide-react";
+import { MediaItem, MediaType } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MediaManager() {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [media, setMedia] = useState<any[]>([]);
+    const [media, setMedia] = useState<MediaItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'image' | 'video'>('image');
+    const [activeTab, setActiveTab] = useState<MediaType | 'all'>('all');
     const [isAdding, setIsAdding] = useState(false);
-    const [newItem, setNewItem] = useState({ type: 'image', url: '', caption: '' });
+    const [newItem, setNewItem] = useState<Partial<MediaItem>>({ media_type: 'image', url: '', caption: '', caption_ne: '', alt_text: '', title: '' });
+    const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
+    const [uploading, setUploading] = useState(false);
+    const [isDeletingBulk, setIsDeletingBulk] = useState(false);
+    const [deleteReason, setDeleteReason] = useState("");
 
     useEffect(() => {
         fetchMedia();
@@ -20,43 +26,45 @@ export default function MediaManager() {
     const fetchMedia = async () => {
         const supabase = createClient();
         const { data } = await supabase.from('media_gallery').select('*').order('created_at', { ascending: false });
-        if (data) setMedia(data);
+        if (data) setMedia(data as MediaItem[]);
         setLoading(false);
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Delete this media item?")) return;
-        await deleteMediaItem(id);
+        const reason = prompt("Reason for deletion (for audit log):");
+        if (!reason) return;
+        await deleteMediaItem(id, reason);
         fetchMedia();
     };
 
-    const [uploading, setUploading] = useState(false);
+    const handleBulkDelete = async () => {
+        if (!deleteReason) return alert("Please provide a reason for bulk deletion.");
+        if (!confirm(`Are you sure you want to delete ${selectedItems.size} items?`)) return;
+
+        setLoading(true);
+        for (const id of Array.from(selectedItems)) {
+            await deleteMediaItem(id, deleteReason);
+        }
+        setSelectedItems(new Set());
+        fetchMedia();
+        setIsDeletingBulk(false);
+        setDeleteReason("");
+    };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files || e.target.files.length === 0) return;
-
+        if (!e.target.files?.length) return;
         const file = e.target.files[0];
         setUploading(true);
         const supabase = createClient();
 
         try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-            const filePath = `${fileName}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from('media')
-                .upload(filePath, file);
-
-            if (uploadError) throw uploadError;
-
-            // Get Public URL
-            const { data } = supabase.storage.from('media').getPublicUrl(filePath);
-
+            const fileName = `gallery/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+            const { error } = await supabase.storage.from('media').upload(fileName, file);
+            if (error) throw error;
+            const { data } = supabase.storage.from('media').getPublicUrl(fileName);
             setNewItem({ ...newItem, url: data.publicUrl });
         } catch (error) {
-            console.error(error);
-            alert("Error uploading image");
+            alert("Upload failed: " + (error as Error).message);
         } finally {
             setUploading(false);
         }
@@ -65,154 +73,328 @@ export default function MediaManager() {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await upsertMediaItem({ ...newItem, type: activeTab }); // Ensure type matches tab
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            await upsertMediaItem(newItem as any);
             setIsAdding(false);
-            setNewItem({ type: activeTab, url: '', caption: '' });
+            setNewItem({ media_type: 'image', url: '', caption: '', caption_ne: '', alt_text: '', title: '' });
             fetchMedia();
         } catch (error) {
-            alert("Failed to save");
-            console.error(error);
+            alert("Failed to save: " + (error as Error).message);
         }
     };
 
-    const filteredMedia = media.filter(m => m.type === activeTab);
+    const toggleSelect = (id: number) => {
+        const next = new Set(selectedItems);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        setSelectedItems(next);
+    };
 
-    if (loading) return <div className="p-8">Loading media...</div>;
+    const filteredMedia = activeTab === 'all' ? media : media.filter(m => m.media_type === activeTab);
 
     return (
-        <div className="max-w-6xl mx-auto space-y-6">
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold text-slate-800">Media Gallery</h1>
-                <button
-                    onClick={() => { setNewItem({ type: activeTab, url: '', caption: '' }); setIsAdding(true); }}
-                    className="flex items-center space-x-2 bg-brand-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                    <Plus size={20} />
-                    <span>Add {activeTab === 'image' ? 'Image' : 'Video'}</span>
-                </button>
+        <div className="max-w-7xl mx-auto space-y-6 p-4 md:p-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 className="text-3xl font-extrabold text-brand-navy tracking-tight">Media Gallery</h1>
+                    <p className="text-slate-500 mt-1">Manage visual assets, videos and documents for the movement.</p>
+                </div>
+                <div className="flex items-center space-x-3">
+                    {selectedItems.size > 0 && (
+                        <button
+                            onClick={() => setIsDeletingBulk(true)}
+                            className="flex items-center space-x-2 bg-red-50 text-red-600 px-4 py-2.5 rounded-xl hover:bg-red-100 transition-all font-bold border border-red-100"
+                        >
+                            <Trash2 size={18} />
+                            <span>Delete Selected ({selectedItems.size})</span>
+                        </button>
+                    )}
+                    <button
+                        onClick={() => { setNewItem({ media_type: activeTab === 'all' ? 'image' : activeTab as MediaType, url: '', caption: '', caption_ne: '', alt_text: '', title: '' }); setIsAdding(true); }}
+                        className="flex items-center space-x-2 bg-brand-blue text-white px-5 py-2.5 rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
+                    >
+                        <Plus size={20} />
+                        <span className="font-bold">Add Media</span>
+                    </button>
+                </div>
             </div>
 
-            {/* Tabs */}
-            <div className="flex space-x-1 bg-slate-200 p-1 rounded-lg inline-block">
-                <button
-                    onClick={() => setActiveTab('image')}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-all ${activeTab === 'image' ? "bg-white text-brand-blue shadow-sm" : "text-slate-600"}`}
-                >
-                    <ImageIcon size={18} />
-                    <span>Images</span>
-                </button>
-                <button
-                    onClick={() => setActiveTab('video')}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-all ${activeTab === 'video' ? "bg-white text-brand-blue shadow-sm" : "text-slate-600"}`}
-                >
-                    <PlayCircle size={18} />
-                    <span>Videos</span>
-                </button>
+            {/* Toolbar */}
+            <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+                <div className="flex space-x-1 bg-slate-100 p-1 rounded-xl">
+                    {(['all', 'image', 'video', 'document'] as const).map(type => (
+                        <button
+                            key={type}
+                            onClick={() => setActiveTab(type)}
+                            className={`flex items-center space-x-2 px-4 py-1.5 rounded-lg font-bold text-xs transition-all ${activeTab === type ? "bg-white text-brand-blue shadow-sm" : "text-slate-500 hover:text-slate-800"}`}
+                        >
+                            {type === 'image' ? <ImageIcon size={14} /> : type === 'video' ? <PlayCircle size={14} /> : type === 'document' ? <FileText size={14} /> : null}
+                            <span>{type.toUpperCase()}</span>
+                        </button>
+                    ))}
+                </div>
+                <div className="text-xs text-slate-400 font-bold uppercase tracking-widest">
+                    {filteredMedia.length} Items found
+                </div>
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                {filteredMedia.map((item) => (
-                    <div key={item.id} className="relative group bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden aspect-square">
-                        {item.type === 'image' ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img src={item.url} alt={item.caption} className="w-full h-full object-cover" />
-                        ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {loading && media.length === 0 ? (
+                    Array.from({ length: 12 }).map((_, i) => (
+                        <Skeleton key={i} className="aspect-square rounded-2xl" />
+                    ))
+                ) : filteredMedia.map((item) => (
+                    <div key={item.id}
+                        onClick={() => toggleSelect(item.id)}
+                        className={`relative group bg-white rounded-2xl shadow-sm border-2 overflow-hidden aspect-square cursor-pointer transition-all duration-300 ${selectedItems.has(item.id) ? 'border-brand-blue ring-4 ring-blue-50' : 'border-slate-100 hover:border-slate-200 hover:shadow-md'}`}>
+
+                        {item.media_type === 'image' ? (
+                            <Image
+                                src={item.url}
+                                alt={item.alt_text || ''}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 20vw"
+                            />
+                        ) : item.media_type === 'video' ? (
                             <div className="w-full h-full bg-slate-900 flex items-center justify-center relative">
-                                {/* Simple Youtube Preview if possible, or icon */}
-                                <iframe src={item.url} className="w-full h-full pointer-events-none opacity-50" />
-                                <PlayCircle className="text-white absolute z-10" size={48} />
+                                {item.embed_url ? (
+                                    <iframe src={item.embed_url} className="w-full h-full pointer-events-none opacity-40" />
+                                ) : (
+                                    <div className="text-white/20"><PlayCircle size={64} /></div>
+                                )}
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 text-white">
+                                        <PlayCircle size={24} />
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="w-full h-full bg-slate-50 flex flex-col items-center justify-center p-4 text-center">
+                                <FileText size={48} className="text-slate-300 mb-2" />
+                                <div className="text-[10px] font-bold text-slate-500 uppercase truncate w-full">{item.title || 'Document'}</div>
                             </div>
                         )}
 
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-2 text-center">
-                            <p className="text-sm font-medium line-clamp-2 mb-2">{item.caption}</p>
-                            <button onClick={() => handleDelete(item.id)} className="bg-red-500/80 hover:bg-red-600 p-2 rounded-full text-white">
-                                <Trash2 size={16} />
-                            </button>
+                        {/* Selection Checkmark */}
+                        {selectedItems.has(item.id) && (
+                            <div className="absolute top-3 right-3 z-10 text-brand-blue bg-white rounded-full shadow-lg">
+                                <CheckCircle2 size={24} fill="currentColor" className="text-white bg-brand-blue rounded-full" />
+                            </div>
+                        )}
+
+                        {/* Overlay Actions */}
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                            <p className="text-white text-[10px] font-bold truncate mb-1">{item.title || item.caption}</p>
+                            <div className="flex items-center justify-between">
+                                <span className="text-[9px] text-white/60 font-medium uppercase tracking-tighter">
+                                    {new Date(item.created_at).toLocaleDateString()}
+                                </span>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                                    className="p-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-white transition-colors">
+                                    <Trash2 size={12} />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 ))}
             </div>
 
+            {/* Bulk Delete Modal */}
+            {isDeletingBulk && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 border border-red-100 animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center space-x-3 text-red-600 mb-4">
+                            <AlertCircle size={28} />
+                            <h2 className="text-xl font-bold text-brand-navy">Bulk Deletion</h2>
+                        </div>
+                        <p className="text-slate-600 mb-4 text-sm leading-relaxed">
+                            You are about to permanently delete <strong>{selectedItems.size}</strong> items. This action will be logged in the audit trail.
+                        </p>
+                        <div className="space-y-2 mb-6">
+                            <label className="form-label">Reason for Deletion</label>
+                            <textarea
+                                required
+                                className="form-input !ring-red-500/20 !border-red-200"
+                                rows={3}
+                                placeholder="e.g. Duplicate uploads, outdated graphics..."
+                                value={deleteReason}
+                                onChange={e => setDeleteReason(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex space-x-3">
+                            <button onClick={() => setIsDeletingBulk(false)} className="flex-1 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-colors">Cancel</button>
+                            <button onClick={handleBulkDelete} disabled={!deleteReason} className="flex-1 py-2.5 rounded-xl font-bold bg-red-600 text-white hover:bg-red-700 transition-all disabled:opacity-50">Delete Items</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Add/Edit Modal */}
             {isAdding && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden transform transition-all">
-                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                            <h2 className="text-xl font-bold text-slate-800">{activeTab === 'image' ? 'Upload Image' : 'Add Video Link'}</h2>
-                            <button onClick={() => setIsAdding(false)} className="text-slate-400 hover:text-red-500 transition-colors">
-                                <X size={24} />
-                            </button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                            <div>
+                                <h2 className="text-2xl font-black text-brand-navy tracking-tight">Add New Asset</h2>
+                                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Global Media Management</p>
+                            </div>
+                            <button onClick={() => setIsAdding(false)} className="p-2 hover:bg-slate-200 rounded-full transition-colors text-slate-400"><X size={24} /></button>
                         </div>
 
-                        <form onSubmit={handleSave} className="p-6 space-y-6">
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">
-                                    {activeTab === 'video' ? 'Video Embed URL' : 'Image File'}
-                                </label>
-
-                                {activeTab === 'image' ? (
-                                    <div className="space-y-4">
-                                        <div className="relative">
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                id="file-upload"
-                                                className="hidden"
-                                                onChange={handleFileUpload}
-                                            />
-                                            <label
-                                                htmlFor="file-upload"
-                                                className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl cursor-pointer transition-all ${newItem.url ? 'border-brand-blue bg-blue-50' : 'border-slate-300 hover:border-brand-blue hover:bg-slate-50'}`}
-                                            >
-                                                {newItem.url ? (
-                                                    // eslint-disable-next-line @next/next/no-img-element
-                                                    <img src={newItem.url} alt="Preview" className="h-full w-full object-contain rounded-lg p-2" />
-                                                ) : (
-                                                    <div className="flex flex-col items-center text-slate-500">
-                                                        {uploading ? (
-                                                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue mb-2"></div>
-                                                        ) : (
-                                                            <ImageIcon size={48} className="mb-2 opacity-50" />
-                                                        )}
-                                                        <span className="text-sm font-medium">{uploading ? 'Uploading...' : 'Click to select an image'}</span>
-                                                        <span className="text-xs mt-1 text-slate-400">JPG, PNG, WebP up to 5MB</span>
-                                                    </div>
-                                                )}
-                                            </label>
+                        <form onSubmit={handleSave} className="p-8 space-y-8 overflow-y-auto flex-1 custom-scrollbar">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                {/* Left Side: Type & Upload */}
+                                <div className="space-y-6">
+                                    <div className="space-y-3">
+                                        <label className="form-label">Asset Type</label>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {(['image', 'video', 'document'] as const).map(t => (
+                                                <button key={t} type="button" onClick={() => setNewItem({ ...newItem, media_type: t })}
+                                                    className={`py-3 rounded-2xl border-2 flex flex-col items-center justify-center transition-all ${newItem.media_type === t ? 'border-brand-blue bg-blue-50/50 text-brand-blue' : 'border-slate-100 text-slate-400 hover:border-slate-200'}`}>
+                                                    {t === 'image' ? <ImageIcon /> : t === 'video' ? <PlayCircle /> : <FileText />}
+                                                    <span className="text-[10px] font-black uppercase mt-2">{t}</span>
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
-                                ) : (
-                                    <input
-                                        type="text"
-                                        required
-                                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue focus:border-transparent outline-none transition-all"
-                                        value={newItem.url}
-                                        onChange={e => setNewItem({ ...newItem, url: e.target.value })}
-                                        placeholder="https://youtube.com/embed/..."
-                                    />
-                                )}
+
+                                    <div className="space-y-3">
+                                        <label className="form-label">
+                                            {newItem.media_type === 'video' ? 'Video URL (YouTube)' : 'Upload File'}
+                                        </label>
+
+                                        {newItem.media_type === 'video' ? (
+                                            <div className="space-y-4">
+                                                <input
+                                                    type="text"
+                                                    required
+                                                    className="form-input !font-medium"
+                                                    value={newItem.url}
+                                                    onChange={e => setNewItem({ ...newItem, url: e.target.value })}
+                                                    placeholder="https://youtube.com/watch?v=..."
+                                                />
+                                                {newItem.url && (
+                                                    <div className="aspect-video rounded-2xl overflow-hidden bg-slate-900 border-4 border-slate-100 shadow-inner">
+                                                        <iframe
+                                                            src={newItem.url.includes('embed') ? newItem.url : `https://www.youtube.com/embed/${newItem.url.split('v=')[1]?.split('&')[0] || newItem.url.split('/').pop()}`}
+                                                            className="w-full h-full"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="relative group">
+                                                <input type="file" id="media-upload" className="hidden" onChange={handleFileUpload} accept={newItem.media_type === 'image' ? "image/*" : ".pdf,.doc,.docx"} />
+                                                <label htmlFor="media-upload"
+                                                    className={`flex flex-col items-center justify-center w-full h-64 border-4 border-dashed rounded-3xl cursor-pointer transition-all ${newItem.url ? 'border-brand-blue bg-blue-50/30' : 'border-slate-100 hover:border-brand-blue/30 focus-within:ring-4 focus-within:ring-blue-100'}`}>
+                                                    {newItem.url ? (
+                                                        newItem.media_type === 'image' ? (
+                                                            <div className="relative h-full w-full p-4">
+                                                                <Image
+                                                                    src={newItem.url}
+                                                                    alt="Preview"
+                                                                    fill
+                                                                    className="object-contain rounded-xl"
+                                                                    sizes="300px"
+                                                                />
+                                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 bg-black/20 rounded-xl transition-opacity">
+                                                                    <span className="bg-white px-4 py-2 rounded-full font-bold text-xs shadow-xl">Change Image</span>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex flex-col items-center">
+                                                                <FileText size={64} className="text-brand-blue mb-4 animate-bounce" />
+                                                                <span className="text-xs font-black text-brand-blue uppercase">File Ready</span>
+                                                                <span className="text-[10px] text-slate-400 mt-1 max-w-[200px] truncate">{newItem.url}</span>
+                                                            </div>
+                                                        )
+                                                    ) : (
+                                                        <div className="flex flex-col items-center text-slate-300 group-hover:text-brand-blue transition-colors">
+                                                            {uploading ? (
+                                                                <span className="flex flex-col items-center">
+                                                                    <div className="w-10 h-10 border-4 border-brand-blue/30 border-t-brand-blue rounded-full animate-spin mb-4" />
+                                                                    <span className="text-xs font-black uppercase tracking-widest">Uploading Asset...</span>
+                                                                </span>
+                                                            ) : (
+                                                                <>
+                                                                    <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                                                        <Plus size={32} />
+                                                                    </div>
+                                                                    <span className="text-xs font-black uppercase tracking-widest">Click to Upload</span>
+                                                                    <span className="text-[10px] mt-2 font-medium opacity-60">Max size 20MB</span>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </label>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Right Side: Localization & Metadata */}
+                                <div className="space-y-6">
+                                    <div className="space-y-4">
+                                        <label className="form-label">Essential Info</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="form-input !font-bold"
+                                            placeholder="Asset Title (Internal use)"
+                                            value={newItem.title || ''}
+                                            onChange={e => setNewItem({ ...newItem, title: e.target.value })}
+                                        />
+                                        <input
+                                            type="text"
+                                            className="form-input"
+                                            placeholder="Alt Text (SEO/Accessibility)"
+                                            value={newItem.alt_text || ''}
+                                            onChange={e => setNewItem({ ...newItem, alt_text: e.target.value })}
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                                        <div className="flex items-center space-x-2">
+                                            <Globe size={14} className="text-slate-400" />
+                                            <label className="form-label !mb-0">Captions</label>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <div className="relative">
+                                                <span className="absolute top-3 left-3 px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[8px] font-black rounded uppercase">EN</span>
+                                                <textarea
+                                                    className="form-input !pl-12 !font-medium"
+                                                    placeholder="English caption..."
+                                                    rows={3}
+                                                    value={newItem.caption || ''}
+                                                    onChange={e => setNewItem({ ...newItem, caption: e.target.value })}
+                                                />
+                                            </div>
+                                            <div className="relative">
+                                                <span className="absolute top-3 left-3 px-1.5 py-0.5 bg-red-100 text-red-700 text-[8px] font-black rounded uppercase">NE</span>
+                                                <textarea
+                                                    className="form-input !pl-12 !font-medium"
+                                                    placeholder="नेपाली विवरण..."
+                                                    rows={3}
+                                                    value={newItem.caption_ne || ''}
+                                                    onChange={e => setNewItem({ ...newItem, caption_ne: e.target.value })}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-2">Caption</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue focus:border-transparent outline-none transition-all text-slate-800 bg-white"
-                                    value={newItem.caption}
-                                    onChange={e => setNewItem({ ...newItem, caption: e.target.value })}
-                                    placeholder="Enter a descriptive caption..."
-                                />
-                            </div>
-
-                            <div className="pt-2">
-                                <button
-                                    type="submit"
-                                    disabled={uploading || (activeTab === 'image' && !newItem.url)}
-                                    className="w-full py-3 bg-brand-blue text-white font-semibold rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-500/20"
-                                >
-                                    {uploading ? 'Uploading...' : 'Save Media'}
+                            <div className="pt-8 flex justify-end space-x-4 border-t border-slate-100">
+                                <button type="button" onClick={() => setIsAdding(false)}
+                                    className="px-8 py-3.5 text-slate-500 font-bold hover:bg-slate-50 rounded-2xl transition-all uppercase text-xs tracking-widest">
+                                    Discard
+                                </button>
+                                <button type="submit" disabled={uploading || !newItem.url}
+                                    className="px-12 py-3.5 bg-brand-blue text-white font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-500/20 active:scale-95 transition-all uppercase text-xs tracking-widest disabled:opacity-50">
+                                    {uploading ? 'Processing...' : 'Save Asset'}
                                 </button>
                             </div>
                         </form>

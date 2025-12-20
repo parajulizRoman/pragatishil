@@ -52,7 +52,7 @@ export default async function AdminCouncilPage() {
 
     return (
         <div className="space-y-8">
-            <h1 className="text-3xl font-bold text-slate-800">Admin Council</h1>
+            <h1 className="text-3xl font-bold text-brand-navy">Admin Council</h1>
 
             {/* Veto Card */}
             <div className={`p-6 rounded-2xl border-2 ${currentVeto ? 'bg-amber-50 border-amber-200' : 'bg-slate-50 border-slate-200'}`}>
@@ -62,7 +62,7 @@ export default async function AdminCouncilPage() {
                             <Crown size={32} />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-slate-800">Current Veto Holder</h2>
+                            <h2 className="text-xl font-bold text-brand-navy">Current Veto Holder</h2>
                             {currentVeto && currentVeto.profile ? (
                                 <p className="text-amber-700 font-medium">
                                     {currentVeto.profile.full_name}
@@ -78,9 +78,9 @@ export default async function AdminCouncilPage() {
 
             {/* Council List */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-                    <h3 className="font-semibold text-slate-800">Active Council Members</h3>
-                    <span className="text-sm text-slate-500">{councilMembers.length} Members</span>
+                <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                    <h3 className="font-bold text-brand-navy uppercase text-xs tracking-widest">Active Council Members</h3>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-widest leading-none">{councilMembers.length} Members</span>
                 </div>
 
                 <div className="divide-y divide-slate-100">
@@ -96,8 +96,8 @@ export default async function AdminCouncilPage() {
                                     />
                                 </div>
                                 <div>
-                                    <p className="font-semibold text-slate-800">{member.profile?.full_name}</p>
-                                    <p className="text-xs text-slate-500 uppercase">{member.profile?.role?.replace("_", " ")}</p>
+                                    <p className="font-bold text-brand-navy">{member.profile?.full_name}</p>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">{member.profile?.role?.replace("_", " ")}</p>
                                 </div>
                             </div>
 
