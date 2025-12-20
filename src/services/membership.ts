@@ -100,6 +100,11 @@ export async function createMembershipApplication(payload: MembershipRequestPayl
         auth_user_id: finalMeta.authUserId || null,
     };
 
+    // REQUIREMENT: auth_user_id is mandatory (no anonymous membership)
+    if (!memberData.auth_user_id) {
+        throw new Error("Authentication required: Please sign in with Google before submitting membership application.");
+    }
+
     // 2. Insert into Members Table
     const { data: member, error: memberError } = await supabaseAdmin
         .from('members')
@@ -113,6 +118,44 @@ export async function createMembershipApplication(payload: MembershipRequestPayl
     }
 
     const memberId = member.id;
+
+    // 2.5 SYNC TO PROFILES (Canonical Identity Table)
+    // Role upgrade logic: only upgrade if current role is 'member' or lower, never downgrade
+    const authUserId = memberData.auth_user_id;
+    try {
+        const { data: existingProfile } = await supabaseAdmin
+            .from('profiles')
+            .select('role')
+            .eq('id', authUserId)
+            .single();
+
+        const currentRole = existingProfile?.role || 'member';
+
+        // Role hierarchy: lower index = lower privilege
+        const roleHierarchy = ['guest', 'member', 'party_member', 'volunteer', 'team_member', 'central_committee', 'board', 'admin_party', 'yantrik', 'admin'];
+        const currentRoleIndex = roleHierarchy.indexOf(currentRole);
+
+        // Only set to 'member' if current role is guest or unknown, otherwise preserve
+        const newRole = currentRoleIndex <= 0 ? 'member' : currentRole;
+
+        // Build location string
+        const locationParts = [personal.districtNe, personal.provinceNe].filter(Boolean);
+        const location = locationParts.length > 0 ? locationParts.join(', ') : null;
+
+        await supabaseAdmin.from('profiles').upsert({
+            id: authUserId,
+            full_name: names.full_name_en || names.full_name_ne,
+            avatar_url: documents.profilePhoto?.imageUrl || null,
+            location: location,
+            role: newRole,
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'id', ignoreDuplicates: false });
+
+        console.log(`[Membership] Synced profile for ${authUserId}, role: ${newRole}`);
+    } catch (profileError) {
+        console.error("[Membership] Failed to sync profile:", profileError);
+        // Don't fail the whole request, member was created successfully
+    }
 
     // 3. Insert Departments (Parallel)
     if (party.departmentIds && party.departmentIds.length > 0) {
