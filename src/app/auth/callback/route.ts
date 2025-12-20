@@ -23,23 +23,48 @@ export async function GET(request: Request) {
                     const fullName = meta.full_name || meta.name || 'Anonymous';
                     const avatarUrl = meta.avatar_url || meta.picture || null;
 
-                    console.log(`[Auth Callback] Upserting profile for ${fullName}`);
-
-                    const { error: upsertError } = await supabaseAdmin
+                    // Check if profile already exists
+                    const { data: existingProfile } = await supabaseAdmin
                         .from('profiles')
-                        .upsert({
-                            id: user.id,
-                            full_name: fullName,
-                            avatar_url: avatarUrl,
-                            // Default to supporter if not checking specific emails
-                            role: 'member',
-                            updated_at: new Date().toISOString()
-                        }, { onConflict: 'id' });
+                        .select('id, role')
+                        .eq('id', user.id)
+                        .single();
 
-                    if (upsertError) {
-                        console.error('[Auth Callback] Profile upsert error:', upsertError);
+                    if (existingProfile) {
+                        // User exists - only update name/avatar, PRESERVE role
+                        console.log(`[Auth Callback] Updating existing profile for ${fullName}, keeping role: ${existingProfile.role}`);
+                        const { error: updateError } = await supabaseAdmin
+                            .from('profiles')
+                            .update({
+                                full_name: fullName,
+                                avatar_url: avatarUrl,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('id', user.id);
+
+                        if (updateError) {
+                            console.error('[Auth Callback] Profile update error:', updateError);
+                        } else {
+                            console.log('[Auth Callback] Profile updated successfully');
+                        }
                     } else {
-                        console.log('[Auth Callback] Profile synced successfully');
+                        // New user - create with default 'member' role
+                        console.log(`[Auth Callback] Creating new profile for ${fullName}`);
+                        const { error: insertError } = await supabaseAdmin
+                            .from('profiles')
+                            .insert({
+                                id: user.id,
+                                full_name: fullName,
+                                avatar_url: avatarUrl,
+                                role: 'member',
+                                updated_at: new Date().toISOString()
+                            });
+
+                        if (insertError) {
+                            console.error('[Auth Callback] Profile insert error:', insertError);
+                        } else {
+                            console.log('[Auth Callback] Profile created successfully');
+                        }
                     }
                 } catch (err) {
                     console.error('[Auth Callback] Unexpected error syncing profile:', err);
