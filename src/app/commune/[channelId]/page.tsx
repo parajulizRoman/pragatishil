@@ -15,10 +15,12 @@ import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ChannelPage() {
     const params = useParams();
     const channelId = params.channelId as string;
+    const { t, language } = useLanguage();
 
     const [channel, setChannel] = useState<DiscussionChannel | null>(null);
     const [threads, setThreads] = useState<DiscussionThread[]>([]);
@@ -265,21 +267,21 @@ export default function ChannelPage() {
             <div className="mb-8">
                 <Link href="/commune" passHref>
                     <Button variant="link" className="pl-0 mb-2 text-muted-foreground hover:text-brand-blue">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Back to Channels
+                        <ArrowLeft className="mr-2 h-4 w-4" />{t("च्यानलहरूमा फर्कनुहोस्", "Back to Channels")}
                     </Button>
                 </Link>
                 <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                     <div>
-                        <Typography variant="h1" className="text-3xl text-brand-navy mb-1">{channel.name}</Typography>
+                        <Typography variant="h1" className="text-3xl text-brand-navy mb-1">{language === 'ne' && channel.name_ne ? channel.name_ne : channel.name}</Typography>
                         {channel.name_ne && <Typography variant="h3" className="text-xl font-nepali text-muted-foreground">{channel.name_ne}</Typography>}
-                        <Typography variant="p" className="text-slate-600 mt-2 max-w-3xl">{channel.description_en || channel.description}</Typography>
+                        <Typography variant="p" className="text-slate-600 mt-2 max-w-3xl">{language === 'ne' && channel.description_ne ? channel.description_ne : (channel.description_en || channel.description)}</Typography>
                     </div>
                     {canCreateThread && !showForm && (
                         <Button
                             onClick={() => setShowForm(true)}
                             className="bg-brand-red hover:bg-brand-red/90 text-white"
                         >
-                            New Thread
+                            {t("नयाँ थ्रेड", "New Thread")}
                         </Button>
                     )}
                 </div>
@@ -287,9 +289,9 @@ export default function ChannelPage() {
                 {/* Guidelines Box */}
                 {(channel.guidelines_en || channel.guidelines_ne) && (
                     <div className="mt-6 p-4 bg-brand-blue/5 border border-brand-blue/10 rounded-lg text-sm text-slate-700">
-                        <strong className="block text-brand-blue mb-1">Guidelines:</strong>
-                        <p>{channel.guidelines_en}</p>
-                        {channel.guidelines_ne && <p className="font-nepali text-slate-600 mt-1">{channel.guidelines_ne}</p>}
+                        <strong className="block text-brand-blue mb-1">{t("दिशानिर्देश", "Guidelines")}:</strong>
+                        <p>{language === 'ne' && channel.guidelines_ne ? channel.guidelines_ne : channel.guidelines_en}</p>
+                        {language === 'en' && channel.guidelines_ne && <p className="font-nepali text-slate-600 mt-1">{channel.guidelines_ne}</p>}
                     </div>
                 )}
             </div>
@@ -298,36 +300,36 @@ export default function ChannelPage() {
             {showForm && (
                 <Card className="mb-8 animate-in slide-in-from-top-2 border-brand-blue/20 shadow-md">
                     <CardHeader>
-                        <CardTitle className="text-lg text-brand-navy">Create New Thread</CardTitle>
+                        <CardTitle className="text-lg text-brand-navy">{t("नयाँ थ्रेड सिर्जना", "Create New Thread")}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {!isAuthenticated && channel.min_role_to_create_threads !== 'anonymous_visitor' && (
-                            <div className="text-destructive text-sm mb-4">You must be logged in to create a thread here.</div>
+                            <div className="text-destructive text-sm mb-4">{t("यहाँ थ्रेड सिर्जना गर्न तपाईंले लग इन हुनुपर्छ।", "You must be logged in to create a thread here.")}</div>
                         )}
                         <form onSubmit={handleCreateThread} className="space-y-4">
                             {/* Title Input */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Title <span className="text-muted-foreground font-normal">(Max 140 chars)</span></label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t("शीर्षक", "Title")} <span className="text-muted-foreground font-normal">({t("अधिकतम १४० अक्षर", "Max 140 chars")})</span></label>
                                 <input
                                     type="text"
                                     value={newTitle}
                                     maxLength={140}
                                     onChange={(e) => setNewTitle(e.target.value)}
                                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-lg font-semibold"
-                                    placeholder={channel.allow_anonymous_posts ? "Topic of discussion..." : "What's on your mind?"}
+                                    placeholder={channel.allow_anonymous_posts ? t("छलफलको विषय...", "Topic of discussion...") : t("तपाईंको मनमा के छ?", "What's on your mind?")}
                                     required
                                 />
                             </div>
 
                             {/* Body Input */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Content <span className="text-muted-foreground font-normal">(Markdown supported)</span></label>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t("सामग्री", "Content")} <span className="text-muted-foreground font-normal">({t("मार्कडाउन समर्थित", "Markdown supported")})</span></label>
                                 <TextareaAutosize
                                     minRows={5}
                                     value={newBody}
                                     onChange={(e) => setNewBody(e.target.value)}
                                     className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                                    placeholder="Share your detailed thoughts, arguments, or questions..."
+                                    placeholder={t("आफ्ना विस्तृत विचार, तर्क वा प्रश्नहरू साझा गर्नुहोस्...", "Share your detailed thoughts, arguments, or questions...")}
                                     required
                                 />
 
@@ -349,7 +351,7 @@ export default function ChannelPage() {
                                     <label className={`flex items-center gap-2 px-3 py-1.5 rounded hover:bg-slate-100 cursor-pointer text-slate-600 transition-colors ${isUploading ? 'opacity-50 pointer-events-none' : ''}`}>
                                         <input type="file" multiple className="hidden" onChange={handleFileSelect} />
                                         {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Paperclip size={16} />}
-                                        <span className="text-sm font-medium">Attach files</span>
+                                        <span className="text-sm font-medium">{t("फाइलहरू संलग्न", "Attach files")}</span>
                                     </label>
                                 </div>
                             </div>
@@ -366,7 +368,7 @@ export default function ChannelPage() {
                                             className="w-4 h-4 rounded text-brand-blue focus:ring-brand-blue"
                                         />
                                         <span className="text-sm text-slate-600">
-                                            Post as <span className={`font-medium ${isNewThreadAnon ? 'text-brand-blue' : 'text-slate-900'}`}>{isNewThreadAnon ? "Anonymous" : (isAuthenticated ? "Myself" : "Guest")}</span>
+                                            {t("पोस्ट गर्नुहोस्", "Post as")} <span className={`font-medium ${isNewThreadAnon ? 'text-brand-blue' : 'text-slate-900'}`}>{isNewThreadAnon ? t("बेनामी", "Anonymous") : (isAuthenticated ? t("म आफैं", "Myself") : t("अतिथि", "Guest"))}</span>
                                         </span>
                                     </label>
                                 ) : (
@@ -379,14 +381,14 @@ export default function ChannelPage() {
                                         variant="ghost"
                                         onClick={() => setShowForm(false)}
                                     >
-                                        Cancel
+                                        {t("रद्द गर्नुहोस्", "Cancel")}
                                     </Button>
                                     <Button
                                         type="submit"
                                         className="bg-brand-blue hover:bg-brand-blue/90 text-white"
                                         disabled={isCreating || isUploading}
                                     >
-                                        {isCreating ? "Publishing..." : "Publish Thread"}
+                                        {isCreating ? t("प्रकाशित गर्दै...", "Publishing...") : t("थ्रेड प्रकाशित", "Publish Thread")}
                                     </Button>
                                 </div>
                             </div>
@@ -404,7 +406,7 @@ export default function ChannelPage() {
                         activeTab === 'discussions' ? "border-brand-blue text-brand-blue" : "border-transparent text-muted-foreground hover:text-slate-800"
                     )}
                 >
-                    Discussions
+                    {t("छलफलहरू", "Discussions")}
                 </button>
                 <button
                     onClick={() => setActiveTab('resources')}
@@ -413,7 +415,7 @@ export default function ChannelPage() {
                         activeTab === 'resources' ? "border-brand-blue text-brand-blue" : "border-transparent text-muted-foreground hover:text-slate-800"
                     )}
                 >
-                    Resources & Docs
+                    {t("स्रोत र कागजातहरू", "Resources & Docs")}
                 </button>
                 <button
                     onClick={() => setActiveTab('impact')}
@@ -422,7 +424,7 @@ export default function ChannelPage() {
                         activeTab === 'impact' ? "border-brand-blue text-brand-blue" : "border-transparent text-muted-foreground hover:text-slate-800"
                     )}
                 >
-                    Impact & Stats
+                    {t("प्रभाव र तथ्याङ्क", "Impact & Stats")}
                 </button>
             </div>
 
@@ -432,7 +434,7 @@ export default function ChannelPage() {
                     {threads.length === 0 ? (
                         <Card className="text-center p-12 bg-slate-50/50 border-dashed">
                             <CardContent>
-                                <Typography variant="muted">No threads yet. Be the first to start a conversation!</Typography>
+                                <Typography variant="muted">{t("अहिलेसम्म कुनै थ्रेड छैन। कुराकानी सुरु गर्ने पहिलो हुनुहोस्!", "No threads yet. Be the first to start a conversation!")}</Typography>
                             </CardContent>
                         </Card>
                     ) : (
@@ -456,7 +458,7 @@ export default function ChannelPage() {
                                                 <div className="flex items-center text-xs text-muted-foreground gap-3 mt-3">
                                                     <span>{new Date(thread.created_at!).toLocaleDateString()}</span>
                                                     <span>•</span>
-                                                    {thread.is_anonymous ? <span className="italic">Anonymous</span> : <span className="font-medium text-slate-700">Member</span>}
+                                                    {thread.is_anonymous ? <span className="italic">{t("बेनामी", "Anonymous")}</span> : <span className="font-medium text-slate-700">{t("सदस्य", "Member")}</span>}
                                                 </div>
                                             </div>
 
@@ -520,7 +522,7 @@ export default function ChannelPage() {
                         <CardHeader>
                             <CardTitle className="text-lg flex items-center gap-2">
                                 <FileText className="w-5 h-5 text-brand-blue" />
-                                Key Documents & ReadMe
+                                {t("मुख्य कागजातहरू र ReadMe", "Key Documents & ReadMe")}
                             </CardTitle>
                         </CardHeader>
                         <CardContent>
@@ -529,7 +531,7 @@ export default function ChannelPage() {
                                     {channel.readme_content}
                                 </div>
                             ) : (
-                                <Typography variant="muted" className="italic">No specific guidelines or readme content added yet.</Typography>
+                                <Typography variant="muted" className="italic">{t("अहिलेसम्म कुनै दिशानिर्देश वा readme सामग्री थपिएको छैन।", "No specific guidelines or readme content added yet.")}</Typography>
                             )}
                         </CardContent>
                     </Card>
@@ -539,7 +541,7 @@ export default function ChannelPage() {
                         <div className="space-y-4">
                             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
                                 <WrapperLinkIcon />
-                                Documents & Links
+                                {t("कागजातहरू र लिङ्कहरू", "Documents & Links")}
                             </h3>
 
                             {/* Legacy Doc Link */}
@@ -551,8 +553,8 @@ export default function ChannelPage() {
                                                 <FileText size={18} />
                                             </div>
                                             <div>
-                                                <div className="font-semibold text-brand-blue">Main Drive Folder (Legacy)</div>
-                                                <div className="text-xs text-slate-500">External Link</div>
+                                                <div className="font-semibold text-brand-blue">{t("मुख्य ड्राइभ फोल्डर (Legacy)", "Main Drive Folder (Legacy)")}</div>
+                                                <div className="text-xs text-slate-500">{t("बाह्य लिङ्क", "External Link")}</div>
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -574,7 +576,7 @@ export default function ChannelPage() {
                             ))}
 
                             {(!channel.docs_url && (!channel.resources || !channel.resources.some(r => ['doc', 'link'].includes(r.type)))) && (
-                                <Typography variant="muted" className="italic text-sm">No documents found.</Typography>
+                                <Typography variant="muted" className="italic text-sm">{t("कुनै कागजातहरू फेला परेनन्।", "No documents found.")}</Typography>
                             )}
                         </div>
 
@@ -582,7 +584,7 @@ export default function ChannelPage() {
                         <div className="space-y-4">
                             <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
                                 <WrapperVideoIcon />
-                                Featured Videos
+                                {t("विशेष भिडियोहरू", "Featured Videos")}
                             </h3>
 
                             {/* Legacy Video Link */}
@@ -594,8 +596,8 @@ export default function ChannelPage() {
                                                 <WrapperVideoIcon size={18} />
                                             </div>
                                             <div>
-                                                <div className="font-semibold text-red-700">Official Playlist (Legacy)</div>
-                                                <div className="text-xs text-red-500">YouTube Playlist</div>
+                                                <div className="font-semibold text-red-700">{t("आधिकारिक प्लेलिस्ट (Legacy)", "Official Playlist (Legacy)")}</div>
+                                                <div className="text-xs text-red-500">{t("YouTube प्लेलिस्ट", "YouTube Playlist")}</div>
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -617,7 +619,7 @@ export default function ChannelPage() {
                             ))}
 
                             {(!channel.video_playlist_url && (!channel.resources || !channel.resources.some(r => r.type === 'video'))) && (
-                                <Typography variant="muted" className="italic text-sm">No videos found.</Typography>
+                                <Typography variant="muted" className="italic text-sm">{t("कुनै भिडियोहरू फेला परेनन्।", "No videos found.")}</Typography>
                             )}
                         </div>
                     </div>
@@ -629,7 +631,7 @@ export default function ChannelPage() {
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
                     <Card className="w-full max-w-sm">
                         <CardHeader>
-                            <CardTitle>Report Thread</CardTitle>
+                            <CardTitle>{t("थ्रेड रिपोर्ट", "Report Thread")}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleFlag} className="space-y-4">
@@ -638,13 +640,13 @@ export default function ChannelPage() {
                                     value={flagReason}
                                     onChange={e => setFlagReason(e.target.value)}
                                 >
-                                    <option value="spam">Spam</option>
-                                    <option value="inappropriate">Inappropriate</option>
-                                    <option value="other">Other</option>
+                                    <option value="spam">{t("स्प्याम", "Spam")}</option>
+                                    <option value="inappropriate">{t("अनुचित", "Inappropriate")}</option>
+                                    <option value="other">{t("अन्य", "Other")}</option>
                                 </select>
                                 <div className="flex justify-end gap-2">
-                                    <Button type="button" variant="ghost" onClick={() => setFlagThreadId(null)}>Cancel</Button>
-                                    <Button type="submit" variant="destructive">Report</Button>
+                                    <Button type="button" variant="ghost" onClick={() => setFlagThreadId(null)}>{t("रद्द गर्नुहोस्", "Cancel")}</Button>
+                                    <Button type="submit" variant="destructive">{t("रिपोर्ट", "Report")}</Button>
                                 </div>
                             </form>
                         </CardContent>

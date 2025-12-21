@@ -12,6 +12,7 @@ import { Typography } from "@/components/ui/typography";
 // import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { useLanguage } from "@/context/LanguageContext";
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Since I don't have shadcn Select yet, I'll use a styled native select
@@ -35,6 +36,7 @@ interface ChannelModalProps {
 }
 
 export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }: ChannelModalProps) {
+    const { t } = useLanguage();
     const [name, setName] = useState("");
     const [slug, setSlug] = useState("");
     const [description, setDescription] = useState("");
@@ -231,7 +233,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
             <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full flex flex-col max-h-[90vh] overflow-hidden">
                 <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white z-10">
                     <Typography variant="h3" className="text-lg font-bold text-slate-800">
-                        {editChannel ? 'Edit Channel' : 'Create New Channel'}
+                        {editChannel ? t('च्यानल सम्पादन', 'Edit Channel') : t('नयाँ च्यानल सिर्जना', 'Create New Channel')}
                     </Typography>
                     <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-slate-400 hover:text-slate-600">
                         <X size={20} />
@@ -243,13 +245,13 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                         className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'details' ? 'border-brand-blue text-brand-blue' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
                         onClick={() => setActiveTab('details')}
                     >
-                        Details
+                        {t('विवरण', 'Details')}
                     </button>
                     <button
                         className={`py-3 px-4 text-sm font-medium border-b-2 transition-colors ${activeTab === 'resources' ? 'border-brand-blue text-brand-blue' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
                         onClick={() => setActiveTab('resources')}
                     >
-                        Resources & Content
+                        {t('स्रोत र सामग्री', 'Resources & Content')}
                     </button>
                 </div>
 
@@ -266,16 +268,16 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
 
                             <div className="grid grid-cols-2 gap-5">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Channel Name</label>
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('च्यानल नाम', 'Channel Name')}</label>
                                     <Input
                                         required
                                         value={name}
                                         onChange={e => handleAutoSlug(e.target.value)}
-                                        placeholder="e.g. Health Policy"
+                                        placeholder={t('जस्तै स्वास्थ्य नीति', 'e.g. Health Policy')}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Slug (URL)</label>
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('स्लग (URL)', 'Slug (URL)')}</label>
                                     <Input
                                         required
                                         className="bg-slate-50 font-mono text-slate-600"
@@ -287,43 +289,43 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Description</label>
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('विवरण', 'Description')}</label>
                                 <Textarea
                                     rows={3}
                                     value={description}
                                     onChange={e => setDescription(e.target.value)}
-                                    placeholder="What is this channel about?"
+                                    placeholder={t('यो च्यानल केबारेमा हो?', 'What is this channel about?')}
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-5">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Visibility</label>
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('दृश्यता', 'Visibility')}</label>
                                     <NativeSelect
                                         value={visibility}
                                         onChange={e => setVisibility(e.target.value as "public" | "logged_in" | "party_only")}
                                     >
-                                        <option value="public">Public (Everyone)</option>
-                                        <option value="logged_in">Members Only</option>
-                                        <option value="party_only">Party Only</option>
+                                        <option value="public">{t('सार्वजनिक (सबै)', 'Public (Everyone)')}</option>
+                                        <option value="logged_in">{t('सदस्यहरू मात्र', 'Members Only')}</option>
+                                        <option value="party_only">{t('पार्टी मात्र', 'Party Only')}</option>
                                     </NativeSelect>
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex justify-between">
-                                        Category
+                                        {t('विधा', 'Category')}
                                         <button
                                             type="button"
                                             onClick={() => setIsCategoryModalOpen(true)}
                                             className="text-xs text-brand-blue hover:underline"
                                         >
-                                            Manage
+                                            {t('व्यवस्थापन', 'Manage')}
                                         </button>
                                     </label>
                                     <NativeSelect
                                         value={category}
                                         onChange={e => setCategory(e.target.value)}
                                     >
-                                        <option value="">Select a Category...</option>
+                                        <option value="">{t('विधा छान्नुहोस्...', 'Select a Category...')}</option>
                                         {categoriesList.map(c => (
                                             <option key={c.name} value={c.name}>{c.name}</option>
                                         ))}
@@ -335,8 +337,8 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                         <div className="space-y-6">
                             {/* Readme Section */}
                             <div className="space-y-2">
-                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Readme Content (Markdown)</label>
-                                <Typography variant="muted" className="text-xs">Displayed in the "About" tab of the channel.</Typography>
+                                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('Readme सामग्री (Markdown)', 'Readme Content (Markdown)')}</label>
+                                <Typography variant="muted" className="text-xs">{t('च्यानलको "About" ट्याबमा देखाइन्छ।', 'Displayed in the "About" tab of the channel.')}</Typography>
                                 <Textarea
                                     className="font-mono text-sm"
                                     rows={6}
@@ -349,7 +351,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                             {/* Legacy URLs */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Legacy Docs URL</label>
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('Legacy Docs URL', 'Legacy Docs URL')}</label>
                                     <Input
                                         type="url"
                                         value={docsUrl}
@@ -358,7 +360,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Legacy Video URL</label>
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('Legacy Video URL', 'Legacy Video URL')}</label>
                                     <Input
                                         type="url"
                                         value={videoUrl}
@@ -371,7 +373,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                             {/* New Resources List */}
                             <div className="space-y-3">
                                 <div className="flex justify-between items-center">
-                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Additional Resources</label>
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('थप स्रोतहरू', 'Additional Resources')}</label>
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -379,7 +381,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                         onClick={handleAddResource}
                                         className="h-7 text-xs"
                                     >
-                                        + Add Resource
+                                        + {t('स्रोत थप्नुहोस्', 'Add Resource')}
                                     </Button>
                                 </div>
 
@@ -398,10 +400,10 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                                     onChange={e => handleResourceChange(idx, 'type', e.target.value)}
                                                     className="col-span-1 h-8 text-sm"
                                                 >
-                                                    <option value="link">Link</option>
-                                                    <option value="doc">Document</option>
-                                                    <option value="video">Video</option>
-                                                    <option value="impact">Impact</option>
+                                                    <option value="link">{t('लिङ्क', 'Link')}</option>
+                                                    <option value="doc">{t('कागजात', 'Document')}</option>
+                                                    <option value="video">{t('भिडियो', 'Video')}</option>
+                                                    <option value="impact">{t('प्रभाव', 'Impact')}</option>
                                                 </NativeSelect>
                                                 <Input
                                                     type="url"
@@ -423,7 +425,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                         </div>
                                     ))}
                                     {resources.length === 0 && (
-                                        <p className="text-xs text-slate-400 italic text-center py-2">No additional resources added.</p>
+                                        <p className="text-xs text-slate-400 italic text-center py-2">{t('कुनै थप स्रोतहरू थपिएको छैन।', 'No additional resources added.')}</p>
                                     )}
                                 </div>
                             </div>
@@ -431,7 +433,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                             {/* Impact Stats Editor */}
                             <div className="space-y-3 pt-4 border-t border-slate-100">
                                 <div className="flex justify-between items-center">
-                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Impact Statistics</label>
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('प्रभाव तथ्याङ्क', 'Impact Statistics')}</label>
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -439,23 +441,23 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                         onClick={handleAddStat}
                                         className="h-7 text-xs"
                                     >
-                                        + Add Stat
+                                        + {t('तथ्याङ्क थप्नुहोस्', 'Add Stat')}
                                     </Button>
                                 </div>
-                                <Typography variant="muted" className="text-xs">Key-Value pairs (e.g., &quot;Villages Reached&quot;: &quot;15&quot;)</Typography>
+                                <Typography variant="muted" className="text-xs">{t('Key-Value जोडीहरू (जस्तै, "गाउँहरू पुगिएको": "15")', 'Key-Value pairs (e.g., "Villages Reached": "15")')}</Typography>
 
                                 <div className="space-y-2">
                                     {Object.entries(impactStats).map(([key, value], idx) => (
                                         <div key={idx} className="flex gap-2 items-center border p-2 rounded-lg bg-emerald-50/50 border-emerald-100">
                                             <Input
-                                                placeholder="Label (e.g. Students)"
+                                                placeholder={t('लेबल (जस्तै विद्यार्थीहरू)', 'Label (e.g. Students)')}
                                                 value={key}
                                                 onChange={e => handleStatChange(key, e.target.value, value)}
                                                 className="flex-1 bg-white h-8 text-sm"
                                             />
                                             <span className="text-slate-400">:</span>
                                             <Input
-                                                placeholder="Value (e.g. 500)"
+                                                placeholder={t('मान (जस्तै 500)', 'Value (e.g. 500)')}
                                                 value={value}
                                                 onChange={e => handleStatChange(key, key, e.target.value)}
                                                 className="w-24 bg-white h-8 text-sm font-mono"
@@ -472,7 +474,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                                         </div>
                                     ))}
                                     {Object.keys(impactStats).length === 0 && (
-                                        <p className="text-xs text-slate-400 italic text-center py-2">No impact stats recorded.</p>
+                                        <p className="text-xs text-slate-400 italic text-center py-2">{t('कुनै प्रभाव तथ्याङ्क रेकर्ड छैन।', 'No impact stats recorded.')}</p>
                                     )}
                                 </div>
                             </div>
@@ -486,7 +488,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                         variant="ghost"
                         onClick={onClose}
                     >
-                        Cancel
+                        {t('रद्द गर्नुहोस्', 'Cancel')}
                     </Button>
                     <Button
                         type="submit"
@@ -494,7 +496,7 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                         disabled={loading}
                         className="bg-brand-blue hover:bg-brand-blue/90 text-white"
                     >
-                        {loading ? 'Saving...' : (editChannel ? 'Update Channel' : 'Create Channel')}
+                        {loading ? t('सुरक्षित गर्दै...', 'Saving...') : (editChannel ? t('च्यानल अपडेट', 'Update Channel') : t('च्यानल सिर्जना', 'Create Channel'))}
                     </Button>
                 </div>
             </div>

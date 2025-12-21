@@ -3,7 +3,6 @@
 import { Component, ReactNode } from "react";
 import Navbar from "./Navbar";
 import Link from "next/link";
-import { siteContent } from "@/config/siteContent";
 
 class NavbarErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { hasError: boolean }> {
     constructor(props: { children: ReactNode; fallback: ReactNode }) {
@@ -35,7 +34,7 @@ export default function SafeNavbar() {
                     <div className="flex items-center gap-4">
                         <Link href="/" className="flex-shrink-0">
                             <span className="font-bold text-xl tracking-tight text-brand-red">
-                                {siteContent.nav.brand.firstEn} <span className="text-brand-blue">{siteContent.nav.brand.secondEn}</span>
+                                Pragatishil <span className="text-brand-blue">Loktantrik</span>
                             </span>
                         </Link>
                     </div>

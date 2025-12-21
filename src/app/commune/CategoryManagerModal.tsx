@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Typography } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface CategoryManagerProps {
     isOpen: boolean;
@@ -15,6 +16,7 @@ interface CategoryManagerProps {
 }
 
 export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: CategoryManagerProps) {
+    const { t } = useLanguage();
     const [categories, setCategories] = useState<{ name: string }[]>([]);
     const [newCategory, setNewCategory] = useState("");
     const [loading, setLoading] = useState(false);
@@ -54,7 +56,7 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
     };
 
     const handleDelete = async (name: string) => {
-        if (!confirm(`Delete category "${name}"?`)) return;
+        if (!confirm(t(`"${name}" विधा मेटाउने हो?`, `Delete category "${name}"?`))) return;
         setLoading(true);
         try {
             const res = await fetch(`/api/discussions/categories?name=${encodeURIComponent(name)}`, {
@@ -73,7 +75,7 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
     };
 
     const handleRename = async (oldName: string) => {
-        const newName = prompt("Rename category to:", oldName);
+        const newName = prompt(t("विधा नाम बदल्नुहोस्:", "Rename category to:"), oldName);
         if (!newName || newName === oldName) return;
 
         try {
@@ -95,7 +97,7 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col">
                 <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-white">
-                    <Typography variant="h4" className="text-base font-bold text-slate-800">Manage Categories</Typography>
+                    <Typography variant="h4" className="text-base font-bold text-slate-800">{t('विधाहरू व्यवस्थापन', 'Manage Categories')}</Typography>
                     <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-slate-400 hover:text-slate-600">
                         <X size={18} />
                     </Button>
@@ -107,10 +109,10 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
                             <li key={c.name} className="flex justify-between items-center p-2 bg-slate-50 rounded group hover:bg-slate-100 transition-colors">
                                 <span className="text-sm font-medium text-slate-700">{c.name}</span>
                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Button variant="ghost" size="icon" onClick={() => handleRename(c.name)} className="h-7 w-7 text-blue-500 hover:text-blue-700 hover:bg-blue-50" title="Rename">
+                                    <Button variant="ghost" size="icon" onClick={() => handleRename(c.name)} className="h-7 w-7 text-blue-500 hover:text-blue-700 hover:bg-blue-50" title={t("नाम बदल्नुहोस्", "Rename")}>
                                         <Edit2 size={12} />
                                     </Button>
-                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(c.name)} className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50" title="Delete">
+                                    <Button variant="ghost" size="icon" onClick={() => handleDelete(c.name)} className="h-7 w-7 text-red-500 hover:text-red-700 hover:bg-red-50" title={t("मेटाउनुहोस्", "Delete")}>
                                         <Trash2 size={12} />
                                     </Button>
                                 </div>
@@ -125,7 +127,7 @@ export default function CategoryManagerModal({ isOpen, onClose, onUpdate }: Cate
                         <Input
                             value={newCategory}
                             onChange={e => setNewCategory(e.target.value)}
-                            placeholder="New category..."
+                            placeholder={t("नयाँ विधा...", "New category...")}
                             className="flex-1 h-9 text-sm"
                             onKeyDown={e => e.key === 'Enter' && handleCreate()}
                         />

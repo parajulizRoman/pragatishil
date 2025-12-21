@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { siteContent } from "@/config/siteContent";
 import { useLanguage } from "@/context/LanguageContext";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { Facebook, Twitter, Instagram, Youtube, Mail, MapPin } from "lucide-react";
 
 export default function Footer() {
     const { t } = useLanguage();
+    const { contact, social, footer, nav, hero } = useSiteSettings();
 
     // Map social names to icons
     const getSocialIcon = (name: string) => {
@@ -31,13 +32,13 @@ export default function Footer() {
                     {/* Column 1: Brand & Slogan */}
                     <div className="space-y-4">
                         <h3 className="text-2xl font-bold text-brand-red">
-                            {t(siteContent.nav.brand.firstEn, siteContent.nav.brand.firstNe)} <span className="text-blue-900">{t(siteContent.nav.brand.secondEn, siteContent.nav.brand.secondNe)}</span>
+                            {t(nav?.brand?.firstEn || "Pragatishil", nav?.brand?.firstNe || "प्रगतिशील")} <span className="text-blue-900">{t(nav?.brand?.secondEn || "Loktantrik", nav?.brand?.secondNe || "लोकतान्त्रिक")}</span>
                         </h3>
                         <p className="text-xl text-blue-900 font-bold">
-                            {t(siteContent.footer.taglineEn, siteContent.footer.taglineNe)}
+                            {t(footer?.taglineEn || "Building a just, progressive and prosperous Nepal.", footer?.taglineNe || "नेपाली माटो, हाम्रो बाटो")}
                         </p>
                         <p className="text-sm text-slate-600 font-medium">
-                            {t(siteContent.hero.subtitleEnLine1, siteContent.hero.subtitleNe)}
+                            {t(hero?.subtitleEnLine1 || "Progressive socialist, democratic alternative for Nepal.", hero?.subtitleNe || "प्रगतिशील समाजवादी, लोकतान्त्रिक विकल्प")}
                         </p>
                     </div>
 
@@ -45,38 +46,38 @@ export default function Footer() {
                     <div className="space-y-4">
                         <h4 className="text-lg font-semibold text-brand-red">{t("Quick Links", "द्रुत लिङ्कहरू")}</h4>
                         <div className="flex flex-col space-y-2">
-                            <Link href="/about" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.about.en, siteContent.nav.about.ne)}</Link>
-                            <Link href="/media" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.media.en, siteContent.nav.media.ne)}</Link>
-                            <Link href="/members" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.members.en, siteContent.nav.members.ne)}</Link>
-                            <Link href="/join" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.join.en, siteContent.nav.join.ne)}</Link>
-                            <Link href="/tools/date-converter" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(siteContent.nav.tools.dateConverter.en, siteContent.nav.tools.dateConverter.ne)}</Link>
+                            <Link href="/about" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(nav?.about?.en || "About", nav?.about?.ne || "हाम्रो बारेमा")}</Link>
+                            <Link href="/media" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(nav?.media?.en || "Media", nav?.media?.ne || "मिडिया")}</Link>
+                            <Link href="/members" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(nav?.members?.en || "Members", nav?.members?.ne || "सदस्यहरू")}</Link>
+                            <Link href="/join" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(nav?.join?.en || "Join Movement", nav?.join?.ne || "अभियानमा जोडिनुहोस्")}</Link>
+                            <Link href="/tools/date-converter" className="text-blue-900 hover:text-brand-red transition-colors font-medium">{t(nav?.tools?.dateConverter?.en || "Date Converter", nav?.tools?.dateConverter?.ne || "मिति परिवर्तन")}</Link>
                         </div>
                     </div>
 
                     {/* Column 3: Contact & Social */}
                     <div className="space-y-4">
-                        <h4 className="text-lg font-semibold text-white">{t(siteContent.nav.contact.en, siteContent.nav.contact.ne)}</h4>
+                        <h4 className="text-lg font-semibold text-white">{t(nav?.contact?.en || "Contact", nav?.contact?.ne || "सम्पर्क")}</h4>
                         <div className="flex items-start gap-3 text-slate-600">
                             <MapPin className="w-5 h-5 mt-0.5 flex-shrink-0" />
-                            <span className="text-sm">{siteContent.contact.address}</span>
+                            <span className="text-sm">{contact?.address || "Baneshwor, Kathmandu, Nepal"}</span>
                         </div>
-                        <a href={`mailto:${siteContent.contact.email}`} className="flex items-center gap-3 text-slate-600 hover:text-brand-blue transition-colors">
+                        <a href={`mailto:${contact?.email || "info@pragatishil.org.np"}`} className="flex items-center gap-3 text-slate-600 hover:text-brand-blue transition-colors">
                             <Mail className="w-5 h-5 flex-shrink-0" />
-                            <span className="text-sm">{siteContent.contact.email}</span>
+                            <span className="text-sm">{contact?.email || "info@pragatishil.org.np"}</span>
                         </a>
 
                         <div className="flex space-x-4 mt-6">
-                            {siteContent.social.map((social) => (
+                            {(social || []).map((s) => (
                                 <a
-                                    key={social.name}
-                                    href={social.url}
+                                    key={s.name}
+                                    href={s.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-slate-600 hover:text-brand-red hover:scale-110 transition-all duration-300"
-                                    title={social.name}
+                                    title={s.name}
                                 >
-                                    <span className="sr-only">{social.name}</span>
-                                    {getSocialIcon(social.name)}
+                                    <span className="sr-only">{s.name}</span>
+                                    {getSocialIcon(s.name)}
                                 </a>
                             ))}
                         </div>

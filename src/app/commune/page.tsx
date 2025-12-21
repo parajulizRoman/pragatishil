@@ -8,6 +8,7 @@ import { DiscussionChannel, UserRole } from "@/types";
 import ChannelModal from "./ChannelModal";
 import { createBrowserClient } from "@supabase/ssr";
 import { canManageChannels, canManageUsers } from "@/lib/permissions";
+import { useLanguage } from "@/context/LanguageContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ function ChannelCardSkeleton() {
 }
 
 export default function CommunityPage() {
+    const { t, language } = useLanguage();
     const [channels, setChannels] = useState<DiscussionChannel[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -112,7 +114,7 @@ export default function CommunityPage() {
             </div>
         );
     }
-    if (error) return <div className="p-10 text-center text-destructive font-medium">Error: {error}</div>;
+    if (error) return <div className="p-10 text-center text-destructive font-medium">{t("त्रुटि", "Error")}: {error}</div>;
 
     // Use Capability Helpers
     const canEditChannels = canManageChannels(userRole);
@@ -122,6 +124,22 @@ export default function CommunityPage() {
         public: channels.filter(c => c.visibility === 'public'),
         members: channels.filter(c => ['members', 'logged_in', 'party_only'].includes(c.visibility)),
         leadership: channels.filter(c => ['central_committee', 'board_only', 'leadership', 'internal'].includes(c.visibility)),
+    };
+
+    // Visibility labels
+    const getVisibilityLabel = (visibility: string) => {
+        const labels: Record<string, { en: string; ne: string }> = {
+            'public': { en: 'Public', ne: 'सार्वजनिक' },
+            'members': { en: 'Members', ne: 'सदस्य' },
+            'logged_in': { en: 'Logged In', ne: 'लग-इन' },
+            'party_only': { en: 'Party Only', ne: 'पार्टी मात्र' },
+            'central_committee': { en: 'Central Committee', ne: 'केन्द्रीय समिति' },
+            'board_only': { en: 'Board Only', ne: 'बोर्ड मात्र' },
+            'leadership': { en: 'Leadership', ne: 'नेतृत्व' },
+            'internal': { en: 'Internal', ne: 'आन्तरिक' },
+        };
+        const label = labels[visibility] || { en: visibility, ne: visibility };
+        return t(label.ne, label.en);
     };
 
     const renderChannelCard = (channel: DiscussionChannel) => {
@@ -139,7 +157,7 @@ export default function CommunityPage() {
                             size="icon"
                             onClick={(e) => handleEdit(e, channel)}
                             className="absolute top-2 right-2 h-8 w-8 text-slate-400 hover:text-brand-blue z-10"
-                            title="Edit Channel"
+                            title={t("च्यानल सम्पादन", "Edit Channel")}
                         >
                             <Edit2 size={14} />
                         </Button>
@@ -147,12 +165,12 @@ export default function CommunityPage() {
                     <CardHeader className="pb-3">
                         <div className="flex justify-between items-start mb-1 pr-6">
                             <Typography variant="h4" className="text-xl group-hover:text-brand-blue transition-colors">
-                                {channel.name}
+                                {language === 'ne' && channel.name_ne ? channel.name_ne : channel.name}
                             </Typography>
                         </div>
                         <div className="flex gap-2 items-center mb-2">
                             <Badge variant={badgeVariant} className="uppercase text-[10px] tracking-wider">
-                                {channel.visibility.replace('_', ' ')}
+                                {getVisibilityLabel(channel.visibility)}
                             </Badge>
                             {channel.category && (
                                 <span className="text-xs text-slate-400 font-medium">
@@ -160,7 +178,7 @@ export default function CommunityPage() {
                                 </span>
                             )}
                         </div>
-                        {channel.name_ne && (
+                        {language === 'en' && channel.name_ne && (
                             <Typography variant="muted" className="text-sm font-nepali text-brand-blue/80 font-medium">
                                 {channel.name_ne}
                             </Typography>
@@ -168,9 +186,9 @@ export default function CommunityPage() {
                     </CardHeader>
                     <CardContent>
                         <Typography variant="p" className="text-sm text-slate-600 line-clamp-3 mt-0 leading-relaxed">
-                            {channel.description_en || channel.description}
+                            {language === 'ne' && channel.description_ne ? channel.description_ne : (channel.description_en || channel.description)}
                         </Typography>
-                        {channel.description_ne && (
+                        {language === 'en' && channel.description_ne && (
                             <Typography variant="muted" className="text-xs italic font-nepali mt-2 opacity-80">
                                 {channel.description_ne}
                             </Typography>
@@ -184,14 +202,14 @@ export default function CommunityPage() {
     return (
         <div className="container mx-auto px-4 py-16 max-w-6xl min-h-[80vh]">
             <div className="mb-16 text-center">
-                <Typography variant="h1" className="mb-3 text-brand-navy">Community Discussions</Typography>
-                <Typography variant="lead">Join the conversation. Select a channel below.</Typography>
+                <Typography variant="h1" className="mb-3 text-brand-navy">{t("समुदाय छलफल", "Community Discussions")}</Typography>
+                <Typography variant="lead">{t("छलफलमा सहभागी हुनुहोस्। तलको च्यानल छान्नुहोस्।", "Join the conversation. Select a channel below.")}</Typography>
             </div>
 
             {channels.length === 0 ? (
                 <Card className="max-w-md mx-auto p-8 text-center bg-slate-50/50">
                     <CardContent>
-                        <Typography variant="p">No discussion channels available to you yet.</Typography>
+                        <Typography variant="p">{t("तपाईंको लागि अहिले कुनै छलफल च्यानलहरू उपलब्ध छैनन्।", "No discussion channels available to you yet.")}</Typography>
                     </CardContent>
                 </Card>
             ) : (
@@ -201,7 +219,7 @@ export default function CommunityPage() {
                         <section>
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="h-px bg-slate-200 flex-grow"></div>
-                                <Typography variant="h2" className="text-2xl text-brand-blue border-none !pb-0">Open Public Forum</Typography>
+                                <Typography variant="h2" className="text-2xl text-brand-blue border-none !pb-0">{t("खुला सार्वजनिक मञ्च", "Open Public Forum")}</Typography>
                                 <div className="h-px bg-slate-200 flex-grow"></div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -215,7 +233,7 @@ export default function CommunityPage() {
                         <section>
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="h-px bg-slate-200 flex-grow"></div>
-                                <Typography variant="h2" className="text-2xl text-brand-red border-none !pb-0">Members Area</Typography>
+                                <Typography variant="h2" className="text-2xl text-brand-red border-none !pb-0">{t("सदस्य क्षेत्र", "Members Area")}</Typography>
                                 <div className="h-px bg-slate-200 flex-grow"></div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -229,7 +247,7 @@ export default function CommunityPage() {
                         <section>
                             <div className="flex items-center gap-4 mb-8">
                                 <div className="h-px bg-slate-200 flex-grow"></div>
-                                <Typography variant="h2" className="text-2xl text-brand-navy border-none !pb-0">Leadership Circle</Typography>
+                                <Typography variant="h2" className="text-2xl text-brand-navy border-none !pb-0">{t("नेतृत्व वृत्त", "Leadership Circle")}</Typography>
                                 <div className="h-px bg-slate-200 flex-grow"></div>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -245,9 +263,9 @@ export default function CommunityPage() {
                 <div className="mt-20 text-center">
                     <Button onClick={handleCreate} size="lg" className="rounded-full shadow-lg hover:shadow-xl px-8">
                         <Plus className="mr-2 h-5 w-5" />
-                        Create New Channel
+                        {t("नयाँ च्यानल सिर्जना", "Create New Channel")}
                     </Button>
-                    <Typography variant="muted" className="mt-3 text-xs">Visible only to Admins & Yantriks</Typography>
+                    <Typography variant="muted" className="mt-3 text-xs">{t("एडमिन र यान्त्रिकहरूलाई मात्र देखिने", "Visible only to Admins & Yantriks")}</Typography>
                 </div>
             )}
 

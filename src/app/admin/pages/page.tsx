@@ -19,6 +19,8 @@ export default function PagesManager() {
     const [visionSettings, setVisionSettings] = useState<any>(null);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [aboutSettings, setAboutSettings] = useState<any>(null);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [globalSettings, setGlobalSettings] = useState<any>(null);
 
     const [userRole, setUserRole] = useState<string | null>(null);
 
@@ -56,6 +58,9 @@ export default function PagesManager() {
         const { data: about } = await supabase.from('site_settings').select('content').eq('key', 'about').single();
         if (about) setAboutSettings(about.content);
 
+        const { data: global } = await supabase.from('site_settings').select('content').eq('key', 'global').single();
+        if (global) setGlobalSettings(global.content);
+
         setLoading(false);
     }
 
@@ -72,6 +77,7 @@ export default function PagesManager() {
             if (activeTab === 'hero') result = await updateSiteSettings('hero', heroSettings);
             if (activeTab === 'vision') result = await updateSiteSettings('vision', visionSettings);
             if (activeTab === 'about') result = await updateSiteSettings('about', aboutSettings);
+            if (activeTab === 'contact') result = await updateSiteSettings('global', globalSettings);
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const r = result as any;
@@ -432,12 +438,141 @@ export default function PagesManager() {
                         </div>
                     )}
 
-                    {/* Contact/Settings Tab Placeholder */}
-                    {activeTab === 'contact' && (
-                        <div className="p-12 text-center bg-white rounded-3xl border-4 border-dashed border-slate-100">
-                            <span className="text-4xl mb-4 block">🛠️</span>
-                            <h3 className="font-black text-slate-800 uppercase tracking-tight">Advanced Settings</h3>
-                            <p className="text-slate-500 max-w-xs mx-auto mt-2 font-medium">Contact info, social links, and footer configuration are coming soon in this module.</p>
+                    {/* Contact/Footer Settings */}
+                    {activeTab === 'contact' && globalSettings && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            {/* Contact Info */}
+                            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-8">
+                                <div className="border-l-8 border-brand-blue pl-4">
+                                    <h2 className="text-xl font-black text-brand-navy uppercase tracking-tight">Contact Information</h2>
+                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Party contact details shown across the site.</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="form-label">📍 Address</label>
+                                        <input type="text" className="form-input !font-medium"
+                                            value={globalSettings.contact?.address || ""}
+                                            onChange={e => setGlobalSettings({
+                                                ...globalSettings,
+                                                contact: { ...globalSettings.contact, address: e.target.value }
+                                            })} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="form-label">📧 Email</label>
+                                        <input type="email" className="form-input !font-medium"
+                                            value={globalSettings.contact?.email || ""}
+                                            onChange={e => setGlobalSettings({
+                                                ...globalSettings,
+                                                contact: { ...globalSettings.contact, email: e.target.value }
+                                            })} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="form-label">📞 Phone</label>
+                                        <input type="tel" className="form-input !font-medium"
+                                            value={globalSettings.contact?.phone || ""}
+                                            onChange={e => setGlobalSettings({
+                                                ...globalSettings,
+                                                contact: { ...globalSettings.contact, phone: e.target.value }
+                                            })} />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Social Links */}
+                            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-8">
+                                <div className="border-l-8 border-brand-red pl-4">
+                                    <h2 className="text-xl font-black text-brand-navy uppercase tracking-tight">Social Links</h2>
+                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Links displayed in footer and contact page.</p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                                    {(globalSettings.social || []).map((link: any, index: number) => (
+                                        <div key={index} className="grid grid-cols-12 gap-3 items-center p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                            <div className="col-span-3 md:col-span-2">
+                                                <input type="text" className="form-input !text-center !font-bold" placeholder="Platform"
+                                                    value={link.name || ""}
+                                                    onChange={e => {
+                                                        const newSocial = [...globalSettings.social];
+                                                        newSocial[index].name = e.target.value;
+                                                        setGlobalSettings({ ...globalSettings, social: newSocial });
+                                                    }} />
+                                            </div>
+                                            <div className="col-span-2 md:col-span-2">
+                                                <input type="text" className="form-input !text-center" placeholder="Icon"
+                                                    value={link.icon || ""}
+                                                    onChange={e => {
+                                                        const newSocial = [...globalSettings.social];
+                                                        newSocial[index].icon = e.target.value;
+                                                        setGlobalSettings({ ...globalSettings, social: newSocial });
+                                                    }} />
+                                            </div>
+                                            <div className="col-span-6 md:col-span-7">
+                                                <input type="url" className="form-input !font-medium" placeholder="https://..."
+                                                    value={link.url || ""}
+                                                    onChange={e => {
+                                                        const newSocial = [...globalSettings.social];
+                                                        newSocial[index].url = e.target.value;
+                                                        setGlobalSettings({ ...globalSettings, social: newSocial });
+                                                    }} />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                        const newSocial = globalSettings.social.filter((_: any, i: number) => i !== index);
+                                                        setGlobalSettings({ ...globalSettings, social: newSocial });
+                                                    }}
+                                                    className="w-8 h-8 rounded-full bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center text-lg font-bold"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            const newSocial = [...(globalSettings.social || []), { name: "", icon: "", url: "" }];
+                                            setGlobalSettings({ ...globalSettings, social: newSocial });
+                                        }}
+                                        className="w-full py-3 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400 font-bold hover:border-brand-blue hover:text-brand-blue transition-colors"
+                                    >
+                                        + Add Social Link
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Footer Taglines */}
+                            <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 space-y-8">
+                                <div className="border-l-8 border-brand-navy pl-4">
+                                    <h2 className="text-xl font-black text-brand-navy uppercase tracking-tight">Footer Tagline</h2>
+                                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Slogan displayed at the bottom of every page.</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="form-label">Tagline (EN)</label>
+                                        <textarea rows={2} className="form-input !font-medium"
+                                            value={globalSettings.footer?.taglineEn || ""}
+                                            onChange={e => setGlobalSettings({
+                                                ...globalSettings,
+                                                footer: { ...globalSettings.footer, taglineEn: e.target.value }
+                                            })} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="form-label">Tagline (NE)</label>
+                                        <textarea rows={2} className="form-input !font-bold !text-lg"
+                                            value={globalSettings.footer?.taglineNe || ""}
+                                            onChange={e => setGlobalSettings({
+                                                ...globalSettings,
+                                                footer: { ...globalSettings.footer, taglineNe: e.target.value }
+                                            })} />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>

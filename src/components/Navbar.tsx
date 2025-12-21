@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { BrandButton } from "./BrandButton";
-import { siteContent } from "@/config/siteContent";
 import { useLanguage } from "@/context/LanguageContext";
+import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { createBrowserClient } from "@supabase/ssr";
 
@@ -13,6 +13,7 @@ export default function Navbar() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [user, setUser] = useState<any>(null);
     const { t } = useLanguage();
+    const { nav } = useSiteSettings();
 
     useEffect(() => {
         const supabase = createBrowserClient(
@@ -32,10 +33,10 @@ export default function Navbar() {
     }, []);
 
     const navLinks = [
-        { name: t(siteContent.nav.home.en, siteContent.nav.home.ne), href: "/" },
-        { name: t(siteContent.nav.media.en, siteContent.nav.media.ne), href: "/media" },
-        { name: t(siteContent.nav.about.en, siteContent.nav.about.ne), href: "/about" },
-        { name: t(siteContent.nav.contact.en, siteContent.nav.contact.ne), href: "/contact" },
+        { name: t(nav?.home?.en || "Home", nav?.home?.ne || "गृहपृष्ठ"), href: "/" },
+        { name: t(nav?.media?.en || "Media", nav?.media?.ne || "मिडिया"), href: "/media" },
+        { name: t(nav?.about?.en || "About", nav?.about?.ne || "हाम्रो बारेमा"), href: "/about" },
+        { name: t(nav?.contact?.en || "Contact", nav?.contact?.ne || "सम्पर्क"), href: "/contact" },
     ];
 
     return (
@@ -46,7 +47,7 @@ export default function Navbar() {
                         <Link href="/" className="flex-shrink-0">
                             {/* Just text logo for now to match prompt "Party logo and name" */}
                             <span className="font-bold text-xl tracking-tight text-brand-red">
-                                {t(siteContent.nav.brand.firstEn, siteContent.nav.brand.firstNe)} <span className="text-brand-blue">{t(siteContent.nav.brand.secondEn, siteContent.nav.brand.secondNe)}</span>
+                                {t(nav?.brand?.firstEn || "Pragatishil", nav?.brand?.firstNe || "प्रगतिशील")} <span className="text-brand-blue">{t(nav?.brand?.secondEn || "Loktantrik", nav?.brand?.secondNe || "लोकतान्त्रिक")}</span>
                             </span>
                         </Link>
                     </div>
@@ -65,13 +66,13 @@ export default function Navbar() {
                                 href="/members"
                                 className="text-slate-700 hover:text-brand-blue px-3 py-2 rounded-md text-sm font-medium transition-colors"
                             >
-                                {t(siteContent.nav.members.en, siteContent.nav.members.ne)}
+                                {t(nav?.members?.en || "Members", nav?.members?.ne || "सदस्यहरू")}
                             </Link>
                             <Link
                                 href="/commune"
                                 className="text-slate-700 hover:text-brand-blue px-3 py-2 rounded-md text-sm font-medium transition-colors"
                             >
-                                Community
+                                {t("Community", "समुदाय")}
                             </Link>
                             {user ? (
                                 <div className="flex items-center gap-4">
@@ -79,7 +80,7 @@ export default function Navbar() {
                                         href={`/members/${user.id}`}
                                         className="text-sm font-medium text-slate-700 hover:text-brand-blue"
                                     >
-                                        My Profile
+                                        {t("My Profile", "मेरो प्रोफाइल")}
                                     </Link>
                                     <button
                                         onClick={async () => {
@@ -92,16 +93,16 @@ export default function Navbar() {
                                         }}
                                         className="text-sm font-medium text-slate-500 hover:text-brand-red"
                                     >
-                                        Sign Out
+                                        {t("Sign Out", "बाहिर निस्कनुहोस्")}
                                     </button>
                                 </div>
                             ) : (
                                 <>
                                     <BrandButton href="/join" variant="primary" className="px-4 py-2 text-sm">
-                                        {t(siteContent.nav.join.en, siteContent.nav.join.ne)}
+                                        {t(nav?.join?.en || "Join Movement", nav?.join?.ne || "अभियानमा जोडिनुहोस्")}
                                     </BrandButton>
                                     <Link href="/auth/login" className="text-sm font-medium text-slate-500 hover:text-brand-blue">
-                                        Sign In
+                                        {t("Sign In", "साइन इन")}
                                     </Link>
                                 </>
                             )}
@@ -156,7 +157,7 @@ export default function Navbar() {
                             className="text-slate-700 hover:text-brand-blue block px-3 py-2 rounded-md text-base font-medium"
                             onClick={() => setIsOpen(false)}
                         >
-                            {t(siteContent.nav.members.en, siteContent.nav.members.ne)}
+                            {t(nav?.members?.en || "Members", nav?.members?.ne || "सदस्यहरू")}
                         </Link>
                         {user ? (
                             <>
@@ -165,7 +166,7 @@ export default function Navbar() {
                                     className="text-slate-700 hover:text-brand-blue block px-3 py-2 rounded-md text-base font-medium"
                                     onClick={() => setIsOpen(false)}
                                 >
-                                    My Profile
+                                    {t("My Profile", "मेरो प्रोफाइल")}
                                 </Link>
                                 <button
                                     onClick={async () => {
@@ -178,7 +179,7 @@ export default function Navbar() {
                                     }}
                                     className="w-full text-center mt-4 justify-center text-red-600 font-medium py-2 rounded-md hover:bg-slate-50"
                                 >
-                                    Sign Out
+                                    {t("Sign Out", "बाहिर निस्कनुहोस्")}
                                 </button>
                             </>
                         ) : (
@@ -188,7 +189,7 @@ export default function Navbar() {
                                 className="w-full text-center mt-4 justify-center"
                                 onClick={() => setIsOpen(false)}
                             >
-                                {t(siteContent.nav.join.en, siteContent.nav.join.ne)}
+                                {t(nav?.join?.en || "Join Movement", nav?.join?.ne || "अभियानमा जोडिनुहोस्")}
                             </BrandButton>
                         )}
                     </div>

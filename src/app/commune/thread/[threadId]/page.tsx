@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Helpers
 const PLACEHOLDERS = [
@@ -57,6 +58,7 @@ export default function ThreadPage() {
     const params = useParams();
     const router = useRouter();
     const threadId = params.threadId as string;
+    const { t } = useLanguage();
 
     const [thread, setThread] = useState<DiscussionThread | null>(null);
     const [posts, setPosts] = useState<DiscussionPost[]>([]);
@@ -300,7 +302,7 @@ export default function ThreadPage() {
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center mb-6">
                     <Link href={`/commune/${thread.channel?.slug || thread.channel?.id}`} passHref>
                         <Button variant="ghost" size="sm" className="pl-0 text-muted-foreground hover:text-brand-blue -ml-2">
-                            <ArrowLeft className="mr-2 h-4 w-4" /> Back to {thread.channel?.name}
+                            <ArrowLeft className="mr-2 h-4 w-4" />{t("फर्कनुहोस्", "Back to")} {thread.channel?.name}
                         </Button>
                     </Link>
 
@@ -313,7 +315,7 @@ export default function ThreadPage() {
                             className={cn("gap-2", isFollowed && "bg-brand-blue/10 text-brand-blue border-brand-blue")}
                         >
                             {isFollowed ? <Heart className="fill-current" size={16} /> : <Heart size={16} />}
-                            {isFollowed ? "Following" : "Follow"}
+                            {isFollowed ? t("फलो गरिएको", "Following") : t("फलो", "Follow")}
                         </Button>
                         <Button
                             variant="outline"
@@ -322,7 +324,7 @@ export default function ThreadPage() {
                             className={cn("gap-2", isSaved && "bg-yellow-50 text-yellow-600 border-yellow-200")}
                         >
                             {isSaved ? <Bookmark className="fill-current" size={16} /> : <Bookmark size={16} />}
-                            {isSaved ? "Saved" : "Save"}
+                            {isSaved ? t("सुरक्षित", "Saved") : t("सुरक्षित गर्नुहोस्", "Save")}
                         </Button>
                     </div>
                 </div>
@@ -332,18 +334,18 @@ export default function ThreadPage() {
                     <Typography variant="h1" className="text-3xl md:text-4xl leading-tight text-brand-navy">{thread.title}</Typography>
 
                     <div className="flex items-center gap-3 py-2 border-b border-sky-100/50">
-                        <span className="text-sm text-muted-foreground">Original discussion started by</span>
+                        <span className="text-sm text-muted-foreground">{t("मूल छलफल सुरु गर्ने", "Original discussion started by")}</span>
                         {thread.is_anonymous ? (
                             <div className="flex items-center gap-2">
                                 <UserAvatar size="w-6 h-6" />
-                                <Typography variant="small" className="font-bold text-slate-700">Anonymous</Typography>
+                                <Typography variant="small" className="font-bold text-slate-700">{t("बेनामी", "Anonymous")}</Typography>
                             </div>
                         ) : (
                             <Link href={`/members/${thread.created_by}`} className="flex items-center gap-2 group">
                                 {/* @ts-ignore */}
                                 <UserAvatar url={thread.author?.avatar_url} name={thread.author?.full_name} size="w-6 h-6" />
                                 <Typography variant="small" className="font-bold text-slate-700 group-hover:text-brand-blue transition-colors">
-                                    {thread.author?.full_name || "Member"}
+                                    {thread.author?.full_name || t("सदस्य", "Member")}
                                 </Typography>
                                 <Badge variant={getRoleBadgeVariant(thread.author?.role) as any} className="text-[10px] py-0 h-5 px-1.5 pointer-events-none">
                                     {thread.author?.role?.replace('_', ' ')}
@@ -366,7 +368,7 @@ export default function ThreadPage() {
                                 disabled={loadingSummary}
                                 className="w-full h-auto py-4 bg-gradient-to-r from-purple-50 to-indigo-50 hover:from-purple-100 hover:to-indigo-100 border-dashed border-purple-200 text-purple-700 gap-2"
                             >
-                                {loadingSummary ? <Loader2 className="animate-spin" /> : "✨"} Generate AI Summary (Admin)
+                                {loadingSummary ? <Loader2 className="animate-spin" /> : "✨"} {t("AI सारांश उत्पादन (एडमिन)", "Generate AI Summary (Admin)")}
                             </Button>
                         )
                     ) : (
@@ -375,7 +377,7 @@ export default function ThreadPage() {
                                 <span className="text-6xl">✨</span>
                             </div>
                             <Typography variant="h4" className="text-purple-900 mb-3 flex items-center gap-2 text-base">
-                                <span>✨</span> AI Discussion Summary
+                                <span>✨</span>{t("AI छलफल सारांश", "AI Discussion Summary")}
                             </Typography>
                             <Typography variant="p" className="text-slate-700 text-sm leading-relaxed">{summary}</Typography>
                         </div>
@@ -387,13 +389,13 @@ export default function ThreadPage() {
             <div className="space-y-6 mb-24">
                 {posts.length === 0 ? (
                     <div className="text-center p-12 bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                        <Typography variant="muted">No posts yet. Be the first to reply!</Typography>
+                        <Typography variant="muted">{t("अहिलेसम्म कुनै पोस्ट छैन। जवाफ दिने पहिलो हुनुहोस्!", "No posts yet. Be the first to reply!")}</Typography>
                     </div>
                 ) : (
                     posts.map((post) => {
                         const isMe = currentUserId === post.author_id;
                         if (post.buried_at) {
-                            return <div key={post.id} className="p-4 bg-slate-50 text-slate-400 italic text-center rounded border text-sm">Content buried due to downvotes.</div>;
+                            return <div key={post.id} className="p-4 bg-slate-50 text-slate-400 italic text-center rounded border text-sm">{t("डाउनभोट्सका कारण सामग्री गाडिएको छ।", "Content buried due to downvotes.")}</div>;
                         }
 
                         return (
@@ -421,7 +423,7 @@ export default function ThreadPage() {
                                             {post.is_anon ? (
                                                 <div className="flex items-center gap-2 text-slate-600">
                                                     <UserAvatar size="w-8 h-8" />
-                                                    <div className="text-sm font-bold">Anonymous</div>
+                                                    <div className="text-sm font-bold">{t("बेनामी", "Anonymous")}</div>
                                                 </div>
                                             ) : (
                                                 <Link href={`/members/${post.author_id}`} className="flex items-center gap-2 group">
@@ -430,7 +432,7 @@ export default function ThreadPage() {
                                                     <div>
                                                         <div className="flex items-center gap-2">
                                                             <div className="text-sm font-bold text-slate-800 group-hover:text-brand-blue transition-colors">
-                                                                {post.author?.full_name || "Member"}
+                                                                {post.author?.full_name || t("सदस्य", "Member")}
                                                             </div>
                                                             {post.author?.role && (
                                                                 <Badge variant={getRoleBadgeVariant(post.author?.role) as any} className="text-[10px] px-1.5 py-0 h-4 md:h-5">
@@ -439,8 +441,8 @@ export default function ThreadPage() {
                                                             )}
                                                         </div>
                                                         <div className="text-[10px] text-slate-400 font-medium">
-                                                            {/* @ts-ignore */}
-                                                            {post.author?.district ? `${post.author.district}, Nepal` : 'Member'}
+                                                            {/* @ts-ignore - district exists in DB but not in Profile type */}
+                                                            {post.author?.district ? `${post.author.district}, Nepal` : t('सदस्य', 'Member')}
                                                         </div>
                                                     </div>
                                                 </Link>
@@ -531,7 +533,7 @@ export default function ThreadPage() {
                                 >
                                     <span className="flex items-center gap-2">
                                         <MessageSquare className="w-5 h-5 text-slate-400 group-hover:text-brand-blue" />
-                                        {isAuthenticated ? "Write a reply..." : "Join the discussion..."}
+                                        {isAuthenticated ? t("जवाफ लेख्नुहोस्...", "Write a reply...") : t("छलफलमा सामेल हुनुहोस्...", "Join the discussion...")}
                                     </span>
                                     <span className="bg-brand-blue text-white rounded-full p-1"><ArrowUp size={16} /></span>
                                 </Button>
@@ -544,14 +546,14 @@ export default function ThreadPage() {
                                 className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden mb-4"
                             >
                                 <div className="flex justify-between items-center px-4 py-3 bg-slate-50 border-b border-slate-100">
-                                    <Typography variant="h4" className="text-sm font-bold text-slate-700">Reply to Thread</Typography>
+                                    <Typography variant="h4" className="text-sm font-bold text-slate-700">{t("थ्रेडमा जवाफ दिनुहोस्", "Reply to Thread")}</Typography>
                                     <Button variant="ghost" size="sm" onClick={() => setIsReplyBoxOpen(false)} className="h-8 w-8 p-0"><X size={16} /></Button>
                                 </div>
 
                                 <div className="p-4">
                                     {!isAuthenticated && !channelConfig?.allow_anonymous_posts ? (
                                         <div className="text-center py-6">
-                                            <Typography variant="p" className="mb-4">Please log in to participate.</Typography>
+                                            <Typography variant="p" className="mb-4">{t("कृपया सहभागी हुन लग इन गर्नुहोस्।", "Please log in to participate.")}</Typography>
                                             <Button onClick={async () => {
                                                 const supabase = createBrowserClient(
                                                     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -561,7 +563,7 @@ export default function ThreadPage() {
                                                     provider: 'google',
                                                     options: { redirectTo: `${window.location.origin}/auth/callback` },
                                                 });
-                                            }} className="bg-brand-blue text-white">Sign In with Google</Button>
+                                            }} className="bg-brand-blue text-white">{t("Google मार्फत साइन इन", "Sign In with Google")}</Button>
                                         </div>
                                     ) : (
                                         <form onSubmit={handleReply}>
@@ -569,7 +571,7 @@ export default function ThreadPage() {
                                                 <TextareaAutosize
                                                     minRows={3}
                                                     maxRows={10}
-                                                    placeholder={!isAuthenticated ? "Share your anonymous thoughts..." : "Type your reply here..."}
+                                                    placeholder={!isAuthenticated ? t("आफ्नो बेनामी विचारहरू साझा गर्नुहोस्...", "Share your anonymous thoughts...") : t("यहाँ आफ्नो जवाफ टाइप गर्नुहोस्...", "Type your reply here...")}
                                                     className="w-full text-base bg-transparent focus:outline-none resize-none mb-2"
                                                     value={replyContent}
                                                     onChange={e => setReplyContent(e.target.value)}
@@ -603,9 +605,9 @@ export default function ThreadPage() {
                                                     </label>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-xs text-muted-foreground hidden sm:inline">Ctrl + Enter to send</span>
+                                                    <span className="text-xs text-muted-foreground hidden sm:inline">{t("Ctrl + Enter पठाउन", "Ctrl + Enter to send")}</span>
                                                     <Button type="submit" disabled={isSubmitting || !replyContent.trim()} className="bg-brand-blue hover:bg-blue-600 text-white">
-                                                        {isSubmitting ? "Sending..." : "Post Reply"}
+                                                        {isSubmitting ? t("पठाउँदैछ...", "Sending...") : t("जवाफ पोस्ट", "Post Reply")}
                                                     </Button>
                                                 </div>
                                             </div>
@@ -623,7 +625,7 @@ export default function ThreadPage() {
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
                     <Card className="w-full max-w-sm">
                         <CardHeader>
-                            <CardTitle>Report Post</CardTitle>
+                            <CardTitle>{t("पोस्ट रिपोर्ट", "Report Post")}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleFlag} className="space-y-4">
@@ -632,13 +634,13 @@ export default function ThreadPage() {
                                     value={flagReason}
                                     onChange={e => setFlagReason(e.target.value)}
                                 >
-                                    <option value="spam">Spam</option>
-                                    <option value="inappropriate">Inappropriate</option>
-                                    <option value="other">Other</option>
+                                    <option value="spam">{t("स्प्याम", "Spam")}</option>
+                                    <option value="inappropriate">{t("अनुचित", "Inappropriate")}</option>
+                                    <option value="other">{t("अन्य", "Other")}</option>
                                 </select>
                                 <div className="flex justify-end gap-2">
-                                    <Button type="button" variant="ghost" onClick={() => setFlagPostId(null)}>Cancel</Button>
-                                    <Button type="submit" variant="destructive">Report</Button>
+                                    <Button type="button" variant="ghost" onClick={() => setFlagPostId(null)}>{t("रद्द गर्नुहोस्", "Cancel")}</Button>
+                                    <Button type="submit" variant="destructive">{t("रिपोर्ट", "Report")}</Button>
                                 </div>
                             </form>
                         </CardContent>
