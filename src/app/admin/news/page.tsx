@@ -15,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/context/ToastContext";
+import MediaPicker from "@/components/MediaPicker";
 
 const convertADtoBS = (adDate: string): string => {
     try {
@@ -36,6 +38,7 @@ const convertBStoAD = (bsDate: string): string => {
 };
 
 export default function NewsManager() {
+    const { showError, showInfo } = useToast();
     const [news, setNews] = useState<NewsItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
@@ -161,7 +164,7 @@ export default function NewsManager() {
             setIsEditing(false);
             fetchNews();
         } catch (error) {
-            alert("Failed to save: " + (error as Error).message);
+            showError("Failed to save", (error as Error).message);
         }
     };
 
@@ -194,11 +197,11 @@ export default function NewsManager() {
     // Image upload handler
     const handleImageUpload = async (file: File) => {
         if (!file.type.startsWith('image/')) {
-            alert('Please select an image file (JPG, PNG, etc.)');
+            showInfo("Invalid file", "Please select an image file (JPG, PNG, etc.)");
             return;
         }
         if (file.size > 5 * 1024 * 1024) {
-            alert('Image size should be less than 5MB');
+            showInfo("File too large", "Image size should be less than 5MB");
             return;
         }
 
@@ -221,7 +224,7 @@ export default function NewsManager() {
             setCurrentItem(prev => ({ ...prev!, image_url: publicUrl }));
         } catch (error) {
             console.error('Upload error:', error);
-            alert('Failed to upload image: ' + (error as Error).message);
+            showError("Upload failed", (error as Error).message);
         } finally {
             setUploadingImage(false);
         }
@@ -597,13 +600,23 @@ export default function NewsManager() {
                                                 )}
                                             </div>
                                         )}
+                                        {/* Select from Gallery */}
+                                        <div className="mt-3 pt-3 border-t border-slate-100">
+                                            <p className="text-xs text-slate-500 mb-2 font-medium">Or select from Media Gallery:</p>
+                                            <MediaPicker
+                                                value={currentItem.image_url || ''}
+                                                onSelect={(url) => setCurrentItem(prev => ({ ...prev!, image_url: url }))}
+                                                mediaType="image"
+                                                label=""
+                                            />
+                                        </div>
 
                                         {/* URL fallback input */}
-                                        <div className="flex gap-2 items-center">
+                                        <div className="flex gap-2 items-center mt-2">
                                             <Input
                                                 value={currentItem.image_url || ''}
                                                 onChange={e => setCurrentItem(prev => ({ ...prev!, image_url: e.target.value }))}
-                                                placeholder="Or paste image URL..."
+                                                placeholder="Or paste image URL directly..."
                                                 className="text-xs"
                                             />
                                         </div>

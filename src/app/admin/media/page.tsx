@@ -4,11 +4,14 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { upsertMediaItem, deleteMediaItem } from "@/actions/cms";
-import { Plus, Trash2, X, PlayCircle, Image as ImageIcon, FileText, CheckCircle2, Globe, AlertCircle } from "lucide-react";
+import { Plus, Trash2, X, PlayCircle, Image as ImageIcon, FileText, CheckCircle2, Globe, AlertCircle, Copy, Check, Sparkles, Loader2 } from "lucide-react";
 import { MediaItem, MediaType } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/context/ToastContext";
+import { parseVideoUrl, getPlatformName, getPlatformColor } from "@/lib/videoEmbed";
 
 export default function MediaManager() {
+    const { showError, showInfo, showSuccess } = useToast();
     const [media, setMedia] = useState<MediaItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<MediaType | 'all'>('all');
@@ -18,10 +21,30 @@ export default function MediaManager() {
     const [uploading, setUploading] = useState(false);
     const [isDeletingBulk, setIsDeletingBulk] = useState(false);
     const [deleteReason, setDeleteReason] = useState("");
+    const [userRole, setUserRole] = useState<string | null>(null);
+    const [saving, setSaving] = useState(false);
+    const [copiedId, setCopiedId] = useState<number | null>(null);
+    const [analyzing, setAnalyzing] = useState(false);
+
+    const canDelete = userRole && ['admin', 'admin_party'].includes(userRole);
 
     useEffect(() => {
         fetchMedia();
+        fetchUserRole();
     }, []);
+
+    const fetchUserRole = async () => {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', user.id)
+                .single();
+            if (profile?.role) setUserRole(profile.role);
+        }
+    };
 
     const fetchMedia = async () => {
         const supabase = createClient();
@@ -31,24 +54,45 @@ export default function MediaManager() {
     };
 
     const handleDelete = async (id: number) => {
+        if (!canDelete) {
+            showError("Access Denied", "Only admins can delete media items.");
+            return;
+        }
         const reason = prompt("Reason for deletion (for audit log):");
         if (!reason) return;
-        await deleteMediaItem(id, reason);
-        fetchMedia();
+        try {
+            await deleteMediaItem(id, reason);
+            fetchMedia();
+        } catch (error) {
+            showError("Delete Failed", (error as Error).message);
+        }
     };
 
     const handleBulkDelete = async () => {
-        if (!deleteReason) return alert("Please provide a reason for bulk deletion.");
+        if (!canDelete) {
+            showError("Access Denied", "Only admins can delete media items.");
+            return;
+        }
+        if (!deleteReason) {
+            showInfo("Reason Required", "Please provide a reason for bulk deletion.");
+            return;
+        }
         if (!confirm(`Are you sure you want to delete ${selectedItems.size} items?`)) return;
 
         setLoading(true);
-        for (const id of Array.from(selectedItems)) {
-            await deleteMediaItem(id, deleteReason);
+        try {
+            for (const id of Array.from(selectedItems)) {
+                await deleteMediaItem(id, deleteReason);
+            }
+            setSelectedItems(new Set());
+            fetchMedia();
+            setIsDeletingBulk(false);
+            setDeleteReason("");
+        } catch (error) {
+            showError("Delete Failed", (error as Error).message);
+        } finally {
+            setLoading(false);
         }
-        setSelectedItems(new Set());
-        fetchMedia();
-        setIsDeletingBulk(false);
-        setDeleteReason("");
     };
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,7 +108,7 @@ export default function MediaManager() {
             const { data } = supabase.storage.from('media').getPublicUrl(fileName);
             setNewItem({ ...newItem, url: data.publicUrl });
         } catch (error) {
-            alert("Upload failed: " + (error as Error).message);
+            showError("Upload failed", (error as Error).message);
         } finally {
             setUploading(false);
         }
@@ -72,14 +116,50 @@ export default function MediaManager() {
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        setSaving(true);
         try {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             await upsertMediaItem(newItem as any);
+            const mediaTypeName = newItem.media_type === 'video' ? 'Video' : newItem.media_type === 'document' ? 'Document' : 'Image';
+            showSuccess(`${mediaTypeName} Added Successfully`, `Your ${mediaTypeName.toLowerCase()} has been saved to the gallery.`);
             setIsAdding(false);
             setNewItem({ media_type: 'image', url: '', caption: '', caption_ne: '', alt_text: '', title: '' });
             fetchMedia();
         } catch (error) {
-            alert("Failed to save: " + (error as Error).message);
+            showError("Save failed", (error as Error).message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleAutoFill = async () => {
+        if (!newItem.url) return;
+        setAnalyzing(true);
+        try {
+            const res = await fetch('/api/ai/analyze-document', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: newItem.url })
+            });
+
+            if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.error || 'Analysis failed');
+            }
+
+            const data = await res.json();
+            setNewItem(prev => ({
+                ...prev,
+                title: data.title || prev.title,
+                alt_text: data.alt_text || prev.alt_text,
+                caption: data.caption_en || prev.caption,
+                caption_ne: data.caption_ne || prev.caption_ne
+            }));
+            showSuccess('AI Auto-fill Complete!', 'Document details have been extracted.');
+        } catch (error) {
+            showError('AI Analysis Failed', (error as Error).message);
+        } finally {
+            setAnalyzing(false);
         }
     };
 
@@ -100,7 +180,7 @@ export default function MediaManager() {
                     <p className="text-slate-500 mt-1">Manage visual assets, videos and documents for the movement.</p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    {selectedItems.size > 0 && (
+                    {selectedItems.size > 0 && canDelete && (
                         <button
                             onClick={() => setIsDeletingBulk(true)}
                             className="flex items-center space-x-2 bg-red-50 text-red-600 px-4 py-2.5 rounded-xl hover:bg-red-100 transition-all font-bold border border-red-100"
@@ -191,11 +271,27 @@ export default function MediaManager() {
                                 <span className="text-[9px] text-white/60 font-medium uppercase tracking-tighter">
                                     {new Date(item.created_at).toLocaleDateString()}
                                 </span>
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
-                                    className="p-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-white transition-colors">
-                                    <Trash2 size={12} />
-                                </button>
+                                <div className="flex items-center gap-1">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigator.clipboard.writeText(item.url);
+                                            setCopiedId(item.id);
+                                            showSuccess("URL Copied!", "Image URL copied to clipboard");
+                                            setTimeout(() => setCopiedId(null), 2000);
+                                        }}
+                                        className={`p-1.5 rounded-lg text-white transition-all duration-300 ${copiedId === item.id ? 'bg-green-500 scale-110' : 'bg-white/20 hover:bg-white/40'}`}
+                                        title="Copy URL">
+                                        {copiedId === item.id ? <Check size={12} className="animate-bounce" /> : <Copy size={12} />}
+                                    </button>
+                                    {canDelete && (
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}
+                                            className="p-1.5 bg-red-500 hover:bg-red-600 rounded-lg text-white transition-colors">
+                                            <Trash2 size={12} />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -263,29 +359,58 @@ export default function MediaManager() {
 
                                     <div className="space-y-3">
                                         <label className="form-label">
-                                            {newItem.media_type === 'video' ? 'Video URL (YouTube)' : 'Upload File'}
+                                            {newItem.media_type === 'video' ? 'Video URL (YouTube, TikTok, Facebook, Instagram, Vimeo)' : 'Upload File'}
                                         </label>
 
-                                        {newItem.media_type === 'video' ? (
-                                            <div className="space-y-4">
-                                                <input
-                                                    type="text"
-                                                    required
-                                                    className="form-input !font-medium"
-                                                    value={newItem.url}
-                                                    onChange={e => setNewItem({ ...newItem, url: e.target.value })}
-                                                    placeholder="https://youtube.com/watch?v=..."
-                                                />
-                                                {newItem.url && (
-                                                    <div className="aspect-video rounded-2xl overflow-hidden bg-slate-900 border-4 border-slate-100 shadow-inner">
-                                                        <iframe
-                                                            src={newItem.url.includes('embed') ? newItem.url : `https://www.youtube.com/embed/${newItem.url.split('v=')[1]?.split('&')[0] || newItem.url.split('/').pop()}`}
-                                                            className="w-full h-full"
-                                                        />
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ) : (
+                                        {newItem.media_type === 'video' ? (() => {
+                                            const videoInfo = newItem.url ? parseVideoUrl(newItem.url) : null;
+                                            return (
+                                                <div className="space-y-4">
+                                                    <input
+                                                        type="text"
+                                                        required
+                                                        className="form-input !font-medium"
+                                                        value={newItem.url}
+                                                        onChange={e => setNewItem({ ...newItem, url: e.target.value })}
+                                                        placeholder="Paste video URL from YouTube, TikTok, Facebook, Instagram..."
+                                                    />
+
+                                                    {/* Platform Badge */}
+                                                    {videoInfo && newItem.url && (
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold text-white ${getPlatformColor(videoInfo.platform)}`}>
+                                                                {getPlatformName(videoInfo.platform)}
+                                                            </span>
+                                                            {videoInfo.canEmbed ? (
+                                                                <span className="text-xs text-green-600 font-medium">✓ Embeddable</span>
+                                                            ) : (
+                                                                <span className="text-xs text-amber-600 font-medium">⚠ May not embed properly</span>
+                                                            )}
+                                                        </div>
+                                                    )}
+
+                                                    {/* Video Preview */}
+                                                    {videoInfo?.canEmbed && videoInfo.embedUrl && (
+                                                        <div className="aspect-video rounded-2xl overflow-hidden bg-slate-900 border-4 border-slate-100 shadow-inner">
+                                                            <iframe
+                                                                src={videoInfo.embedUrl}
+                                                                className="w-full h-full"
+                                                                allowFullScreen
+                                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                            />
+                                                        </div>
+                                                    )}
+
+                                                    {/* Non-embeddable warning */}
+                                                    {videoInfo && !videoInfo.canEmbed && newItem.url && (
+                                                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-800">
+                                                            <p className="font-semibold mb-1">Unrecognized video platform</p>
+                                                            <p>The URL will be saved but may not display as an embedded video. Supported platforms: YouTube, Facebook, TikTok, Instagram, Vimeo.</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })() : (
                                             <div className="relative group">
                                                 <input type="file" id="media-upload" className="hidden" onChange={handleFileUpload} accept={newItem.media_type === 'image' ? "image/*" : ".pdf,.doc,.docx"} />
                                                 <label htmlFor="media-upload"
@@ -309,6 +434,22 @@ export default function MediaManager() {
                                                                 <FileText size={64} className="text-brand-blue mb-4 animate-bounce" />
                                                                 <span className="text-xs font-black text-brand-blue uppercase">File Ready</span>
                                                                 <span className="text-[10px] text-slate-400 mt-1 max-w-[200px] truncate">{newItem.url}</span>
+
+                                                                {/* AI Auto-fill Button for Documents */}
+                                                                {newItem.media_type === 'document' && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAutoFill(); }}
+                                                                        disabled={analyzing}
+                                                                        className="mt-4 flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold rounded-full hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-purple-500/30 disabled:opacity-50"
+                                                                    >
+                                                                        {analyzing ? (
+                                                                            <><Loader2 size={14} className="animate-spin" /> Analyzing...</>
+                                                                        ) : (
+                                                                            <><Sparkles size={14} /> Auto-fill with AI</>
+                                                                        )}
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                         )
                                                     ) : (
@@ -392,9 +533,9 @@ export default function MediaManager() {
                                     className="px-8 py-3.5 text-slate-500 font-bold hover:bg-slate-50 rounded-2xl transition-all uppercase text-xs tracking-widest">
                                     Discard
                                 </button>
-                                <button type="submit" disabled={uploading || !newItem.url}
+                                <button type="submit" disabled={uploading || saving || !newItem.url}
                                     className="px-12 py-3.5 bg-brand-blue text-white font-black rounded-2xl hover:bg-blue-700 shadow-xl shadow-blue-500/20 active:scale-95 transition-all uppercase text-xs tracking-widest disabled:opacity-50">
-                                    {uploading ? 'Processing...' : 'Save Asset'}
+                                    {uploading ? 'Uploading...' : saving ? 'Saving...' : 'Save Asset'}
                                 </button>
                             </div>
                         </form>

@@ -246,8 +246,8 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                                 showSensitive={showSensitive}
                             />
 
-                            {/* Activity Section - Visible to Owner or if Public */}
-                            {(showSensitive || target.is_public) && (
+                            {/* Activity Section - Only visible to central_committee and above */}
+                            {hasRole(viewerRole, 'central_committee') && (
                                 <div className="mt-12 pt-8 border-t border-slate-200">
                                     <h2 className="text-xl font-bold text-slate-800 mb-6 font-heading">Recent Activity</h2>
                                     <ActivityFeed userId={target.id} />

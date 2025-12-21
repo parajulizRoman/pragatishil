@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 import SafeNavbar from "@/components/SafeNavbar";
 import Footer from "@/components/Footer";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { ToastProvider } from "@/context/ToastContext";
 
 // ... metadata ...
 
@@ -33,17 +34,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ne">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-brand-tricolor font-sans`}
         suppressHydrationWarning
       >
         <LanguageProvider>
-          <SafeNavbar />
-          <div className="pt-16 min-h-screen">
-            {children}
-          </div>
-          <Footer />
+          <ToastProvider>
+            <SafeNavbar />
+            <div className="pt-16 min-h-screen">
+              {children}
+            </div>
+            <Footer />
+          </ToastProvider>
         </LanguageProvider>
       </body>
     </html>

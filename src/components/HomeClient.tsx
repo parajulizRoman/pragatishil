@@ -7,16 +7,19 @@ import { Typography } from "@/components/ui/typography";
 import { SectionHeader } from "@/components/SectionHeader";
 import { useLanguage } from "@/context/LanguageContext";
 import { SiteSettings, NewsItem, MediaVideo } from "@/types/cms";
+import { MediaItem } from "@/types";
 import { siteContent as fallbackContent } from "@/config/siteContent";
 import { cn } from "@/lib/utils";
+import { FileText } from "lucide-react";
 
 interface HomeClientProps {
     content: SiteSettings;
     news: NewsItem[];
     videos: MediaVideo[];
+    documents?: MediaItem[];
 }
 
-export default function HomeClient({ content, news, videos }: HomeClientProps) {
+export default function HomeClient({ content, news, videos, documents = [] }: HomeClientProps) {
     const { t } = useLanguage();
 
     // Defensive Merge: Ensure every section has defaults even if DB returns partial objects
@@ -197,6 +200,55 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
                 </div>
             </section>
 
+            {/* Press Releases Section */}
+            {documents && documents.length > 0 && (
+                <section className="py-20 bg-gradient-to-b from-slate-50 to-white">
+                    <div className="container mx-auto px-4">
+                        <SectionHeader
+                            titleEn="Press Releases"
+                            titleNe="प्रेस विज्ञप्ति"
+                            descriptionEn="Official statements and documents from the party"
+                            descriptionNe="पार्टीका आधिकारिक विज्ञप्ति र कागजातहरू"
+                        />
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+                            {documents.slice(0, 4).map((doc) => (
+                                <Link
+                                    key={doc.id}
+                                    href="/press-releases"
+                                    className="group bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-xl transition-all"
+                                >
+                                    <div className="relative h-36 bg-gradient-to-br from-brand-red/10 to-brand-blue/10 flex items-center justify-center">
+                                        <FileText size={48} className="text-brand-red/60 group-hover:scale-110 transition-transform" />
+                                        <div className="absolute top-2 right-2">
+                                            <span className="px-2 py-0.5 bg-brand-red text-white text-[9px] font-bold rounded-full uppercase">
+                                                {doc.url?.toLowerCase().endsWith('.pdf') ? 'PDF' : 'DOC'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="font-bold text-sm text-brand-navy line-clamp-2 group-hover:text-brand-blue transition-colors">
+                                            {t(doc.caption_ne || doc.title || '', doc.title || doc.caption || '')}
+                                        </h3>
+                                        <p className="text-xs text-slate-400 mt-2">
+                                            {new Date(doc.created_at).toISOString().split('T')[0]}
+                                        </p>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+
+                        <div className="text-center mt-10">
+                            <Button asChild variant="outline" className="rounded-full px-8">
+                                <Link href="/press-releases">
+                                    {t("सबै प्रेस विज्ञप्ति हेर्नुहोस्", "View All Press Releases")} →
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* Watch & Follow Section */}
             <section className="py-24 bg-brand-navy text-white overflow-hidden relative">
                 {/* Subtle Ambient Background */}
@@ -207,7 +259,7 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
                         {t("Watch & Follow", "हेर्नुहोस् र पछ्याउनुहोस्")}
                     </Typography>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-20">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-12">
                         {v.map((video) => (
                             <div key={video.id} className="group">
                                 <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-white/10 group-hover:border-brand-blue transition-all duration-300 relative">
@@ -226,6 +278,13 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
                             </div>
                         ))}
                     </div>
+
+                    {/* View All Media Link */}
+                    <Button asChild variant="outline" size="lg" className="border-white/30 text-white hover:bg-white hover:text-brand-navy rounded-full px-10 py-7 text-lg transition-all">
+                        <Link href="/media">
+                            {t("View All Media", "सबै मिडिया हेर्नुहोस्")} →
+                        </Link>
+                    </Button>
                 </div>
             </section>
 

@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/serverAdmin";
 import { revalidatePath } from "next/cache";
-import { canManageCms, normalizeYoutubeUrl } from "@/lib/cms-utils";
+import { canManageCms } from "@/lib/cms-utils";
 
 // --- Helpers ---
 
@@ -307,29 +307,62 @@ export async function deleteNewsItem(id: number, reason?: string) {
 
 // --- Media Gallery ---
 
+import { parseVideoUrl } from "@/lib/videoEmbed";
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function upsertMediaItem(item: any) {
+    console.log("[CMS:upsertMediaItem] Starting upsert with item:", JSON.stringify(item, null, 2));
+
     const supabase = await createClient();
     const user = await getActor(supabase);
+    console.log("[CMS:upsertMediaItem] Actor/User ID:", user.id, "Role:", user.role);
 
-    // Normalize Video URL
+    // Normalize Video URL using multi-platform parser
     if (item.media_type === 'video' || item.type === 'video') {
-        item.embed_url = normalizeYoutubeUrl(item.url);
+        console.log("[CMS:upsertMediaItem] Processing video URL:", item.url);
+        const videoInfo = parseVideoUrl(item.url || '');
+        console.log("[CMS:upsertMediaItem] Parsed video info:", JSON.stringify(videoInfo, null, 2));
+
+        if (videoInfo.canEmbed && videoInfo.embedUrl) {
+            item.embed_url = videoInfo.embedUrl;
+            console.log("[CMS:upsertMediaItem] Set embed_url to:", item.embed_url);
+        } else {
+            // Keep original URL if not embeddable
+            item.embed_url = item.url;
+            console.log("[CMS:upsertMediaItem] Video not embeddable, using original URL as embed_url");
+        }
     }
 
     let oldData = null;
     if (item.id) {
         const { data } = await supabase.from('media_gallery').select('*').eq('id', item.id).single();
         oldData = data;
+        console.log("[CMS:upsertMediaItem] Existing item found for update:", oldData?.id);
     }
+
+    // Build the payload to insert/update
+    // Note: DB has both 'type' (legacy, NOT NULL, only 'image'|'video') and 'media_type' (new, allows 'document')
+    // Map 'document' to 'image' for legacy column to satisfy CHECK constraint
+    const legacyType = (item.media_type === 'video' || item.type === 'video') ? 'video' : 'image';
+    const payload = {
+        ...item,
+        type: legacyType,  // Legacy column only accepts 'image' or 'video'
+        updated_by: user.id
+    };
+    console.log("[CMS:upsertMediaItem] Upserting payload:", JSON.stringify(payload, null, 2));
 
     const { data: newData, error } = await supabase
         .from('media_gallery')
-        .upsert({ ...item, updated_by: user.id })
+        .upsert(payload)
         .select()
         .single();
 
-    if (error) throw new Error(error.message);
+    if (error) {
+        console.error("[CMS:upsertMediaItem] SUPABASE ERROR:", error.message, error.details, error.hint);
+        throw new Error(error.message);
+    }
+
+    console.log("[CMS:upsertMediaItem] SUCCESS! Inserted/Updated item:", JSON.stringify(newData, null, 2));
 
     // Audit Log
     await supabaseAdmin.from('audit_logs').insert({

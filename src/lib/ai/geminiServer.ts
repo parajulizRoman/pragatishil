@@ -171,3 +171,96 @@ export async function summarizeThread(title: string, content: string): Promise<s
 
     return result.text || "Could not generate summary.";
 }
+
+// -- Document Analysis for Media Gallery --
+export interface DocumentAnalysisResult {
+    title: string;
+    alt_text: string;
+    caption_en: string;
+    caption_ne: string;
+    document_type: string;
+    key_topics: string[];
+}
+
+/**
+ * Analyze a document (PDF or image) and extract metadata for media gallery
+ */
+export async function analyzeDocument(base64Data: string, mimeType: string): Promise<DocumentAnalysisResult> {
+    const prompt = `You are analyzing a document (could be a PDF, scanned image, or photo of a document) for a Nepali political party's media gallery.
+
+Extract the following information:
+1. title: A concise title for this document (max 100 chars, in English)
+2. alt_text: SEO-friendly description for accessibility (max 150 chars, in English)
+3. caption_en: Brief English caption describing the document (2-3 sentences)
+4. caption_ne: Nepali translation of the caption (नेपाली विवरण)
+5. document_type: What type of document is this? (e.g., "letter", "report", "certificate", "notice", "press_release", "pamphlet", "other")
+6. key_topics: Array of 3-5 key topics/keywords found in the document
+
+If the document is in Nepali, still provide English title/alt_text/caption_en, and translate to Nepali for caption_ne.
+If you cannot read the document clearly, provide your best guess based on visible elements.
+
+Return valid JSON only.`;
+
+    const responseSchema: Schema = {
+        type: Type.OBJECT,
+        properties: {
+            title: { type: Type.STRING },
+            alt_text: { type: Type.STRING },
+            caption_en: { type: Type.STRING },
+            caption_ne: { type: Type.STRING },
+            document_type: { type: Type.STRING },
+            key_topics: { type: Type.ARRAY, items: { type: Type.STRING } },
+        },
+        required: ["title", "alt_text", "caption_en", "caption_ne"],
+    };
+
+    try {
+        const cleanBase64 = base64Data.replace(/^data:[^;]+;base64,/, "");
+
+        const result = await ai.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: {
+                parts: [
+                    { text: prompt },
+                    { inlineData: { mimeType, data: cleanBase64 } }
+                ]
+            },
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: responseSchema,
+            }
+        });
+
+        if (result.text) {
+            return JSON.parse(result.text) as DocumentAnalysisResult;
+        }
+        throw new Error("No structured response from Gemini");
+    } catch (error) {
+        console.error("[AI] Document Analysis Error:", error);
+        throw error;
+    }
+}
+
+/**
+ * Analyze document from URL (downloads and processes)
+ */
+export async function analyzeDocumentFromUrl(url: string): Promise<DocumentAnalysisResult> {
+    // Fetch the file
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch document: ${response.statusText}`);
+    }
+
+    const contentType = response.headers.get('content-type') || 'application/octet-stream';
+    const buffer = await response.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+
+    // Determine mime type
+    let mimeType = contentType;
+    if (url.endsWith('.pdf')) mimeType = 'application/pdf';
+    else if (url.endsWith('.jpg') || url.endsWith('.jpeg')) mimeType = 'image/jpeg';
+    else if (url.endsWith('.png')) mimeType = 'image/png';
+    else if (url.endsWith('.heic')) mimeType = 'image/heic';
+
+    return analyzeDocument(base64, mimeType);
+}

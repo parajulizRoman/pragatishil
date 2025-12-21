@@ -57,11 +57,20 @@ export default async function Home() {
     .eq('media_type', 'video')
     .limit(3);
 
+  // 4. Fetch Documents (Press Releases)
+  const { data: documents } = await supabase
+    .from('media_gallery')
+    .select('*')
+    .eq('media_type', 'document')
+    .order('created_at', { ascending: false })
+    .limit(4);
+
   return (
     <HomeClient
       content={content}
       news={newsItems || []}
       videos={videos || []}
+      documents={documents || []}
     />
   );
 }
