@@ -13,6 +13,9 @@ const nextConfig = {
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: '*.googleusercontent.com' },
       { protocol: 'https', hostname: 'img.youtube.com' },
+      { protocol: 'https', hostname: 'www.youtube.com' },
+      { protocol: 'https', hostname: '*.fbcdn.net' }, // Facebook CDN
+      { protocol: 'https', hostname: '*.fna.fbcdn.net' }, // Facebook CDN regional
     ],
   },
 };

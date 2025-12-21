@@ -52,11 +52,11 @@ export default function NewsArticleClient({ item }: NewsArticleClientProps) {
                     <div className="flex flex-wrap gap-3 items-center">
                         {/* Content Type Badge */}
                         {item.content_type === 'official' ? (
-                            <Badge variant="secondary" className="bg-blue-600 text-white hover:bg-blue-700">
+                            <Badge className="bg-brand-red text-white border-transparent font-bold">
                                 Official Statement
                             </Badge>
                         ) : (
-                            <Badge variant="secondary" className="bg-green-50 text-green-700 hover:bg-green-100">
+                            <Badge className="bg-green-100 text-green-900 border-transparent font-semibold">
                                 Personal Article
                             </Badge>
                         )}

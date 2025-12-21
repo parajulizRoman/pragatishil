@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { SectionHeader } from "@/components/SectionHeader";
@@ -121,7 +122,7 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
                                     {t(pillar.titleEn, pillar.titleNe)}
                                 </h4>
                                 <p className="text-slate-600 leading-relaxed text-sm">
-                                    {t(pillar.descEn, pillar.descEn)}
+                                    {t(pillar.descEn, pillar.descNe || pillar.descEn)}
                                 </p>
                             </div>
                         ))}
@@ -146,16 +147,17 @@ export default function HomeClient({ content, news, videos }: HomeClientProps) {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {n.slice(0, 3).map((item) => (
-                            <Link key={item.id} href={item.link} className="block group h-full">
+                            <Link key={item.id} href={`/news/${item.slug || item.id}`} className="block group h-full">
                                 <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full hover:-translate-y-1">
                                     {/* Image */}
                                     {(item.image_url || item.image) && (
                                         <div className="relative h-56 w-full overflow-hidden">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img
-                                                src={item.image_url || item.image}
+                                            <Image
+                                                src={item.image_url || item.image || ''}
                                                 alt={item.title}
-                                                className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-700"
+                                                fill
+                                                sizes="(max-width: 768px) 100vw, 400px"
+                                                className="object-cover transform group-hover:scale-105 transition-transform duration-700"
                                             />
                                             <div className="absolute top-3 left-3">
                                                 <span className={cn(

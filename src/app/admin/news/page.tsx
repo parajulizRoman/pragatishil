@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import NepaliDate from "nepali-date-converter";
 import { createClient } from "@/lib/supabase/client";
 import { upsertNewsItem, deleteNewsItem } from "@/actions/cms";
-import { Plus, Edit, Trash2, X, Globe, Calendar, FileText, ExternalLink, Link as LinkIcon, AlertTriangle } from "lucide-react";
+import { Plus, Edit, Trash2, X, Globe, Calendar, FileText, ExternalLink, Link as LinkIcon, AlertTriangle, ImageIcon, Loader2 } from "lucide-react";
 import { NewsItem, NewsStatus, NewsType, NewsAttachment, NewsReference } from "@/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,11 @@ export default function NewsManager() {
     // Local state for textareas mapped to JSON arrays
     const [referencesText, setReferencesText] = useState("");
     const [attachmentsText, setAttachmentsText] = useState("");
+
+    // Image upload state
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [dragActive, setDragActive] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         fetchNews();
@@ -184,6 +189,67 @@ export default function NewsManager() {
             if (adDate) updates.date = adDate;
         }
         setCurrentItem({ ...currentItem, ...updates });
+    };
+
+    // Image upload handler
+    const handleImageUpload = async (file: File) => {
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file (JPG, PNG, etc.)');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Image size should be less than 5MB');
+            return;
+        }
+
+        setUploadingImage(true);
+        try {
+            const supabase = createClient();
+            const fileExt = file.name.split('.').pop();
+            const fileName = `news/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('media')
+                .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('media')
+                .getPublicUrl(fileName);
+
+            setCurrentItem(prev => ({ ...prev!, image_url: publicUrl }));
+        } catch (error) {
+            console.error('Upload error:', error);
+            alert('Failed to upload image: ' + (error as Error).message);
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
+    const handleDrag = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === 'dragenter' || e.type === 'dragover') {
+            setDragActive(true);
+        } else if (e.type === 'dragleave') {
+            setDragActive(false);
+        }
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            handleImageUpload(e.dataTransfer.files[0]);
+        }
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            handleImageUpload(e.target.files[0]);
+        }
     };
 
     const filteredNews = filterStatus === 'all' ? news : news.filter(n => n.status === filterStatus);
@@ -330,8 +396,8 @@ export default function NewsManager() {
                                     <Label className="text-sm font-semibold text-slate-700 mb-3 block">Content Type</Label>
                                     <div className="flex gap-4">
                                         <label className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 cursor-pointer transition-all ${currentItem.content_type === 'official'
-                                                ? 'bg-blue-50 border-brand-blue text-brand-blue'
-                                                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                                            ? 'bg-blue-50 border-brand-blue text-brand-blue'
+                                            : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                                             }`}>
                                             <input
                                                 type="radio"
@@ -345,8 +411,8 @@ export default function NewsManager() {
                                             <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Party</span>
                                         </label>
                                         <label className={`flex items-center gap-2 px-4 py-3 rounded-lg border-2 cursor-pointer transition-all ${currentItem.content_type === 'article'
-                                                ? 'bg-green-50 border-green-600 text-green-700'
-                                                : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                                            ? 'bg-green-50 border-green-600 text-green-700'
+                                            : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
                                             }`}>
                                             <input
                                                 type="radio"
@@ -460,13 +526,87 @@ export default function NewsManager() {
                                         </div>
                                         <p className="text-[10px] text-slate-400">Used for &quot;Read Original&quot; button.</p>
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label>Featured Image URL</Label>
-                                        <Input
-                                            value={currentItem.image_url || ''}
-                                            onChange={e => setCurrentItem(prev => ({ ...prev!, image_url: e.target.value }))}
-                                            placeholder="https://..."
+                                    <div className="space-y-2 md:col-span-2">
+                                        <Label>Featured Image</Label>
+                                        <input
+                                            type="file"
+                                            ref={fileInputRef}
+                                            onChange={handleFileSelect}
+                                            accept="image/*"
+                                            className="hidden"
                                         />
+
+                                        {/* Upload Zone or Preview */}
+                                        {currentItem.image_url ? (
+                                            <div className="relative group">
+                                                <div className="relative h-48 w-full rounded-xl overflow-hidden border-2 border-slate-200 bg-slate-100">
+                                                    <Image
+                                                        src={currentItem.image_url}
+                                                        alt="Featured image preview"
+                                                        fill
+                                                        className="object-cover"
+                                                        sizes="400px"
+                                                    />
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setCurrentItem(prev => ({ ...prev!, image_url: '' }))}
+                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => fileInputRef.current?.click()}
+                                                    className="absolute bottom-2 right-2 bg-white text-slate-700 px-3 py-1.5 rounded-lg shadow-lg text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity hover:bg-slate-50"
+                                                >
+                                                    Replace Image
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div
+                                                onClick={() => !uploadingImage && fileInputRef.current?.click()}
+                                                onDragEnter={handleDrag}
+                                                onDragLeave={handleDrag}
+                                                onDragOver={handleDrag}
+                                                onDrop={handleDrop}
+                                                className={`
+                                                    h-40 flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed cursor-pointer transition-all
+                                                    ${dragActive
+                                                        ? 'border-brand-blue bg-blue-50'
+                                                        : 'border-slate-300 bg-slate-50 hover:border-slate-400 hover:bg-slate-100'
+                                                    }
+                                                    ${uploadingImage ? 'pointer-events-none opacity-60' : ''}
+                                                `}
+                                            >
+                                                {uploadingImage ? (
+                                                    <>
+                                                        <Loader2 className="w-8 h-8 text-brand-blue animate-spin" />
+                                                        <span className="text-sm text-slate-500 font-medium">Uploading...</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center">
+                                                            <ImageIcon className="w-6 h-6 text-slate-400" />
+                                                        </div>
+                                                        <div className="text-center">
+                                                            <span className="text-sm font-medium text-slate-700">Click or drag to upload</span>
+                                                            <p className="text-xs text-slate-400 mt-1">JPG, PNG up to 5MB</p>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {/* URL fallback input */}
+                                        <div className="flex gap-2 items-center">
+                                            <Input
+                                                value={currentItem.image_url || ''}
+                                                onChange={e => setCurrentItem(prev => ({ ...prev!, image_url: e.target.value }))}
+                                                placeholder="Or paste image URL..."
+                                                className="text-xs"
+                                            />
+                                        </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Author Name</Label>

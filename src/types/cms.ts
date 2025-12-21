@@ -62,6 +62,7 @@ export interface SiteSettings {
 
 export interface NewsItem {
     id: number;
+    slug?: string;
     title: string;
     title_ne: string | null;
     summary_en: string | null;
