@@ -137,10 +137,10 @@ export default function HomeClient({ content, news, videos, documents = [] }: Ho
             <section className="py-24 bg-brand-bg relative z-20 border-t border-brand-navy/5">
                 <div className="container mx-auto px-4">
                     <div className="flex justify-between items-end mb-12 border-b border-slate-200 pb-4">
-                        <div>
+                        <Link href="/news" className="hover:opacity-80 transition-opacity">
                             <Typography variant="h2" className="border-none !pb-0 mb-1">{t("Latest News", "ताजा समाचार")}</Typography>
                             <Typography variant="muted">{t("Updates from the party", "पार्टीका गतिविधिहरु")}</Typography>
-                        </div>
+                        </Link>
                         <Button variant="link" asChild className="hidden md:flex text-brand-blue font-semibold">
                             <Link href="/news">
                                 {t("View all news", "सबै समाचार हेर्नुहोस्")} &rarr;
