@@ -175,8 +175,11 @@ export default function PressReleasesClient({ documents: initialDocuments }: Pre
                                     </div>
                                 )}
 
-                                {/* Thumbnail */}
-                                <div className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center">
+                                {/* Thumbnail - clickable to open viewer */}
+                                <div
+                                    className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center cursor-pointer"
+                                    onClick={() => setSelectedDoc(doc)}
+                                >
                                     {isPdf(doc.url) ? (
                                         <FileText size={64} className="text-brand-red/60" />
                                     ) : (

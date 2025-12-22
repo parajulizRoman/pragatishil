@@ -214,10 +214,12 @@ export default function HomeClient({ content, news, videos, documents = [] }: Ho
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
                             {documents.slice(0, 4).map((doc) => (
-                                <Link
+                                <a
                                     key={doc.id}
-                                    href="/press-releases"
-                                    className="group bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-xl transition-all"
+                                    href={doc.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="group bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden hover:shadow-xl transition-all cursor-pointer"
                                 >
                                     <div className="relative h-36 bg-gradient-to-br from-brand-red/10 to-brand-blue/10 flex items-center justify-center">
                                         <FileText size={48} className="text-brand-red/60 group-hover:scale-110 transition-transform" />
@@ -235,7 +237,7 @@ export default function HomeClient({ content, news, videos, documents = [] }: Ho
                                             {new Date(doc.created_at).toISOString().split('T')[0]}
                                         </p>
                                     </div>
-                                </Link>
+                                </a>
                             ))}
                         </div>
 
