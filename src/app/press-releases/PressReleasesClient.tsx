@@ -116,7 +116,7 @@ export default function PressReleasesClient({ documents: initialDocuments }: Pre
                                 setEditingDoc(null);
                                 setShowForm(true);
                             }}
-                            className="bg-white text-brand-blue hover:bg-white/90 font-bold gap-2"
+                            className="bg-brand-red hover:bg-brand-red/90 text-white font-bold gap-2 shadow-lg"
                         >
                             <Plus size={18} />
                             {t("नयाँ प्रेस विज्ञप्ति", "New Press Release")}
