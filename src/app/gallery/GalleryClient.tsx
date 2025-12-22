@@ -604,18 +604,25 @@ function PhotoEditModal({ image, albums, onClose, onSuccess }: { image: MediaIte
             );
             const { data: { user } } = await supabase.auth.getUser();
 
-            const { error } = await supabase.from('media_gallery').update({
+            const updatePayload = {
                 caption,
                 caption_ne: captionNe || null,
                 alt_text: altText || null,
                 album_id: albumId || null,
                 updated_by: user?.id
-            }).eq('id', image.id);
+            };
+
+            console.log('Updating photo:', image.id, 'with payload:', updatePayload);
+
+            const { data, error } = await supabase.from('media_gallery').update(updatePayload).eq('id', image.id).select();
+
+            console.log('Update result:', { data, error });
 
             if (error) throw error;
             onSuccess();
-        } catch {
-            alert(t("अद्यावधिक गर्न असफल", "Failed to update"));
+        } catch (err) {
+            console.error('Photo update error:', err);
+            alert(t("अद्यावधिक गर्न असफल", "Failed to update: ") + (err as Error).message);
         } finally {
             setLoading(false);
         }
