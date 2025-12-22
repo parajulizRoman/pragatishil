@@ -133,7 +133,6 @@ export default function PressReleaseForm({ onClose, onSuccess, editItem }: Press
                 alt_text: altText,
                 url: fileUrl,
                 media_type: 'document',
-                type: 'press-release',
                 uploaded_by: user?.id,
                 updated_by: user?.id,
             };
