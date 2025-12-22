@@ -569,10 +569,31 @@ function PhotoUploadModal({ albums, onClose, onSuccess }: { albums: MediaAlbum[]
 function PhotoEditModal({ image, albums, onClose, onSuccess }: { image: MediaItem; albums: MediaAlbum[]; onClose: () => void; onSuccess: () => void }) {
     const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
+    const [analyzing, setAnalyzing] = useState(false);
     const [caption, setCaption] = useState(image.caption || "");
     const [captionNe, setCaptionNe] = useState(image.caption_ne || "");
     const [altText, setAltText] = useState(image.alt_text || "");
     const [albumId, setAlbumId] = useState<number | "">(image.album_id || "");
+
+    const handleAnalyze = async () => {
+        setAnalyzing(true);
+        try {
+            const res = await fetch("/api/ai/analyze-document", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ documentUrl: image.url })
+            });
+            if (!res.ok) throw new Error("Analysis failed");
+            const data = await res.json();
+            if (data.caption_en) setCaption(data.caption_en);
+            if (data.caption_ne) setCaptionNe(data.caption_ne);
+            if (data.alt_text) setAltText(data.alt_text);
+        } catch {
+            alert(t("विश्लेषण असफल", "Analysis failed"));
+        } finally {
+            setAnalyzing(false);
+        }
+    };
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -612,6 +633,12 @@ function PhotoEditModal({ image, albums, onClose, onSuccess }: { image: MediaIte
                     <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-slate-100">
                         <Image src={image.url} alt="Preview" fill className="object-cover" />
                     </div>
+
+                    {/* AI Auto-fill Button */}
+                    <Button onClick={handleAnalyze} disabled={analyzing} variant="outline" className="w-full gap-2 bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-100">
+                        {analyzing ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                        {analyzing ? t("विश्लेषण गर्दै...", "Analyzing...") : t("AI ले भर्नुहोस्", "Auto-fill with AI")}
+                    </Button>
 
                     {/* Album Selection */}
                     <div>
