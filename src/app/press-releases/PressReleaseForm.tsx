@@ -133,9 +133,12 @@ export default function PressReleaseForm({ onClose, onSuccess, editItem }: Press
                 alt_text: altText,
                 url: fileUrl,
                 media_type: 'document',
+                type: 'Article', // Valid type for the check constraint
                 uploaded_by: user?.id,
                 updated_by: user?.id,
             };
+
+            console.log('Saving press release with payload:', payload);
 
             let result;
             if (isEditing && editItem) {
