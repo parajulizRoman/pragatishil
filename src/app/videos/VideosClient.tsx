@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { useLanguage } from "@/context/LanguageContext";
 import { MediaItem } from "@/types";
-import { canManageChannels } from "@/lib/permissions";
+import { canManageChannels, canDeleteContent } from "@/lib/permissions";
 import { Search, Plus, X, Video, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +59,7 @@ export default function VideosClient({ videos: initialVideos }: VideosClientProp
     }, []);
 
     const canManage = canManageChannels(userRole);
+    const canDelete = canDeleteContent(userRole);
 
     const filteredVideos = videos.filter(v =>
         !search || v.title?.toLowerCase().includes(search.toLowerCase())
@@ -150,13 +151,15 @@ export default function VideosClient({ videos: initialVideos }: VideosClientProp
                                             >
                                                 <Pencil size={14} className="text-brand-blue" />
                                             </button>
-                                            <button
-                                                onClick={() => handleDelete(video)}
-                                                className="p-2 bg-white/90 rounded-full hover:bg-white shadow-lg transition-all"
-                                                title={t("मेटाउनुहोस्", "Delete")}
-                                            >
-                                                <Trash2 size={14} className="text-red-500" />
-                                            </button>
+                                            {canDelete && (
+                                                <button
+                                                    onClick={() => handleDelete(video)}
+                                                    className="p-2 bg-white/90 rounded-full hover:bg-white shadow-lg transition-all"
+                                                    title={t("मेटाउनुहोस्", "Delete")}
+                                                >
+                                                    <Trash2 size={14} className="text-red-500" />
+                                                </button>
+                                            )}
                                         </div>
                                     )}
                                 </div>

@@ -48,3 +48,12 @@ export function isVerifiedMember(role: UserRole | string | null | undefined): bo
 export function canManagePressReleases(role: UserRole | string | null | undefined): boolean {
     return getRoleLevel(role) > ROLE_HIERARCHY.central_committee;
 }
+
+/**
+ * Checks if a user can delete content (photos, videos, press releases).
+ * Allowed Roles: Higher than Central Committee (admin_party, yantrik, board, admin)
+ * Note: Central Committee can edit but not delete
+ */
+export function canDeleteContent(role: UserRole | string | null | undefined): boolean {
+    return getRoleLevel(role) > ROLE_HIERARCHY.central_committee;
+}
