@@ -1,19 +1,84 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/context/LanguageContext";
-import { FileText, Download, ExternalLink, Search, Calendar, Eye } from "lucide-react";
+import { FileText, Download, ExternalLink, Search, Calendar, Eye, Plus, Edit2, Trash2 } from "lucide-react";
 import { MediaItem } from "@/types";
+import { createBrowserClient } from "@supabase/ssr";
+import { canManagePressReleases } from "@/lib/permissions";
+import PressReleaseForm from "./PressReleaseForm";
+import { Button } from "@/components/ui/button";
 
 interface PressReleasesClientProps {
     documents: MediaItem[];
 }
 
-export default function PressReleasesClient({ documents }: PressReleasesClientProps) {
+export default function PressReleasesClient({ documents: initialDocuments }: PressReleasesClientProps) {
     const { t } = useLanguage();
     const [search, setSearch] = useState("");
     const [selectedDoc, setSelectedDoc] = useState<MediaItem | null>(null);
+    const [documents, setDocuments] = useState(initialDocuments);
+
+    // Auth & permissions
+    const [userRole, setUserRole] = useState<string | null>(null);
+    const [showForm, setShowForm] = useState(false);
+    const [editingDoc, setEditingDoc] = useState<MediaItem | null>(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single();
+                if (profile) setUserRole(profile.role);
+            }
+        };
+        fetchUser();
+    }, []);
+
+    const canCreate = canManagePressReleases(userRole);
+
+    // Refresh documents after create/edit
+    const refreshDocuments = async () => {
+        const supabase = createBrowserClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        const { data } = await supabase
+            .from('media_gallery')
+            .select('*')
+            .eq('media_type', 'document')
+            .order('created_at', { ascending: false });
+        if (data) setDocuments(data);
+    };
+
+    // Delete document
+    const handleDelete = async (doc: MediaItem) => {
+        if (!confirm(t(`"${doc.title}" मेटाउने हो?`, `Delete "${doc.title}"?`))) return;
+
+        try {
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+            const { error } = await supabase
+                .from('media_gallery')
+                .delete()
+                .eq('id', doc.id);
+            if (error) throw error;
+            refreshDocuments();
+        } catch {
+            alert(t("मेटाउन असफल", "Failed to delete"));
+        }
+    };
 
     const filteredDocs = documents.filter(doc =>
         doc.title?.toLowerCase().includes(search.toLowerCase()) ||
@@ -37,12 +102,26 @@ export default function PressReleasesClient({ documents }: PressReleasesClientPr
                     <h1 className="text-3xl md:text-4xl font-black text-white mb-4">
                         {t("प्रेस विज्ञप्ति", "Press Releases")}
                     </h1>
-                    <p className="text-white/80 max-w-2xl mx-auto">
+                    <p className="text-white/80 max-w-2xl mx-auto mb-6">
                         {t(
                             "प्रगतिशील लोकतान्त्रिक पार्टीका आधिकारिक विज्ञप्ति, वक्तव्य र कागजातहरू",
                             "Official press releases, statements and documents from Pragatishil Loktantrik Party"
                         )}
                     </p>
+
+                    {/* Create Button - Only for authorized users */}
+                    {canCreate && (
+                        <Button
+                            onClick={() => {
+                                setEditingDoc(null);
+                                setShowForm(true);
+                            }}
+                            className="bg-white text-brand-blue hover:bg-white/90 font-bold gap-2"
+                        >
+                            <Plus size={18} />
+                            {t("नयाँ प्रेस विज्ञप्ति", "New Press Release")}
+                        </Button>
+                    )}
                 </div>
             </section>
 
@@ -71,8 +150,31 @@ export default function PressReleasesClient({ documents }: PressReleasesClientPr
                         {filteredDocs.map((doc) => (
                             <article
                                 key={doc.id}
-                                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all border border-slate-100 overflow-hidden group"
+                                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all border border-slate-100 overflow-hidden group relative"
                             >
+                                {/* Edit/Delete buttons for authorized users */}
+                                {canCreate && (
+                                    <div className="absolute top-3 left-3 z-10 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={() => {
+                                                setEditingDoc(doc);
+                                                setShowForm(true);
+                                            }}
+                                            className="p-2 bg-white/90 rounded-full shadow hover:bg-brand-blue hover:text-white transition-colors"
+                                            title={t("सम्पादन", "Edit")}
+                                        >
+                                            <Edit2 size={14} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(doc)}
+                                            className="p-2 bg-white/90 rounded-full shadow hover:bg-red-500 hover:text-white transition-colors"
+                                            title={t("मेटाउनुहोस्", "Delete")}
+                                        >
+                                            <Trash2 size={14} />
+                                        </button>
+                                    </div>
+                                )}
+
                                 {/* Thumbnail */}
                                 <div className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center">
                                     {isPdf(doc.url) ? (
@@ -200,6 +302,18 @@ export default function PressReleasesClient({ documents }: PressReleasesClientPr
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Create/Edit Form Modal */}
+            {showForm && (
+                <PressReleaseForm
+                    onClose={() => {
+                        setShowForm(false);
+                        setEditingDoc(null);
+                    }}
+                    onSuccess={refreshDocuments}
+                    editItem={editingDoc}
+                />
             )}
         </main>
     );

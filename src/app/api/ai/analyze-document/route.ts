@@ -4,7 +4,7 @@ import { analyzeDocumentFromUrl } from '@/lib/ai/geminiServer';
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { url } = body;
+        const url = body.url || body.documentUrl;
 
         if (!url) {
             return NextResponse.json({ error: 'Document URL is required' }, { status: 400 });

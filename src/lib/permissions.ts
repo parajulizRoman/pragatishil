@@ -40,3 +40,11 @@ export function isLeadership(role: UserRole | string | null | undefined): boolea
 export function isVerifiedMember(role: UserRole | string | null | undefined): boolean {
     return getRoleLevel(role) >= ROLE_HIERARCHY.member;
 }
+
+/**
+ * Checks if a user can create/manage press releases.
+ * Allowed Roles: Higher than Central Committee (admin_party, yantrik, board, admin)
+ */
+export function canManagePressReleases(role: UserRole | string | null | undefined): boolean {
+    return getRoleLevel(role) > ROLE_HIERARCHY.central_committee;
+}
