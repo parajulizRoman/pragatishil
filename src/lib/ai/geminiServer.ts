@@ -175,6 +175,7 @@ export async function summarizeThread(title: string, content: string): Promise<s
 // -- Document Analysis for Media Gallery --
 export interface DocumentAnalysisResult {
     title: string;
+    title_ne: string;
     alt_text: string;
     caption_en: string;
     caption_ne: string;
@@ -190,13 +191,15 @@ export async function analyzeDocument(base64Data: string, mimeType: string): Pro
 
 Extract the following information:
 1. title: A concise title for this document (max 100 chars, in English)
-2. alt_text: SEO-friendly description for accessibility (max 150 chars, in English)
-3. caption_en: Brief English caption describing the document (2-3 sentences)
-4. caption_ne: Nepali translation of the caption (नेपाली विवरण)
-5. document_type: What type of document is this? (e.g., "letter", "report", "certificate", "notice", "press_release", "pamphlet", "other")
-6. key_topics: Array of 3-5 key topics/keywords found in the document
+2. title_ne: Nepali title for this document (नेपालीमा शीर्षक)
+3. alt_text: SEO-friendly description for accessibility (max 150 chars, in English)
+4. caption_en: Brief English caption describing the document (2-3 sentences)
+5. caption_ne: Nepali translation of the caption (नेपाली विवरण)
+6. document_type: What type of document is this? (e.g., "letter", "report", "certificate", "notice", "press_release", "pamphlet", "other")
+7. key_topics: Array of 3-5 key topics/keywords found in the document
 
-If the document is in Nepali, still provide English title/alt_text/caption_en, and translate to Nepali for caption_ne.
+If the document is in Nepali, extract the original Nepali title for title_ne, and translate to English for title.
+If the document is in English, provide title in English and translate to Nepali for title_ne.
 If you cannot read the document clearly, provide your best guess based on visible elements.
 
 Return valid JSON only.`;
@@ -205,13 +208,14 @@ Return valid JSON only.`;
         type: Type.OBJECT,
         properties: {
             title: { type: Type.STRING },
+            title_ne: { type: Type.STRING },
             alt_text: { type: Type.STRING },
             caption_en: { type: Type.STRING },
             caption_ne: { type: Type.STRING },
             document_type: { type: Type.STRING },
             key_topics: { type: Type.ARRAY, items: { type: Type.STRING } },
         },
-        required: ["title", "alt_text", "caption_en", "caption_ne"],
+        required: ["title", "title_ne", "alt_text", "caption_en", "caption_ne"],
     };
 
     try {
