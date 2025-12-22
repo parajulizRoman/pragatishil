@@ -5,7 +5,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useLanguage } from "@/context/LanguageContext";
 import { MediaItem } from "@/types";
 import { canManageChannels } from "@/lib/permissions";
-import { Search, Plus, X, Video } from "lucide-react";
+import { Search, Plus, X, Video, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,6 +21,23 @@ export default function VideosClient({ videos: initialVideos }: VideosClientProp
     const [search, setSearch] = useState("");
     const [userRole, setUserRole] = useState<string | null>(null);
     const [showAddForm, setShowAddForm] = useState(false);
+    const [editingVideo, setEditingVideo] = useState<MediaItem | null>(null);
+
+    // Delete handler
+    const handleDelete = async (video: MediaItem) => {
+        if (!confirm(t(`"${video.title || 'यो भिडियो'}" मेटाउने हो?`, `Delete "${video.title || 'this video'}"?`))) return;
+
+        const supabase = createBrowserClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        const { error } = await supabase.from('media_gallery').delete().eq('id', video.id);
+        if (error) {
+            alert(t("मेटाउन असफल", "Failed to delete"));
+        } else {
+            refreshVideos();
+        }
+    };
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -110,7 +127,7 @@ export default function VideosClient({ videos: initialVideos }: VideosClientProp
                 {filteredVideos.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredVideos.map((video) => (
-                            <div key={video.id} className="group">
+                            <div key={video.id} className="group relative">
                                 <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-xl border-4 border-white mb-4 relative">
                                     <iframe
                                         width="100%"
@@ -122,6 +139,26 @@ export default function VideosClient({ videos: initialVideos }: VideosClientProp
                                         allowFullScreen
                                         className="w-full h-full"
                                     />
+
+                                    {/* Edit/Delete buttons */}
+                                    {canManage && (
+                                        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                            <button
+                                                onClick={() => setEditingVideo(video)}
+                                                className="p-2 bg-white/90 rounded-full hover:bg-white shadow-lg transition-all"
+                                                title={t("सम्पादन", "Edit")}
+                                            >
+                                                <Pencil size={14} className="text-brand-blue" />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(video)}
+                                                className="p-2 bg-white/90 rounded-full hover:bg-white shadow-lg transition-all"
+                                                title={t("मेटाउनुहोस्", "Delete")}
+                                            >
+                                                <Trash2 size={14} className="text-red-500" />
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                                 <h3 className="font-bold text-slate-800 group-hover:text-brand-blue transition-colors px-2 text-lg leading-snug">
                                     {video.title || t("शीर्षकविहीन", "Untitled")}
@@ -145,6 +182,15 @@ export default function VideosClient({ videos: initialVideos }: VideosClientProp
                 <VideoAddModal
                     onClose={() => setShowAddForm(false)}
                     onSuccess={() => { refreshVideos(); setShowAddForm(false); }}
+                />
+            )}
+
+            {/* Edit Video Modal */}
+            {editingVideo && (
+                <VideoEditModal
+                    video={editingVideo}
+                    onClose={() => setEditingVideo(null)}
+                    onSuccess={() => { refreshVideos(); setEditingVideo(null); }}
                 />
             )}
         </main>
@@ -254,6 +300,82 @@ function VideoAddModal({ onClose, onSuccess }: { onClose: () => void; onSuccess:
                     <Button variant="ghost" onClick={onClose}>{t("रद्द", "Cancel")}</Button>
                     <Button onClick={handleSubmit} disabled={loading || !embedUrl || !title.trim()} className="bg-brand-blue hover:bg-brand-blue/90 text-white">
                         {loading ? t("थप्दै...", "Adding...") : t("थप्नुहोस्", "Add")}
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Video Edit Modal
+function VideoEditModal({ video, onClose, onSuccess }: { video: MediaItem; onClose: () => void; onSuccess: () => void }) {
+    const { t } = useLanguage();
+    const [loading, setLoading] = useState(false);
+    const [title, setTitle] = useState(video.title || "");
+    const [caption, setCaption] = useState(video.caption || "");
+
+    const handleSubmit = async () => {
+        if (!title.trim()) return;
+        setLoading(true);
+        try {
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+            const { data: { user } } = await supabase.auth.getUser();
+
+            const { error } = await supabase.from('media_gallery').update({
+                title,
+                caption: caption || null,
+                updated_by: user?.id
+            }).eq('id', video.id);
+
+            if (error) throw error;
+            onSuccess();
+        } catch {
+            alert(t("अद्यावधिक गर्न असफल", "Failed to update"));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+                <div className="p-5 border-b bg-gradient-to-r from-brand-navy to-brand-blue flex justify-between items-center">
+                    <h2 className="text-lg font-bold text-white">{t("भिडियो सम्पादन", "Edit Video")}</h2>
+                    <button onClick={onClose} className="text-white/80 hover:text-white"><X size={20} /></button>
+                </div>
+                <div className="p-6 space-y-4">
+                    {/* Preview */}
+                    <div className="aspect-video bg-black rounded-xl overflow-hidden">
+                        <iframe
+                            width="100%"
+                            height="100%"
+                            src={video.embed_url || video.url}
+                            title="Preview"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        />
+                    </div>
+
+                    {/* Title */}
+                    <div>
+                        <label className="text-sm font-medium text-slate-700">{t("शीर्षक", "Title")} *</label>
+                        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Video title" className="mt-1" />
+                    </div>
+
+                    {/* Caption */}
+                    <div>
+                        <label className="text-sm font-medium text-slate-700">{t("विवरण", "Description")}</label>
+                        <Textarea value={caption} onChange={(e) => setCaption(e.target.value)} className="mt-1" rows={3} />
+                    </div>
+                </div>
+                <div className="p-5 border-t bg-slate-50 flex justify-end gap-3">
+                    <Button variant="ghost" onClick={onClose}>{t("रद्द", "Cancel")}</Button>
+                    <Button onClick={handleSubmit} disabled={loading || !title.trim()} className="bg-brand-blue hover:bg-brand-blue/90 text-white">
+                        {loading ? t("अद्यावधिक गर्दै...", "Updating...") : t("अद्यावधिक गर्नुहोस्", "Update")}
                     </Button>
                 </div>
             </div>
