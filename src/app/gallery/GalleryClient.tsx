@@ -6,7 +6,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useLanguage } from "@/context/LanguageContext";
 import { MediaItem, MediaAlbum } from "@/types";
 import { canManageChannels } from "@/lib/permissions";
-import { Search, X, Plus, FolderPlus, ChevronLeft, ChevronRight, Download, Loader2, Sparkles } from "lucide-react";
+import { Search, X, Plus, FolderPlus, ChevronLeft, ChevronRight, Download, Loader2, Sparkles, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,6 +29,24 @@ export default function GalleryClient({ albums: initialAlbums, images: initialIm
     const [userRole, setUserRole] = useState<string | null>(null);
     const [showUploadForm, setShowUploadForm] = useState(false);
     const [showAlbumForm, setShowAlbumForm] = useState(false);
+    const [editingImage, setEditingImage] = useState<MediaItem | null>(null);
+
+    // Delete handler
+    const handleDelete = async (img: MediaItem, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!confirm(t(`"${img.caption || 'यो फोटो'}" मेटाउने हो?`, `Delete "${img.caption || 'this photo'}"?`))) return;
+
+        const supabase = createBrowserClient(
+            process.env.NEXT_PUBLIC_SUPABASE_URL!,
+            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        );
+        const { error } = await supabase.from('media_gallery').delete().eq('id', img.id);
+        if (error) {
+            alert(t("मेटाउन असफल", "Failed to delete"));
+        } else {
+            refreshData();
+        }
+    };
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -194,11 +212,32 @@ export default function GalleryClient({ albums: initialAlbums, images: initialIm
                                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                                     sizes="(max-width: 768px) 50vw, 25vw"
                                 />
+                                {/* Caption overlay */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                                     <p className="text-white text-sm font-medium line-clamp-2">
                                         {t(img.caption_ne || '', img.caption || '')}
                                     </p>
                                 </div>
+
+                                {/* Edit/Delete buttons for authorized users */}
+                                {canManage && (
+                                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setEditingImage(img); }}
+                                            className="p-2 bg-white/90 rounded-full hover:bg-white shadow-lg transition-all"
+                                            title={t("सम्पादन", "Edit")}
+                                        >
+                                            <Pencil size={14} className="text-brand-blue" />
+                                        </button>
+                                        <button
+                                            onClick={(e) => handleDelete(img, e)}
+                                            className="p-2 bg-white/90 rounded-full hover:bg-white shadow-lg transition-all"
+                                            title={t("मेटाउनुहोस्", "Delete")}
+                                        >
+                                            <Trash2 size={14} className="text-red-500" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -275,6 +314,16 @@ export default function GalleryClient({ albums: initialAlbums, images: initialIm
                     albums={albums}
                     onClose={() => setShowUploadForm(false)}
                     onSuccess={() => { refreshData(); setShowUploadForm(false); }}
+                />
+            )}
+
+            {/* Photo Edit Modal */}
+            {editingImage && (
+                <PhotoEditModal
+                    image={editingImage}
+                    albums={albums}
+                    onClose={() => setEditingImage(null)}
+                    onSuccess={() => { refreshData(); setEditingImage(null); }}
                 />
             )}
         </main>
@@ -506,6 +555,98 @@ function PhotoUploadModal({ albums, onClose, onSuccess }: { albums: MediaAlbum[]
                     <Button variant="ghost" onClick={onClose}>{t("रद्द", "Cancel")}</Button>
                     <Button onClick={handleSubmit} disabled={loading || !fileUrl} className="bg-brand-blue hover:bg-brand-blue/90 text-white">
                         {loading ? t("सुरक्षित गर्दै...", "Saving...") : t("सुरक्षित गर्नुहोस्", "Save")}
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Photo Edit Modal
+function PhotoEditModal({ image, albums, onClose, onSuccess }: { image: MediaItem; albums: MediaAlbum[]; onClose: () => void; onSuccess: () => void }) {
+    const { t } = useLanguage();
+    const [loading, setLoading] = useState(false);
+    const [caption, setCaption] = useState(image.caption || "");
+    const [captionNe, setCaptionNe] = useState(image.caption_ne || "");
+    const [altText, setAltText] = useState(image.alt_text || "");
+    const [albumId, setAlbumId] = useState<number | "">(image.album_id || "");
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        try {
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+            const { data: { user } } = await supabase.auth.getUser();
+
+            const { error } = await supabase.from('media_gallery').update({
+                caption,
+                caption_ne: captionNe || null,
+                alt_text: altText || null,
+                album_id: albumId || null,
+                updated_by: user?.id
+            }).eq('id', image.id);
+
+            if (error) throw error;
+            onSuccess();
+        } catch {
+            alert(t("अद्यावधिक गर्न असफल", "Failed to update"));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+                <div className="p-5 border-b bg-gradient-to-r from-brand-navy to-brand-blue flex justify-between items-center">
+                    <h2 className="text-lg font-bold text-white">{t("फोटो सम्पादन", "Edit Photo")}</h2>
+                    <button onClick={onClose} className="text-white/80 hover:text-white"><X size={20} /></button>
+                </div>
+                <div className="p-6 space-y-4 overflow-y-auto flex-1">
+                    {/* Preview */}
+                    <div className="relative aspect-video w-full rounded-lg overflow-hidden bg-slate-100">
+                        <Image src={image.url} alt="Preview" fill className="object-cover" />
+                    </div>
+
+                    {/* Album Selection */}
+                    <div>
+                        <label className="text-sm font-medium text-slate-700">{t("एल्बम", "Album")}</label>
+                        <select
+                            value={albumId}
+                            onChange={(e) => setAlbumId(e.target.value ? Number(e.target.value) : "")}
+                            className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue/20"
+                        >
+                            <option value="">{t("कुनै एल्बम छैन", "No album")}</option>
+                            {albums.map(a => (
+                                <option key={a.id} value={a.id}>{a.name}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Caption EN */}
+                    <div>
+                        <label className="text-sm font-medium text-slate-700">{t("क्याप्सन (अंग्रेजी)", "Caption (English)")}</label>
+                        <Textarea value={caption} onChange={(e) => setCaption(e.target.value)} className="mt-1" rows={2} />
+                    </div>
+
+                    {/* Caption NE */}
+                    <div>
+                        <label className="text-sm font-medium text-slate-700">{t("क्याप्सन (नेपाली)", "Caption (Nepali)")}</label>
+                        <Textarea value={captionNe} onChange={(e) => setCaptionNe(e.target.value)} className="mt-1" rows={2} />
+                    </div>
+
+                    {/* Alt Text */}
+                    <div>
+                        <label className="text-sm font-medium text-slate-700">{t("SEO विवरण", "SEO Description")}</label>
+                        <Input value={altText} onChange={(e) => setAltText(e.target.value)} className="mt-1" />
+                    </div>
+                </div>
+                <div className="p-5 border-t bg-slate-50 flex justify-end gap-3">
+                    <Button variant="ghost" onClick={onClose}>{t("रद्द", "Cancel")}</Button>
+                    <Button onClick={handleSubmit} disabled={loading} className="bg-brand-blue hover:bg-brand-blue/90 text-white">
+                        {loading ? t("अद्यावधिक गर्दै...", "Updating...") : t("अद्यावधिक गर्नुहोस्", "Update")}
                     </Button>
                 </div>
             </div>
