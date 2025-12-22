@@ -46,10 +46,10 @@ export default function MediaContent({ initialNews, initialMedia }: MediaContent
                 {/* --- SECTION 1: NEWS & ARTICLES --- */}
                 <section>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-6 border-b border-slate-200">
-                        <div>
+                        <Link href="/news" className="hover:opacity-80 transition-opacity">
                             <h2 className="text-3xl font-black text-slate-800 border-l-8 border-brand-red pl-4">News & Media Coverage</h2>
                             <p className="text-slate-500 mt-2 pl-5 font-bold uppercase text-[10px] tracking-widest">Latest updates from press and digital media.</p>
-                        </div>
+                        </Link>
 
                         {/* News Filters */}
                         <div className="flex gap-2">
@@ -127,8 +127,10 @@ export default function MediaContent({ initialNews, initialMedia }: MediaContent
                 {/* --- SECTION 2: VIDEOS --- */}
                 <section>
                     <div className="mb-10 pb-6 border-b border-slate-200">
-                        <h2 className="text-3xl font-black text-slate-800 border-l-8 border-brand-blue pl-4">Interviews & Speeches</h2>
-                        <p className="text-slate-500 mt-2 pl-5 font-bold uppercase text-[10px] tracking-widest">Selected video highlights from our campaigns.</p>
+                        <Link href="/videos" className="hover:opacity-80 transition-opacity block">
+                            <h2 className="text-3xl font-black text-slate-800 border-l-8 border-brand-blue pl-4">Interviews & Speeches</h2>
+                            <p className="text-slate-500 mt-2 pl-5 font-bold uppercase text-[10px] tracking-widest">Selected video highlights from our campaigns.</p>
+                        </Link>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -155,8 +157,10 @@ export default function MediaContent({ initialNews, initialMedia }: MediaContent
                 {/* --- SECTION 3: PHOTO GALLERY --- */}
                 <section>
                     <div className="mb-10 pb-6 border-b border-slate-200">
-                        <h2 className="text-3xl font-black text-slate-800 border-l-8 border-brand-red pl-4">Photo Gallery</h2>
-                        <p className="text-slate-500 mt-2 pl-5 font-bold uppercase text-[10px] tracking-widest">Capturing moments with the community.</p>
+                        <Link href="/gallery" className="hover:opacity-80 transition-opacity block">
+                            <h2 className="text-3xl font-black text-slate-800 border-l-8 border-brand-red pl-4">Photo Gallery</h2>
+                            <p className="text-slate-500 mt-2 pl-5 font-bold uppercase text-[10px] tracking-widest">Capturing moments with the community.</p>
+                        </Link>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
