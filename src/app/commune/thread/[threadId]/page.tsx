@@ -19,6 +19,7 @@ import { Typography } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
+import { RichTextWithVideos } from "@/components/ui/VideoEmbed";
 
 // Helpers
 const PLACEHOLDERS = [
@@ -450,9 +451,9 @@ export default function ThreadPage() {
                                             <div className="ml-auto text-xs text-slate-400">{new Date(post.created_at).toLocaleDateString()}</div>
                                         </div>
 
-                                        {/* Content */}
+                                        {/* Content - with video embeds */}
                                         <div className="text-slate-800 leading-relaxed whitespace-pre-wrap text-[15px] mb-4">
-                                            {post.content}
+                                            <RichTextWithVideos content={post.content} />
                                         </div>
 
                                         {/* Attachments */}
