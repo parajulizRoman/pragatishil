@@ -4,6 +4,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 import { Loader2, Save, AlertTriangle, Info } from "lucide-react";
 import { updateMembership } from "./actions";
 import { NestedProvince } from "@/lib/geo";
@@ -38,6 +39,7 @@ const INCLUSION_OPTIONS = [
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function MembershipForm({ member }: { member: any }) {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
 
     // -- GEO STATE --
@@ -125,11 +127,11 @@ export default function MembershipForm({ member }: { member: any }) {
             <div className="bg-blue-50 border border-blue-200 p-4 rounded-xl flex gap-3 text-blue-900 mb-8">
                 <Info className="shrink-0 text-blue-600" size={24} />
                 <div>
-                    <h3 className="font-bold text-lg">Edit Membership Record</h3>
+                    <h3 className="font-bold text-lg">{t("सदस्यता रेकर्ड सम्पादन", "Edit Membership Record")}</h3>
                     <p className="text-sm text-blue-800">
-                        Update your full profile details here. All changes are logged.
+                        {t("यहाँ तपाईंको पूर्ण प्रोफाइल विवरण अपडेट गर्नुहोस्।", "Update your full profile details here. All changes are logged.")}
                         <br />
-                        <strong>Note:</strong> Sensitive fields (Citizenship, DOB) are locked.
+                        <strong>{t("नोट:", "Note:")}</strong> {t("संवेदनशील फिल्डहरू (नागरिकता, जन्ममिति) लक छन्।", "Sensitive fields (Citizenship, DOB) are locked.")}
                     </p>
                 </div>
             </div>
@@ -388,7 +390,7 @@ export default function MembershipForm({ member }: { member: any }) {
                     className="flex items-center gap-2 px-8 py-3 bg-brand-blue text-white font-bold rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20"
                 >
                     {loading ? <Loader2 className="animate-spin" /> : <Save className="w-5 h-5" />}
-                    Save Details
+                    {t("विवरण सुरक्षित गर्नुहोस्", "Save Details")}
                 </button>
             </div>
 

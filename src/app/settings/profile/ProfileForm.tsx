@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { createBrowserClient } from "@supabase/ssr";
+import { useLanguage } from "@/context/LanguageContext";
 import {
     Loader2, Camera, Save, Eye, EyeOff, AtSign,
     Briefcase, Linkedin, Globe, Check, X
@@ -12,6 +13,7 @@ import { Profile } from "@/types";
 import { validateHandle, formatHandle } from "@/lib/handle";
 
 export default function ProfileForm({ profile }: { profile: Profile }) {
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatar_url);
     const [uploading, setUploading] = useState(false);
@@ -155,8 +157,8 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
         <form action={handleSubmit} className="space-y-8 bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
             {/* Header */}
             <div>
-                <h2 className="text-2xl font-bold text-slate-800">Edit Profile</h2>
-                <p className="text-slate-500">Update your public information and settings.</p>
+                <h2 className="text-2xl font-bold text-slate-800">{t("प्रोफाइल सम्पादन", "Edit Profile")}</h2>
+                <p className="text-slate-500">{t("तपाईंको सार्वजनिक जानकारी र सेटिङ्हरू अपडेट गर्नुहोस्।", "Update your public information and settings.")}</p>
             </div>
 
             {/* Avatar */}
@@ -177,7 +179,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
                 <div>
                     <label htmlFor="avatar-upload" className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors">
                         <Camera size={16} />
-                        Change Photo
+                        {t("फोटो परिवर्तन", "Change Photo")}
                         <input
                             id="avatar-upload"
                             type="file"
@@ -195,7 +197,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
             <div className="p-4 rounded-xl border border-blue-100 bg-blue-50/50">
                 <div className="flex items-center gap-2 mb-3">
                     <AtSign className="h-5 w-5 text-brand-blue" />
-                    <h3 className="font-semibold text-slate-800">Your Handle</h3>
+                    <h3 className="font-semibold text-slate-800">{t("तपाईंको ह्यान्डल", "Your Handle")}</h3>
                 </div>
                 <p className="text-sm text-slate-500 mb-3">
                     Choose a unique handle for your profile URL and mentions. Others can tag you with @{handle || "yourhandle"}
@@ -235,9 +237,9 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
                             {isPublic ? <Eye size={20} /> : <EyeOff size={20} />}
                         </div>
                         <div>
-                            <h3 className="font-semibold text-slate-800">Public Profile</h3>
+                            <h3 className="font-semibold text-slate-800">{t("सार्वजनिक प्रोफाइल", "Public Profile")}</h3>
                             <p className="text-sm text-slate-500">
-                                {isPublic ? "Your profile is visible on the members page." : "Only you and admins can see your profile."}
+                                {isPublic ? t("तपाईंको प्रोफाइल सदस्य पृष्ठमा देखिन्छ।", "Your profile is visible on the members page.") : t("तपाईं र प्रशासकहरूले मात्र देख्न सक्छन्।", "Only you and admins can see your profile.")}
                             </p>
                         </div>
                     </div>
@@ -256,7 +258,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
             {/* Basic Fields */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Full Name</label>
+                    <label className="text-sm font-semibold text-slate-700">{t("पूरा नाम", "Full Name")}</label>
                     <input
                         name="full_name"
                         defaultValue={profile.full_name || ""}
@@ -266,7 +268,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700">Location</label>
+                    <label className="text-sm font-semibold text-slate-700">{t("ठेगाना", "Location")}</label>
                     <input
                         name="location"
                         defaultValue={profile.location || ""}
@@ -276,7 +278,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-semibold text-slate-700">Bio</label>
+                    <label className="text-sm font-semibold text-slate-700">{t("परिचय", "Bio")}</label>
                     <textarea
                         name="bio"
                         defaultValue={profile.bio || ""}
@@ -291,7 +293,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
             <div className="space-y-4">
                 <div className="flex items-center gap-2">
                     <Briefcase className="h-5 w-5 text-slate-500" />
-                    <h3 className="font-semibold text-slate-800">Professional Info</h3>
+                    <h3 className="font-semibold text-slate-800">{t("पेशागत जानकारी", "Professional Info")}</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
@@ -381,7 +383,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
             <div className="space-y-4">
                 <div className="flex items-center gap-2">
                     <Globe className="h-5 w-5 text-slate-500" />
-                    <h3 className="font-semibold text-slate-800">Social Links (Optional)</h3>
+                    <h3 className="font-semibold text-slate-800">{t("सामाजिक लिङ्कहरू (वैकल्पिक)", "Social Links (Optional)")}</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -430,7 +432,7 @@ export default function ProfileForm({ profile }: { profile: Profile }) {
                     className="flex items-center gap-2 px-6 py-3 bg-brand-red text-white font-bold rounded-lg hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-red/20"
                 >
                     {loading ? <Loader2 className="animate-spin" /> : <Save className="w-5 h-5" />}
-                    Save Changes
+                    {t("परिवर्तनहरू सुरक्षित गर्नुहोस्", "Save Changes")}
                 </button>
             </div>
         </form>
