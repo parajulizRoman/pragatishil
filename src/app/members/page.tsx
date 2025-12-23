@@ -1,19 +1,42 @@
 export const dynamic = 'force-dynamic'; // Always fresh data
 
 import { supabaseAdmin } from "@/lib/supabase/serverAdmin";
+import { createClient } from "@/lib/supabase/server";
 import MembersClient from "./MembersClient";
-import { Profile } from "@/types";
+import { Profile, UserRole, hasRole } from "@/types";
 import { Suspense } from "react";
 import { MembersLoading } from "./MembersClient";
 
 export default async function MembersGalleryPage() {
-    // Fetch all relevant members with new fields
-    // Include leadership (for leadership tab) + public profiles (for community tab)
-    // Note: admin and yantrik are invisible (technical staff) - not included
-    const { data: members, error } = await supabaseAdmin
-        .from("profiles")
-        .select("*")
-        .or("is_public.eq.true,role.in.(admin_party,board,central_committee)");
+    // Get viewer's role to determine visibility
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    let viewerRole: UserRole = 'guest';
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+        if (profile) viewerRole = profile.role as UserRole;
+    }
+
+    // Central committee and above can see ALL members
+    const canSeeAllMembers = hasRole(viewerRole, 'central_committee');
+
+    let query = supabaseAdmin.from("profiles").select("*");
+
+    if (canSeeAllMembers) {
+        // Fetch all members for central committee+
+        // Still exclude admin and yantrik from display
+        query = query.not('role', 'in', '(admin,yantrik)');
+    } else {
+        // Regular users only see public + leadership
+        query = query.or("is_public.eq.true,role.in.(admin_party,board,central_committee)");
+    }
+
+    const { data: members, error } = await query;
 
     if (error) {
         console.error("Error fetching members:", error);
@@ -38,7 +61,10 @@ export default async function MembersGalleryPage() {
 
     return (
         <Suspense fallback={<MembersLoading />}>
-            <MembersClient members={safeMembers} />
+            <MembersClient
+                members={safeMembers}
+                viewerRole={viewerRole}
+            />
         </Suspense>
     );
 }

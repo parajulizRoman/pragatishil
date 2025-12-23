@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Profile, UserRole } from "@/types";
+import { Profile, UserRole, hasRole } from "@/types";
 import MemberTabs, { MemberTab } from "./components/MemberTabs";
 import MemberCard, { MemberCardSkeleton } from "./components/MemberCard";
 import MemberSearch from "./components/MemberSearch";
@@ -13,13 +13,16 @@ import { cn } from "@/lib/utils";
 
 interface MembersClientProps {
     members: Profile[];
+    viewerRole?: UserRole;
 }
 
 // Define leadership roles - admin and yantrik are invisible (technical staff)
 const LEADERSHIP_ROLES: UserRole[] = ['admin_party', 'board', 'central_committee'];
 const COMMITTEE_ROLES: UserRole[] = ['central_committee'];
 
-export default function MembersClient({ members }: MembersClientProps) {
+export default function MembersClient({ members, viewerRole = 'guest' }: MembersClientProps) {
+    // Central committee+ can see all contact info
+    const canSeeContacts = hasRole(viewerRole, 'central_committee');
     // Tab state
     const [activeTab, setActiveTab] = useState<MemberTab>("community");
 
@@ -216,14 +219,14 @@ export default function MembersClient({ members }: MembersClientProps) {
                 ) : viewMode === "grid" ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                         {filteredMembers.map((member) => (
-                            <MemberCard key={member.id} member={member} />
+                            <MemberCard key={member.id} member={member} canSeeContacts={canSeeContacts} />
                         ))}
                     </div>
                 ) : (
                     // List View
                     <div className="space-y-3">
                         {filteredMembers.map((member) => (
-                            <MemberCard key={member.id} member={member} showDetails />
+                            <MemberCard key={member.id} member={member} showDetails canSeeContacts={canSeeContacts} />
                         ))}
                     </div>
                 )}

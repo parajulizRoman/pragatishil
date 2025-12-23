@@ -20,6 +20,7 @@ const PLACEHOLDERS = [
 interface MemberCardProps {
     member: Profile;
     showDetails?: boolean;
+    canSeeContacts?: boolean;  // Central committee+ can see all contacts
 }
 
 // Get role display info
@@ -50,12 +51,16 @@ const getRoleDisplay = (role: UserRole) => {
     }
 };
 
-export default function MemberCard({ member, showDetails = true }: MemberCardProps) {
+export default function MemberCard({ member, showDetails = true, canSeeContacts = false }: MemberCardProps) {
     const role = getRoleDisplay(member.role);
     const placeholderIndex = member.id.charCodeAt(0) % PLACEHOLDERS.length;
     const avatar = member.avatar_url || PLACEHOLDERS[placeholderIndex];
     const handle = formatHandle(member.handle);
     const isVerified = !!member.verified_at;
+
+    // Show contact if user opted in OR viewer is central_committee+
+    const showEmail = canSeeContacts || (member.show_contact_email && member.contact_email_public);
+    const showPhone = canSeeContacts || (member.show_contact_phone && member.contact_phone_public);
 
     return (
         <Link href={member.handle ? `/members/@${member.handle}` : `/members/${member.id}`}>
@@ -127,10 +132,10 @@ export default function MemberCard({ member, showDetails = true }: MemberCardPro
 
                                 {/* Contact Icons */}
                                 <div className="flex items-center gap-2 pt-2">
-                                    {member.show_contact_email && member.contact_email_public && (
+                                    {showEmail && member.contact_email_public && (
                                         <Mail className="h-3.5 w-3.5 text-slate-400" />
                                     )}
-                                    {member.show_contact_phone && member.contact_phone_public && (
+                                    {showPhone && member.contact_phone_public && (
                                         <Phone className="h-3.5 w-3.5 text-slate-400" />
                                     )}
                                     {member.linkedin_url && (
