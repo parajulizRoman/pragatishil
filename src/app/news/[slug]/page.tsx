@@ -45,6 +45,18 @@ export default async function NewsArticlePage({ params }: { params: { slug: stri
     const supabase = await createClient();
     const { slug } = params;
 
+    // Get current user's role for edit permission
+    const { data: { user } } = await supabase.auth.getUser();
+    let userRole: string | null = null;
+    if (user) {
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+        userRole = profile?.role || null;
+    }
+
     // Try slug first, fallback to ID for legacy URLs
     let news = null;
     let error = null;
@@ -83,5 +95,5 @@ export default async function NewsArticlePage({ params }: { params: { slug: stri
     const item = news as NewsItem;
 
     // Delegate all rendering to client component for language toggle
-    return <NewsArticleClient item={item} />;
+    return <NewsArticleClient item={item} userRole={userRole} />;
 }

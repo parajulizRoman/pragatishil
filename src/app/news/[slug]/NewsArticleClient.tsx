@@ -4,18 +4,20 @@ import { useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { createT, Lang } from "@/lib/translations";
 import { NewsItem, NewsAttachment, NewsReference } from "@/types";
+import { canManageNews } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, ArrowLeft, ExternalLink, FileText, Download, Languages, Share2, Facebook, Twitter, Linkedin, Copy, Check, ImageIcon, MessageCircle } from "lucide-react";
+import { Calendar, ArrowLeft, ExternalLink, FileText, Download, Languages, Share2, Facebook, Twitter, Linkedin, Copy, Check, ImageIcon, MessageCircle, Pencil } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import ThreadEmbed from "@/components/discussion/ThreadEmbed";
 
 interface NewsArticleClientProps {
     item: NewsItem;
+    userRole?: string | null;
 }
 
-export default function NewsArticleClient({ item }: NewsArticleClientProps) {
+export default function NewsArticleClient({ item, userRole }: NewsArticleClientProps) {
     const { language, toggleLanguage } = useLanguage();
     const lang = language as Lang;
     const T = createT(lang);
@@ -62,15 +64,30 @@ export default function NewsArticleClient({ item }: NewsArticleClientProps) {
                         </Link>
 
                         {/* Language Toggle Button */}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={toggleLanguage}
-                            className="gap-2 text-sm"
-                        >
-                            <Languages className="w-4 h-4" />
-                            {lang === "en" ? "नेपालीमा हेर्नुहोस्" : "View in English"}
-                        </Button>
+                        <div className="flex gap-2">
+                            {canManageNews(userRole) && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    asChild
+                                    className="gap-2 text-sm border-brand-blue text-brand-blue hover:bg-brand-blue hover:text-white"
+                                >
+                                    <Link href={`/write?edit=${item.id}`}>
+                                        <Pencil className="w-4 h-4" />
+                                        {lang === "ne" ? "सम्पादन" : "Edit"}
+                                    </Link>
+                                </Button>
+                            )}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={toggleLanguage}
+                                className="gap-2 text-sm"
+                            >
+                                <Languages className="w-4 h-4" />
+                                {lang === "en" ? "नेपालीमा हेर्नुहोस्" : "View in English"}
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="flex flex-wrap gap-3 items-center">
