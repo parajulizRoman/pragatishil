@@ -314,6 +314,21 @@ Document Analysis:
 - Type: ${analysis.document_type || 'Unknown'}
 - Description: ${analysis.caption_en || 'Unknown'}
 - Key Topics: ${analysis.key_topics?.join(', ') || 'Unknown'}`;
+
+                            // If no text fields are filled, use document analysis directly
+                            if (!title.trim() && !titleNe.trim() && !bodyEn.trim() && !bodyNe.trim()) {
+                                // Directly fill from document analysis
+                                if (analysis.title) setTitle(analysis.title);
+                                if (analysis.title_ne) setTitleNe(analysis.title_ne);
+                                if (analysis.caption_en) setSummaryEn(analysis.caption_en);
+
+                                // Generate body content from document analysis
+                                const generatedBodyEn = `${analysis.caption_en || ''}\n\n${analysis.key_topics?.length ? `Key topics covered: ${analysis.key_topics.join(', ')}` : ''}`;
+                                const generatedBodyNe = `${analysis.caption_ne || ''}`;
+
+                                if (generatedBodyEn.trim()) setBodyEn(generatedBodyEn);
+                                if (generatedBodyNe.trim()) setBodyNe(generatedBodyNe);
+                            }
                         }
                     }
                 } catch (analysisError) {
@@ -323,46 +338,51 @@ Document Analysis:
             }
 
             // Step 2: Call article completion with all context including attachment analysis
-            const response = await fetch('/api/ai/complete-article', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    title: title.trim() || undefined,
-                    title_ne: titleNe.trim() || undefined,
-                    body_en: (bodyEn.trim() + attachmentContext) || undefined,
-                    body_ne: bodyNe.trim() || undefined,
-                    summary_en: summaryEn.trim() || undefined
-                })
-            });
+            // Only call if we still have something to complete (e.g., generate Nepali from English or vice versa)
+            const hasContent = title.trim() || titleNe.trim() || bodyEn.trim() || bodyNe.trim() || attachmentContext;
 
-            const result = await response.json();
+            if (hasContent) {
+                const response = await fetch('/api/ai/complete-article', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: title.trim() || undefined,
+                        title_ne: titleNe.trim() || undefined,
+                        body_en: (bodyEn.trim() ? bodyEn.trim() + "\n\n" + attachmentContext : attachmentContext) || undefined,
+                        body_ne: bodyNe.trim() || undefined,
+                        summary_en: summaryEn.trim() || undefined
+                    })
+                });
 
-            if (!response.ok) {
-                throw new Error(result.error || 'AI completion failed');
-            }
+                const result = await response.json();
 
-            const { data } = result;
+                if (!response.ok) {
+                    throw new Error(result.error || 'AI completion failed');
+                }
 
-            // Fill in missing fields with AI-generated content (BIDIRECTIONAL)
-            // English → Nepali
-            if (data.title_ne && !titleNe.trim()) {
-                setTitleNe(data.title_ne);
+                const { data } = result;
+
+                // Fill in missing fields with AI-generated content (BIDIRECTIONAL)
+                // English → Nepali
+                if (data.title_ne && !titleNe.trim()) {
+                    setTitleNe(data.title_ne);
+                }
+                if (data.body_ne && !bodyNe.trim()) {
+                    setBodyNe(data.body_ne);
+                }
+                // Nepali → English
+                if (data.title_en && !title.trim()) {
+                    setTitle(data.title_en);
+                }
+                if (data.body_en && !bodyEn.trim()) {
+                    setBodyEn(data.body_en);
+                }
+                // Summary (always generate if missing)
+                if (data.summary_en && !summaryEn.trim()) {
+                    setSummaryEn(data.summary_en);
+                }
+                // No popup - form fields are visually updated
             }
-            if (data.body_ne && !bodyNe.trim()) {
-                setBodyNe(data.body_ne);
-            }
-            // Nepali → English
-            if (data.title_en && !title.trim()) {
-                setTitle(data.title_en);
-            }
-            if (data.body_en && !bodyEn.trim()) {
-                setBodyEn(data.body_en);
-            }
-            // Summary (always generate if missing)
-            if (data.summary_en && !summaryEn.trim()) {
-                setSummaryEn(data.summary_en);
-            }
-            // No popup - form fields are visually updated
 
         } catch (error) {
             console.error("AI completion error:", error);
