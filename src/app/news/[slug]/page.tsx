@@ -77,7 +77,9 @@ export default async function NewsArticlePage({ params }: { params: { slug: stri
     }
 
     // Check if not found or if draft/archived
-    if (error || !news || news.status !== 'published') {
+    // Support both new 'status' field and legacy 'is_published' field
+    const isPublished = news?.status === 'published' || news?.is_published === true;
+    if (error || !news || !isPublished) {
         notFound();
     }
 
