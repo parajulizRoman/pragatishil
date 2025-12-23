@@ -75,47 +75,59 @@ export default function MediaContent({ initialNews, initialMedia }: MediaContent
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-                        {filteredNews.map((item) => (
-                            <Link
-                                key={item.id}
-                                href={`/news/${item.slug || item.id}`}
-                                className="bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col md:flex-row overflow-hidden group"
-                            >
-                                {(item.image_url || item.image) && (
-                                    <div className="md:w-1/3 aspect-video md:aspect-auto overflow-hidden">
-                                        <img
-                                            src={item.image_url || item.image}
-                                            alt={item.title}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                        />
-                                    </div>
-                                )}
-                                <div className="p-8 flex-1 flex flex-col justify-between">
-                                    <div>
-                                        <div className="flex items-center gap-3 mb-4">
-                                            <span className={`text-[10px] uppercase tracking-widest font-black px-3 py-1 rounded-full border ${item.type === 'Video' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-blue-50 text-blue-600 border-blue-100'
-                                                }`}>
-                                                {item.type}
-                                            </span>
-                                            <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{item.date}</span>
+                        {filteredNews.map((item) => {
+                            // For fallback/external news, link to external source
+                            // For DB news (id > 10 typically indicates DB content), link to internal page
+                            const isDbItem = typeof item.id === 'number' && item.id > 10;
+                            const href = isDbItem
+                                ? `/news/${item.slug || item.id}`
+                                : (item.link || `/news/${item.slug || item.id}`);
+                            const isExternal = !isDbItem && item.link;
+
+                            return (
+                                <Link
+                                    key={item.id}
+                                    href={href}
+                                    target={isExternal ? "_blank" : undefined}
+                                    rel={isExternal ? "noopener noreferrer" : undefined}
+                                    className="bg-white rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col md:flex-row overflow-hidden group"
+                                >
+                                    {(item.image_url || item.image) && (
+                                        <div className="md:w-1/3 aspect-video md:aspect-auto overflow-hidden">
+                                            <img
+                                                src={item.image_url || item.image}
+                                                alt={item.title}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                            />
                                         </div>
-                                        <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-brand-blue transition-colors leading-tight">
-                                            {t(item.title, item.title_ne || item.title)}
-                                        </h3>
-                                        {(item.summary_en || item.summary_ne) && (
-                                            <p className="text-sm text-slate-500 line-clamp-2 mb-6 font-medium">
-                                                {t(item.summary_en || "", item.summary_ne || "")}
-                                            </p>
-                                        )}
-                                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-4">Source: {item.source}</p>
+                                    )}
+                                    <div className="p-8 flex-1 flex flex-col justify-between">
+                                        <div>
+                                            <div className="flex items-center gap-3 mb-4">
+                                                <span className={`text-[10px] uppercase tracking-widest font-black px-3 py-1 rounded-full border ${item.type === 'Video' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-blue-50 text-blue-600 border-blue-100'
+                                                    }`}>
+                                                    {item.type}
+                                                </span>
+                                                <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">{item.date}</span>
+                                            </div>
+                                            <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-brand-blue transition-colors leading-tight">
+                                                {t(item.title, item.title_ne || item.title)}
+                                            </h3>
+                                            {(item.summary_en || item.summary_ne) && (
+                                                <p className="text-sm text-slate-500 line-clamp-2 mb-6 font-medium">
+                                                    {t(item.summary_en || "", item.summary_ne || "")}
+                                                </p>
+                                            )}
+                                            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-4">Source: {item.source}</p>
+                                        </div>
+                                        <span className="inline-flex items-center text-xs font-black text-brand-blue group-hover:text-brand-red transition-all uppercase tracking-widest">
+                                            Read Full Article
+                                            <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                        </span>
                                     </div>
-                                    <span className="inline-flex items-center text-xs font-black text-brand-blue group-hover:text-brand-red transition-all uppercase tracking-widest">
-                                        Read Full Article
-                                        <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                                    </span>
-                                </div>
-                            </Link>
-                        ))}
+                                </Link>
+                            );
+                        })}
                     </div>
                     {filteredNews.length === 0 && (
                         <div className="text-center py-16 bg-slate-50 rounded-3xl border-4 border-dashed border-slate-100">
