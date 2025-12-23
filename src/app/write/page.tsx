@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Save, Send, Clock, Upload, X, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { convertADtoBS } from "@/lib/dateConverter";
 import Image from "next/image";
 import { NewsAttachment } from "@/types";
@@ -32,6 +32,7 @@ interface Draft {
 
 export default function WritePage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { t } = useLanguage();
     const [loading, setLoading] = useState(true);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
@@ -155,11 +156,36 @@ export default function WritePage() {
                 }
             }
 
+            // Check for ?edit=N URL param and load article for editing
+            const editId = searchParams.get("edit");
+            if (editId && !isNaN(Number(editId))) {
+                const articleId = Number(editId);
+                const { data: article } = await supabase
+                    .from("news_items")
+                    .select("*")
+                    .eq("id", articleId)
+                    .single();
+
+                if (article) {
+                    setEditingId(article.id);
+                    setTitle(article.title || "");
+                    setTitleNe(article.title_ne || "");
+                    setBodyEn(article.body_en || "");
+                    setBodyNe(article.body_ne || "");
+                    setSummaryEn(article.summary_en || "");
+                    setImageUrl(article.image_url || "");
+                    setVisibility(article.visibility || "party");
+                    setAttachments(article.attachments || []);
+                    setContentType(article.type === 'Interview' ? 'interview' : article.type === 'Speech' ? 'speech' : 'article');
+                    localStorage.removeItem(DRAFT_KEY); // Clear local draft when editing
+                }
+            }
+
             setLoading(false);
         };
 
         init();
-    }, [router]);
+    }, [router, searchParams]);
 
     // Load a draft for editing
     const loadDraft = async (draftId: number) => {
