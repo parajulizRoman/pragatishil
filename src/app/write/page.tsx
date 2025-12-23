@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useLanguage } from "@/context/LanguageContext";
 import { upsertNewsItem } from "@/actions/cms";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ interface Draft {
 
 export default function WritePage() {
     const router = useRouter();
+    const { t } = useLanguage();
     const [loading, setLoading] = useState(true);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
     const [user, setUser] = useState<any>(null);
@@ -376,10 +378,10 @@ export default function WritePage() {
                 <div className="flex items-center justify-between mb-8">
                     <div>
                         <Link href="/news" className="inline-flex items-center text-slate-500 hover:text-brand-blue mb-2">
-                            <ArrowLeft className="w-4 h-4 mr-2" /> Back to News
+                            <ArrowLeft className="w-4 h-4 mr-2" />{t("समाचारमा फर्कनुहोस्", "Back to News")}
                         </Link>
-                        <h1 className="text-3xl font-bold text-slate-900">Share Your Thoughts</h1>
-                        <p className="text-slate-500 mt-1">We&apos;d love to hear your ideas and stories</p>
+                        <h1 className="text-3xl font-bold text-slate-900">{t("तपाईंको विचार साझा गर्नुहोस्", "Share Your Thoughts")}</h1>
+                        <p className="text-slate-500 mt-1">{t("हामीलाई तपाईंको विचार र कथाहरू सुन्न मन लाग्छ", "We'd love to hear your ideas and stories")}</p>
                     </div>
 
                     {lastSaved && (
@@ -394,7 +396,7 @@ export default function WritePage() {
                 {myDrafts.length > 0 && !editingId && (
                     <div className="bg-amber-50 rounded-2xl border border-amber-200 p-4 mb-6">
                         <h3 className="font-semibold text-amber-800 mb-3 flex items-center gap-2">
-                            📝 Your Saved Drafts ({myDrafts.length})
+                            📝 {t(`तपाईंका सुरक्षित ड्राफ्टहरू (${myDrafts.length})`, `Your Saved Drafts (${myDrafts.length})`)}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {myDrafts.map((draft) => (
@@ -441,7 +443,7 @@ export default function WritePage() {
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
                     {/* Content Type Selector */}
                     <div className="space-y-2">
-                        <Label>What would you like to share?</Label>
+                        <Label>{t("के साझा गर्न चाहनुहुन्छ?", "What would you like to share?")}</Label>
                         <div className="flex gap-2 p-1 bg-slate-100 rounded-xl">
                             <button
                                 type="button"
@@ -451,7 +453,7 @@ export default function WritePage() {
                                     : 'text-slate-600 hover:text-slate-800'
                                     }`}
                             >
-                                📝 Article
+                                📝 {t("लेख", "Article")}
                             </button>
                             <button
                                 type="button"
@@ -461,7 +463,7 @@ export default function WritePage() {
                                     : 'text-slate-600 hover:text-slate-800'
                                     }`}
                             >
-                                🎤 Interview
+                                🎤 {t("अन्तर्वार्ता", "Interview")}
                             </button>
                             <button
                                 type="button"
@@ -471,7 +473,7 @@ export default function WritePage() {
                                     : 'text-slate-600 hover:text-slate-800'
                                     }`}
                             >
-                                🎙️ Speech
+                                🎙️ {t("भाषण", "Speech")}
                             </button>
                         </div>
                     </div>
@@ -742,10 +744,10 @@ export default function WritePage() {
                             disabled={saving}
                             className="bg-green-600 hover:bg-green-700"
                         >
-                            {saving ? "Saving..." : (
+                            {saving ? t("सुरक्षित गर्दै...", "Saving...") : (
                                 <>
                                     <Save className="w-4 h-4 mr-2" />
-                                    Save as Draft
+                                    {t("ड्राफ्टमा सुरक्षित", "Save as Draft")}
                                 </>
                             )}
                         </Button>
