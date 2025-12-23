@@ -23,15 +23,22 @@ interface MemberCardProps {
 }
 
 // Get role display info
+// Note: Some roles have masked display for privacy/simplicity:
+// - admin (root) → displays as Yantrik
+// - board → displays as Central Committee
 const getRoleDisplay = (role: UserRole) => {
     switch (role) {
         case 'admin':
+            // Root admin displays as Yantrik (technical staff)
+            return { variant: "secondary" as const, icon: <Shield size={12} />, label: "Yantrik" };
         case 'admin_party':
+            // Party admin displays as Admin
             return { variant: "red" as const, icon: <Crown size={12} />, label: "Admin" };
         case 'yantrik':
             return { variant: "secondary" as const, icon: <Shield size={12} />, label: "Yantrik" };
         case 'board':
-            return { variant: "default" as const, icon: <Crown size={12} />, label: "Board" };
+            // Board displays as Central Committee
+            return { variant: "default" as const, icon: <Building2 size={12} />, label: "Committee" };
         case 'central_committee':
             return { variant: "default" as const, icon: <Building2 size={12} />, label: "Committee" };
         case 'team_member':

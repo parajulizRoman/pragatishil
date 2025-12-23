@@ -441,11 +441,15 @@ async function PublicationsSection({
 }
 
 function RoleBadge({ role }: { role: UserRole }) {
-    // Admin role is hidden - displays as Yantrik to everyone
-    const displayRole = role === 'admin' ? 'yantrik' : role;
+    // Role masking for display:
+    // - admin (root) → displays as Yantrik
+    // - board → displays as Central Committee
+    let displayRole = role;
+    if (role === 'admin') displayRole = 'yantrik';
+    if (role === 'board') displayRole = 'central_committee';
 
     const config: Record<string, { color: string; icon: any; label: string }> = {
-        'admin_party': { color: 'bg-red-100 text-red-700 border-red-200', icon: Crown, label: "Political Admin" },
+        'admin_party': { color: 'bg-red-100 text-red-700 border-red-200', icon: Crown, label: "Admin" },
         'yantrik': { color: 'bg-slate-100 text-slate-700 border-slate-200', icon: Shield, label: "Yantrik" },
         'central_committee': { color: 'bg-blue-100 text-blue-700 border-blue-200', icon: Shield, label: "Central Committee" },
         'team_member': { color: 'bg-green-100 text-green-700 border-green-200', icon: User, label: "Team Member" },
@@ -454,7 +458,6 @@ function RoleBadge({ role }: { role: UserRole }) {
         'guest': { color: 'bg-slate-50 text-slate-400 border-slate-100', icon: null, label: "Guest" },
         'member': { color: 'bg-slate-100 text-slate-600 border-slate-200', icon: User, label: "Member" },
         'volunteer': { color: 'bg-green-50 text-green-600 border-green-100', icon: User, label: "Volunteer" },
-        'board': { color: 'bg-purple-100 text-purple-700 border-purple-200', icon: Crown, label: "Board Member" },
     };
 
     const style = config[displayRole] || { color: 'bg-slate-100', icon: null, label: displayRole };
