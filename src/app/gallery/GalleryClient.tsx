@@ -5,7 +5,7 @@ import Image from "next/image";
 import { createBrowserClient } from "@supabase/ssr";
 import { useLanguage } from "@/context/LanguageContext";
 import { MediaItem, MediaAlbum } from "@/types";
-import { canCreateAlbum, canUploadToAlbum, canManageMedia, canDeleteContent } from "@/lib/permissions";
+import { canCreateAlbum, canUploadToAlbum, canManageMedia, canDeleteContent, canMergeAlbums } from "@/lib/permissions";
 import { Search, X, Plus, FolderPlus, ChevronLeft, ChevronRight, Download, Loader2, Sparkles, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,7 @@ export default function GalleryClient({ albums: initialAlbums, images: initialIm
     const [userRole, setUserRole] = useState<string | null>(null);
     const [showUploadForm, setShowUploadForm] = useState(false);
     const [showAlbumForm, setShowAlbumForm] = useState(false);
+    const [showMergeForm, setShowMergeForm] = useState(false);
     const [editingImage, setEditingImage] = useState<MediaItem | null>(null);
 
     // Delete handler
@@ -71,6 +72,7 @@ export default function GalleryClient({ albums: initialAlbums, images: initialIm
     const canUploadPhoto = canUploadToAlbum(userRole);
     const canEdit = canManageMedia(userRole);
     const canDelete = canDeleteContent(userRole);
+    const canMerge = canMergeAlbums(userRole);
 
     // Filter images
     const filteredImages = images.filter(img => {
@@ -144,6 +146,15 @@ export default function GalleryClient({ albums: initialAlbums, images: initialIm
                                 >
                                     <Plus size={18} />
                                     {t("फोटो थप्नुहोस्", "Add Photos")}
+                                </Button>
+                            )}
+                            {canMerge && albums.length >= 2 && (
+                                <Button
+                                    onClick={() => setShowMergeForm(true)}
+                                    variant="outline"
+                                    className="bg-white/10 border-white/30 text-white hover:bg-white hover:text-brand-navy gap-2"
+                                >
+                                    {t("एल्बम मर्ज", "Merge Albums")}
                                 </Button>
                             )}
                         </div>
@@ -333,6 +344,15 @@ export default function GalleryClient({ albums: initialAlbums, images: initialIm
                     albums={albums}
                     onClose={() => setEditingImage(null)}
                     onSuccess={() => { refreshData(); setEditingImage(null); }}
+                />
+            )}
+
+            {/* Album Merge Modal */}
+            {showMergeForm && (
+                <AlbumMergeModal
+                    albums={albums}
+                    onClose={() => setShowMergeForm(false)}
+                    onSuccess={() => { refreshData(); setShowMergeForm(false); }}
                 />
             )}
         </main>
@@ -690,6 +710,141 @@ function PhotoEditModal({ image, albums, onClose, onSuccess }: { image: MediaIte
                     <Button variant="ghost" onClick={onClose}>{t("रद्द", "Cancel")}</Button>
                     <Button onClick={handleSubmit} disabled={loading} className="bg-brand-blue hover:bg-brand-blue/90 text-white">
                         {loading ? t("अद्यावधिक गर्दै...", "Updating...") : t("अद्यावधिक गर्नुहोस्", "Update")}
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Album Merge Modal
+function AlbumMergeModal({ albums, onClose, onSuccess }: { albums: MediaAlbum[]; onClose: () => void; onSuccess: () => void }) {
+    const { t } = useLanguage();
+    const [sourceAlbumId, setSourceAlbumId] = useState<number | "">("");
+    const [targetAlbumId, setTargetAlbumId] = useState<number | "">("");
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async () => {
+        if (!sourceAlbumId || !targetAlbumId) {
+            alert(t("कृपया दुवै एल्बम छनोट गर्नुहोस्", "Please select both albums"));
+            return;
+        }
+
+        if (sourceAlbumId === targetAlbumId) {
+            alert(t("स्रोत र लक्ष्य एल्बम फरक हुनुपर्छ", "Source and target albums must be different"));
+            return;
+        }
+
+        if (!confirm(t(
+            "के तपाईं निश्चित हुनुहुन्छ? स्रोत एल्बम मेटिनेछ।",
+            "Are you sure? The source album will be deleted after merging."
+        ))) return;
+
+        setLoading(true);
+        try {
+            const res = await fetch("/api/gallery/merge-albums", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sourceAlbumId, targetAlbumId })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.error || "Failed to merge albums");
+            }
+
+            alert(t(
+                `${data.photosMoved} फोटोहरू सफलतापूर्वक मर्ज गरियो!`,
+                `Successfully merged ${data.photosMoved} photos!`
+            ));
+            onSuccess();
+        } catch (error) {
+            alert(t("मर्ज असफल भयो", "Merge failed") + ": " + (error instanceof Error ? error.message : "Unknown error"));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const sourceAlbum = albums.find(a => a.id === sourceAlbumId);
+
+    return (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+                <div className="p-5 border-b bg-gradient-to-r from-brand-navy to-brand-blue">
+                    <h2 className="text-xl font-bold text-white">{t("एल्बम मर्ज गर्नुहोस्", "Merge Albums")}</h2>
+                    <p className="text-white/70 text-sm mt-1">
+                        {t("स्रोत एल्बमका सबै फोटोहरू लक्ष्यमा सारिनेछ", "All photos from source will be moved to target")}
+                    </p>
+                </div>
+                <div className="p-5 space-y-4">
+                    {/* Source Album */}
+                    <div>
+                        <label className="text-sm font-semibold text-slate-700 block mb-2">
+                            {t("स्रोत एल्बम (मेटिनेछ)", "Source Album (will be deleted)")}
+                        </label>
+                        <select
+                            value={sourceAlbumId}
+                            onChange={(e) => setSourceAlbumId(e.target.value ? Number(e.target.value) : "")}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-brand-blue"
+                        >
+                            <option value="">{t("एल्बम छनोट...", "Select album...")}</option>
+                            {albums.map(album => (
+                                <option key={album.id} value={album.id} disabled={album.id === targetAlbumId}>
+                                    {album.name_ne || album.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Arrow Indicator */}
+                    <div className="flex justify-center text-slate-400">
+                        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                    </div>
+
+                    {/* Target Album */}
+                    <div>
+                        <label className="text-sm font-semibold text-slate-700 block mb-2">
+                            {t("लक्ष्य एल्बम (फोटोहरू यहाँ जानेछन्)", "Target Album (photos go here)")}
+                        </label>
+                        <select
+                            value={targetAlbumId}
+                            onChange={(e) => setTargetAlbumId(e.target.value ? Number(e.target.value) : "")}
+                            className="w-full px-3 py-2 border border-slate-300 rounded-lg text-slate-900 focus:ring-2 focus:ring-brand-blue"
+                        >
+                            <option value="">{t("एल्बम छनोट...", "Select album...")}</option>
+                            {albums.map(album => (
+                                <option key={album.id} value={album.id} disabled={album.id === sourceAlbumId}>
+                                    {album.name_ne || album.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {/* Info Box */}
+                    {sourceAlbum && (
+                        <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                            <strong>{t("चेतावनी:", "Warning:")}</strong> {t(
+                                `"${sourceAlbum.name_ne || sourceAlbum.name}" एल्बम मर्ज पछि मेटिनेछ।`,
+                                `Album "${sourceAlbum.name_ne || sourceAlbum.name}" will be deleted after merge.`
+                            )}
+                        </div>
+                    )}
+                </div>
+                <div className="p-5 border-t bg-slate-50 flex justify-end gap-3">
+                    <Button variant="ghost" onClick={onClose}>{t("रद्द", "Cancel")}</Button>
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={loading || !sourceAlbumId || !targetAlbumId}
+                        className="bg-brand-red hover:bg-brand-red/90 text-white"
+                    >
+                        {loading ? (
+                            <><Loader2 className="w-4 h-4 animate-spin mr-2" />{t("मर्ज गर्दै...", "Merging...")}</>
+                        ) : (
+                            t("एल्बम मर्ज गर्नुहोस्", "Merge Albums")
+                        )}
                     </Button>
                 </div>
             </div>
