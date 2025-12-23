@@ -5,7 +5,7 @@ import Image from "next/image";
 import { createBrowserClient } from "@supabase/ssr";
 import { useLanguage } from "@/context/LanguageContext";
 import { MediaItem, MediaAlbum } from "@/types";
-import { canManageChannels, canDeleteContent } from "@/lib/permissions";
+import { canCreateAlbum, canUploadToAlbum, canManageMedia, canDeleteContent } from "@/lib/permissions";
 import { Search, X, Plus, FolderPlus, ChevronLeft, ChevronRight, Download, Loader2, Sparkles, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,7 +67,9 @@ export default function GalleryClient({ albums: initialAlbums, images: initialIm
         fetchUser();
     }, []);
 
-    const canManage = canManageChannels(userRole);
+    const canAddAlbum = canCreateAlbum(userRole);
+    const canUploadPhoto = canUploadToAlbum(userRole);
+    const canEdit = canManageMedia(userRole);
     const canDelete = canDeleteContent(userRole);
 
     // Filter images
@@ -123,23 +125,27 @@ export default function GalleryClient({ albums: initialAlbums, images: initialIm
                     </p>
 
                     {/* Action Buttons */}
-                    {canManage && (
+                    {(canAddAlbum || canUploadPhoto) && (
                         <div className="flex justify-center gap-3">
-                            <Button
-                                onClick={() => setShowAlbumForm(true)}
-                                variant="outline"
-                                className="bg-white/10 border-white/30 text-white hover:bg-white hover:text-brand-navy gap-2"
-                            >
-                                <FolderPlus size={18} />
-                                {t("नयाँ एल्बम", "New Album")}
-                            </Button>
-                            <Button
-                                onClick={() => setShowUploadForm(true)}
-                                className="bg-brand-red hover:bg-brand-red/90 text-white font-bold gap-2 shadow-lg"
-                            >
-                                <Plus size={18} />
-                                {t("फोटो थप्नुहोस्", "Add Photos")}
-                            </Button>
+                            {canAddAlbum && (
+                                <Button
+                                    onClick={() => setShowAlbumForm(true)}
+                                    variant="outline"
+                                    className="bg-white/10 border-white/30 text-white hover:bg-white hover:text-brand-navy gap-2"
+                                >
+                                    <FolderPlus size={18} />
+                                    {t("नयाँ एल्बम", "New Album")}
+                                </Button>
+                            )}
+                            {canUploadPhoto && (
+                                <Button
+                                    onClick={() => setShowUploadForm(true)}
+                                    className="bg-brand-red hover:bg-brand-red/90 text-white font-bold gap-2 shadow-lg"
+                                >
+                                    <Plus size={18} />
+                                    {t("फोटो थप्नुहोस्", "Add Photos")}
+                                </Button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -221,7 +227,7 @@ export default function GalleryClient({ albums: initialAlbums, images: initialIm
                                 </div>
 
                                 {/* Edit/Delete buttons for authorized users */}
-                                {canManage && (
+                                {canEdit && (
                                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                         <button
                                             onClick={(e) => { e.stopPropagation(); setEditingImage(img); }}

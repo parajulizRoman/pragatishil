@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createBrowserClient } from "@supabase/ssr";
 import { useLanguage } from "@/context/LanguageContext";
 import { MediaItem } from "@/types";
-import { canManageChannels, canDeleteContent } from "@/lib/permissions";
+import { canManageMedia, canDeleteContent } from "@/lib/permissions";
 import { Search, Plus, X, Video, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,7 +58,7 @@ export default function VideosClient({ videos: initialVideos }: VideosClientProp
         fetchUser();
     }, []);
 
-    const canManage = canManageChannels(userRole);
+    const canManage = canManageMedia(userRole);
     const canDelete = canDeleteContent(userRole);
 
     const filteredVideos = videos.filter(v =>
