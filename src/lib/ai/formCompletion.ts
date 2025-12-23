@@ -13,7 +13,9 @@ export interface ArticleCompletionInput {
 }
 
 export interface ArticleCompletionResult {
+    title_en: string | null;
     title_ne: string | null;
+    body_en: string | null;
     body_ne: string | null;
     summary_en: string | null;
     summary_ne: string | null;
@@ -37,7 +39,7 @@ export interface TranslationResult {
 
 /**
  * Complete article fields using AI
- * Given partial article data, generates missing Nepali translations and summary
+ * Bidirectional: English → Nepali OR Nepali → English
  */
 export async function completeArticle(input: ArticleCompletionInput): Promise<ArticleCompletionResult> {
     const { title, title_ne, body_en, body_ne, summary_en } = input;
@@ -55,16 +57,20 @@ export async function completeArticle(input: ArticleCompletionInput): Promise<Ar
     }
 
     const prompt = `You are a helpful assistant for a Nepali political party website. 
-Based on the following article content, generate the missing fields.
+Based on the following article content, generate the missing fields. This is BIDIRECTIONAL translation:
+- If English is provided, generate Nepali
+- If Nepali is provided, generate English
 
 ${context.join("\n\n")}
 
 Generate the following as valid JSON:
-1. title_ne: Nepali translation of the title (if not already provided)
-2. body_ne: Nepali translation/adaptation of the body content (if not already provided). Keep the same structure and formatting.
-3. summary_en: A concise 2-3 sentence summary in English (if not already provided)
-4. summary_ne: A concise 2-3 sentence summary in Nepali
-5. suggested_tags: An array of 3-5 relevant topic tags in English (lowercase, no spaces, use underscores)
+1. title_en: English title (if only Nepali title was provided, translate to English; otherwise null)
+2. title_ne: Nepali title (if only English title was provided, translate to Nepali; otherwise null)
+3. body_en: English body content (if only Nepali body was provided, translate to English; otherwise null)
+4. body_ne: Nepali body content (if only English body was provided, translate to Nepali; otherwise null)
+5. summary_en: A concise 2-3 sentence summary in English
+6. summary_ne: A concise 2-3 sentence summary in Nepali
+7. suggested_tags: An array of 3-5 relevant topic tags in English (lowercase, no spaces, use underscores)
 
 Important:
 - If a field is already provided in the input, return null for that field
@@ -74,13 +80,15 @@ Important:
     const responseSchema: Schema = {
         type: Type.OBJECT,
         properties: {
+            title_en: { type: Type.STRING, nullable: true },
             title_ne: { type: Type.STRING, nullable: true },
+            body_en: { type: Type.STRING, nullable: true },
             body_ne: { type: Type.STRING, nullable: true },
             summary_en: { type: Type.STRING, nullable: true },
             summary_ne: { type: Type.STRING, nullable: true },
             suggested_tags: { type: Type.ARRAY, items: { type: Type.STRING } }
         },
-        required: ["title_ne", "body_ne", "summary_en", "summary_ne", "suggested_tags"]
+        required: ["title_en", "title_ne", "body_en", "body_ne", "summary_en", "summary_ne", "suggested_tags"]
     };
 
     try {

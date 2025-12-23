@@ -309,13 +309,22 @@ export default function WritePage() {
 
             const { data } = result;
 
-            // Fill in missing fields with AI-generated content
+            // Fill in missing fields with AI-generated content (BIDIRECTIONAL)
+            // English → Nepali
             if (data.title_ne && !titleNe.trim()) {
                 setTitleNe(data.title_ne);
             }
             if (data.body_ne && !bodyNe.trim()) {
                 setBodyNe(data.body_ne);
             }
+            // Nepali → English
+            if (data.title_en && !title.trim()) {
+                setTitle(data.title_en);
+            }
+            if (data.body_en && !bodyEn.trim()) {
+                setBodyEn(data.body_en);
+            }
+            // Summary (always generate if missing)
             if (data.summary_en && !summaryEn.trim()) {
                 setSummaryEn(data.summary_en);
             }
