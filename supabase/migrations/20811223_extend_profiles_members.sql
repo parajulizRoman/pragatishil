@@ -132,6 +132,10 @@ ON CONFLICT (name_en) DO NOTHING;
 -- Enable RLS on profession_categories
 ALTER TABLE public.profession_categories ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies (safe for re-run)
+DROP POLICY IF EXISTS "profession_categories_select" ON public.profession_categories;
+DROP POLICY IF EXISTS "profession_categories_insert" ON public.profession_categories;
+
 -- Public read, admin write for profession_categories
 CREATE POLICY "profession_categories_select" ON public.profession_categories
     FOR SELECT TO authenticated
