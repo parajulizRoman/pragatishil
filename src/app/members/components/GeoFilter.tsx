@@ -1,8 +1,26 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getGeoStructure, NestedProvince, NestedDistrict, NestedLocalLevel } from "@/lib/geo";
 import { ChevronDown } from "lucide-react";
+
+// Types for geo data
+interface GeoProvince {
+    id: number;
+    name_en: string;
+    districts: GeoDistrict[];
+}
+
+interface GeoDistrict {
+    id: number;
+    name_en: string;
+    localLevels: GeoLocalLevel[];
+}
+
+interface GeoLocalLevel {
+    id: number;
+    name_en: string;
+    category_label?: string;
+}
 
 interface GeoFilterProps {
     selectedProvince: number | null;
@@ -21,15 +39,17 @@ export default function GeoFilter({
     onDistrictChange,
     onLocalLevelChange,
 }: GeoFilterProps) {
-    const [provinces, setProvinces] = useState<NestedProvince[]>([]);
+    const [provinces, setProvinces] = useState<GeoProvince[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Fetch geo structure on mount
+    // Fetch geo structure from API on mount
     useEffect(() => {
         const fetchGeo = async () => {
             try {
-                const geo = await getGeoStructure();
-                setProvinces(geo.provinces);
+                const res = await fetch("/api/geo/structure");
+                if (!res.ok) throw new Error("Failed to fetch geo data");
+                const data = await res.json();
+                setProvinces(data.provinces || []);
             } catch (error) {
                 console.error("Failed to load geo data:", error);
             } finally {
@@ -40,12 +60,12 @@ export default function GeoFilter({
     }, []);
 
     // Get filtered districts based on selected province
-    const districts: NestedDistrict[] = selectedProvince
+    const districts: GeoDistrict[] = selectedProvince
         ? provinces.find(p => p.id === selectedProvince)?.districts || []
         : [];
 
     // Get filtered local levels based on selected district
-    const localLevels: NestedLocalLevel[] = selectedDistrict
+    const localLevels: GeoLocalLevel[] = selectedDistrict
         ? districts.find(d => d.id === selectedDistrict)?.localLevels || []
         : [];
 
