@@ -319,9 +319,7 @@ export default function WritePage() {
             if (data.summary_en && !summaryEn.trim()) {
                 setSummaryEn(data.summary_en);
             }
-
-            // Show success message
-            alert(t("✨ AI ले फारम पूरा गर्यो!", "✨ AI completed the form!"));
+            // No popup - form fields are visually updated
 
         } catch (error) {
             console.error("AI completion error:", error);
@@ -528,8 +526,8 @@ export default function WritePage() {
                                 type="button"
                                 onClick={() => setContentType('article')}
                                 className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all ${contentType === 'article'
-                                    ? 'bg-white shadow-sm text-brand-blue'
-                                    : 'text-slate-600 hover:text-slate-800'
+                                    ? 'bg-brand-red text-white shadow-sm'
+                                    : 'text-slate-600 hover:text-brand-red hover:bg-red-50'
                                     }`}
                             >
                                 📝 {t("लेख", "Article")}
@@ -538,8 +536,8 @@ export default function WritePage() {
                                 type="button"
                                 onClick={() => setContentType('interview')}
                                 className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all ${contentType === 'interview'
-                                    ? 'bg-white shadow-sm text-brand-blue'
-                                    : 'text-slate-600 hover:text-slate-800'
+                                    ? 'bg-brand-blue text-white shadow-sm'
+                                    : 'text-slate-600 hover:text-brand-blue hover:bg-blue-50'
                                     }`}
                             >
                                 🎤 {t("अन्तर्वार्ता", "Interview")}
@@ -548,8 +546,8 @@ export default function WritePage() {
                                 type="button"
                                 onClick={() => setContentType('speech')}
                                 className={`flex-1 py-2.5 px-4 rounded-lg font-medium transition-all ${contentType === 'speech'
-                                    ? 'bg-white shadow-sm text-brand-blue'
-                                    : 'text-slate-600 hover:text-slate-800'
+                                    ? 'bg-brand-red text-white shadow-sm'
+                                    : 'text-slate-600 hover:text-brand-red hover:bg-red-50'
                                     }`}
                             >
                                 🎙️ {t("भाषण", "Speech")}
