@@ -36,8 +36,9 @@ export default function HomeClient({ content, news, videos, documents = [] }: Ho
         footer: { ...fallbackContent.footer, ...content?.footer },
     };
 
-    const n = news && news.length > 0 ? news : fallbackContent.news;
-    const v = videos && videos.length > 0 ? videos : fallbackContent.videos;
+    // Use database items directly - no fallback placeholder content
+    const n = news || [];
+    const v = videos || [];
 
     return (
         <main className="flex flex-col min-h-screen">
