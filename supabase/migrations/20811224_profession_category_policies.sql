@@ -1,8 +1,13 @@
 -- Profession Category Management - Additional RLS Policies
 -- Allows central_committee and above to manage profession categories
 
+-- Drop existing policies if they exist (safe to run multiple times)
+DROP POLICY IF EXISTS "profession_categories_update" ON public.profession_categories;
+DROP POLICY IF EXISTS "profession_categories_delete" ON public.profession_categories;
+DROP POLICY IF EXISTS "profession_categories_insert" ON public.profession_categories;
+
 -- Update policy for profession_categories
-CREATE POLICY IF NOT EXISTS "profession_categories_update" ON public.profession_categories
+CREATE POLICY "profession_categories_update" ON public.profession_categories
     FOR UPDATE TO authenticated
     USING (
         EXISTS (
@@ -13,7 +18,7 @@ CREATE POLICY IF NOT EXISTS "profession_categories_update" ON public.profession_
     );
 
 -- Delete policy for profession_categories  
-CREATE POLICY IF NOT EXISTS "profession_categories_delete" ON public.profession_categories
+CREATE POLICY "profession_categories_delete" ON public.profession_categories
     FOR DELETE TO authenticated
     USING (
         EXISTS (
@@ -23,8 +28,7 @@ CREATE POLICY IF NOT EXISTS "profession_categories_delete" ON public.profession_
         )
     );
 
--- Update insert policy to include central_committee
-DROP POLICY IF EXISTS "profession_categories_insert" ON public.profession_categories;
+-- Insert policy for profession_categories (central committee+)
 CREATE POLICY "profession_categories_insert" ON public.profession_categories
     FOR INSERT TO authenticated
     WITH CHECK (
