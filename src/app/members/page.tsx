@@ -1,29 +1,43 @@
 export const dynamic = 'force-dynamic'; // Always fresh data
 
 import { supabaseAdmin } from "@/lib/supabase/serverAdmin";
-import React from "react";
-import InteractiveMemberGrid from "@/components/InteractiveMemberGrid";
+import MembersClient from "./MembersClient";
 import { Profile } from "@/types";
+import { Suspense } from "react";
+import { MembersLoading } from "./MembersClient";
 
 export default async function MembersGalleryPage() {
-    // Fetch public profiles with new RBAC fields
+    // Fetch all relevant members with new fields
+    // Include leadership (for leadership tab) + public profiles (for community tab)
     const { data: members, error } = await supabaseAdmin
         .from("profiles")
         .select("*")
-        .eq("is_public", true);
+        .or("is_public.eq.true,role.in.(admin,yantrik,admin_party,board,central_committee)");
 
     if (error) {
         console.error("Error fetching members:", error);
-        return <div className="p-10 text-center text-red-500">Failed to load members gallery. (Error: {error.message})</div>;
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center p-10">
+                    <h1 className="text-2xl font-bold text-red-500 mb-2">Failed to load members</h1>
+                    <p className="text-slate-500">{error.message}</p>
+                </div>
+            </div>
+        );
     }
 
-    // Cast or map if needed, but select * should match Profile interface if DB is synced
-    // We might need to ensure `expertise` is array in DB, or handle it
+    // Ensure defaults for any missing fields
     const safeMembers = (members || []).map(m => ({
         ...m,
-        // Ensure defaults if missing and cast to Profile
         role: m.role || 'supporter',
+        is_public: m.is_public ?? false,
+        expertise: m.expertise || [],
+        skills: m.skills || [],
     })) as Profile[];
 
-    return <InteractiveMemberGrid members={safeMembers} />;
+    return (
+        <Suspense fallback={<MembersLoading />}>
+            <MembersClient members={safeMembers} />
+        </Suspense>
+    );
 }
