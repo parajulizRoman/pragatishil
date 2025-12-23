@@ -1,16 +1,12 @@
 import { notFound } from "next/navigation";
-import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
 import { NewsItem } from "@/types";
 import { Metadata } from "next";
 import NewsArticleClient from "./NewsArticleClient";
 
-// Init generic client for server-side read
-const supabase = createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+    const supabase = await createClient();
+
     // Try slug first, fallback to ID for legacy URLs
     let news = null;
     const { data: bySlug } = await supabase
@@ -46,6 +42,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function NewsArticlePage({ params }: { params: { slug: string } }) {
+    const supabase = await createClient();
     const { slug } = params;
 
     // Try slug first, fallback to ID for legacy URLs
