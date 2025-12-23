@@ -619,23 +619,32 @@ Document Analysis:
                     </div>
 
                     {/* AI Complete Button */}
-                    <div className="flex items-center justify-end">
+                    <div className="flex items-center justify-end gap-2">
+                        {attachments.length > 0 && (
+                            <span className="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full">
+                                📎 {attachments.length} {t("कागजात", "attachment")}{attachments.length > 1 ? "s" : ""}
+                            </span>
+                        )}
                         <Button
                             type="button"
                             variant="outline"
                             onClick={handleAIComplete}
-                            disabled={aiCompleting || (!title.trim() && !bodyEn.trim())}
+                            disabled={aiCompleting || (!title.trim() && !titleNe.trim() && !bodyEn.trim() && !bodyNe.trim() && attachments.length === 0)}
                             className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-800 hover:border-purple-300"
                         >
                             {aiCompleting ? (
                                 <>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    {t("AI पूरा गर्दै...", "Completing...")}
+                                    {attachments.length > 0
+                                        ? t("कागजात पढ्दै...", "Reading documents...")
+                                        : t("AI पूरा गर्दै...", "Completing...")}
                                 </>
                             ) : (
                                 <>
                                     <Sparkles className="w-4 h-4" />
-                                    {t("✨ AI ले पूरा गर्नुहोस्", "✨ Complete with AI")}
+                                    {attachments.length > 0 && !title.trim() && !bodyEn.trim()
+                                        ? t("📄 कागजातबाट लेख्नुहोस्", "📄 Write from documents")
+                                        : t("✨ AI ले पूरा गर्नुहोस्", "✨ Complete with AI")}
                                 </>
                             )}
                         </Button>
