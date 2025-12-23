@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import { Profile, UserRole, hasRole } from "@/types";
+import { useLanguage } from "@/context/LanguageContext";
 import MemberTabs, { MemberTab } from "./components/MemberTabs";
 import MemberCard, { MemberCardSkeleton } from "./components/MemberCard";
 import MemberSearch from "./components/MemberSearch";
@@ -21,6 +22,7 @@ const LEADERSHIP_ROLES: UserRole[] = ['admin_party', 'board', 'central_committee
 const COMMITTEE_ROLES: UserRole[] = ['central_committee'];
 
 export default function MembersClient({ members, viewerRole = 'guest' }: MembersClientProps) {
+    const { t } = useLanguage();
     // Central committee+ can see all contact info
     const canSeeContacts = hasRole(viewerRole, 'central_committee');
     // Tab state
@@ -111,11 +113,11 @@ export default function MembersClient({ members, viewerRole = 'guest' }: Members
             <div className="container mx-auto px-4 py-12">
                 <div className="text-center mb-10">
                     <Typography as="h1" variant="h1" className="mb-3">
-                        <span className="text-brand-blue">Progressive</span>{" "}
-                        <span className="text-brand-red">Community</span>
+                        <span className="text-brand-blue">{t("प्रगतिशील", "Progressive")}</span>{" "}
+                        <span className="text-brand-red">{t("समुदाय", "Community")}</span>
                     </Typography>
                     <Typography variant="large" className="text-slate-600">
-                        प्रगतिशील समुदाय • Meet Our Members
+                        {t("हाम्रा सदस्यहरूलाई भेट्नुहोस्", "Meet Our Members")}
                     </Typography>
                 </div>
 
@@ -132,7 +134,7 @@ export default function MembersClient({ members, viewerRole = 'guest' }: Members
                     <MemberSearch
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        placeholder="Search by name, @handle..."
+                        placeholder={t("नाम, @ह्यान्डलद्वारा खोज्नुहोस्...", "Search by name, @handle...")}
                     />
 
                     {/* Geo Filter - only for committee/community */}
@@ -164,7 +166,7 @@ export default function MembersClient({ members, viewerRole = 'guest' }: Members
                                 className="flex items-center gap-1.5 px-3 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
                             >
                                 <RotateCcw className="h-4 w-4" />
-                                Reset
+                                {t("रिसेट", "Reset")}
                             </button>
                         )}
 
@@ -194,25 +196,27 @@ export default function MembersClient({ members, viewerRole = 'guest' }: Members
 
                 {/* Results Count */}
                 <div className="mb-6 text-sm text-slate-500">
-                    Showing {filteredMembers.length} {filteredMembers.length === 1 ? "member" : "members"}
-                    {hasActiveFilters && " (filtered)"}
+                    {t(
+                        `${filteredMembers.length} सदस्यहरू देखाउँदै${hasActiveFilters ? " (फिल्टर गरिएको)" : ""}`,
+                        `Showing ${filteredMembers.length} ${filteredMembers.length === 1 ? "member" : "members"}${hasActiveFilters ? " (filtered)" : ""}`
+                    )}
                 </div>
 
                 {/* Member Grid */}
                 {filteredMembers.length === 0 ? (
                     <div className="text-center py-16">
                         <Typography variant="h4" className="text-slate-400 mb-2">
-                            No members found
+                            {t("कुनै सदस्य भेटिएन", "No members found")}
                         </Typography>
                         <Typography variant="muted">
-                            Try adjusting your filters or search query
+                            {t("फिल्टर वा खोजी परिवर्तन गर्नुहोस्", "Try adjusting your filters or search query")}
                         </Typography>
                         {hasActiveFilters && (
                             <button
                                 onClick={resetFilters}
                                 className="mt-4 text-brand-blue hover:underline"
                             >
-                                Clear all filters
+                                {t("सबै फिल्टर हटाउनुहोस्", "Clear all filters")}
                             </button>
                         )}
                     </div>

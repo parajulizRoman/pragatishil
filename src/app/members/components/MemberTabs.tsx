@@ -2,6 +2,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 import { Users, Crown, Building2 } from "lucide-react";
 
 export type MemberTab = "leadership" | "committee" | "community";
@@ -23,6 +24,9 @@ const TABS: { id: MemberTab; label: string; labelNe: string; icon: React.ReactNo
 ];
 
 export default function MemberTabs({ activeTab, onTabChange, counts }: MemberTabsProps) {
+    const { language } = useLanguage();
+    const isNepali = language === 'ne';
+
     return (
         <div className="flex flex-wrap justify-center gap-2 mb-8">
             {TABS.map((tab) => (
@@ -37,7 +41,7 @@ export default function MemberTabs({ activeTab, onTabChange, counts }: MemberTab
                     )}
                 >
                     {tab.icon}
-                    <span>{tab.label}</span>
+                    <span>{isNepali ? tab.labelNe : tab.label}</span>
                     {counts && counts[tab.id] > 0 && (
                         <span className={cn(
                             "ml-1 px-2 py-0.5 rounded-full text-xs",
@@ -53,3 +57,4 @@ export default function MemberTabs({ activeTab, onTabChange, counts }: MemberTab
         </div>
     );
 }
+
