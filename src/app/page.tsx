@@ -42,11 +42,11 @@ export default async function Home() {
     footer: globalData?.footer
   };
 
-  // 2. Fetch News
+  // 2. Fetch News - support both new 'status' field and legacy 'is_published' field
   const { data: newsItems } = await supabase
     .from('news_items')
     .select('*')
-    .eq('status', 'published')
+    .or('status.eq.published,is_published.eq.true')
     .order('date', { ascending: false })
     .limit(3);
 
