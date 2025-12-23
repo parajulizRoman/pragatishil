@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { createBrowserClient } from "@supabase/ssr";
+import { useLanguage } from "@/context/LanguageContext";
 import { ProfessionCategory } from "@/types";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,8 @@ interface ProfessionFilterProps {
 }
 
 export default function ProfessionFilter({ selected, onChange }: ProfessionFilterProps) {
+    const { t, language } = useLanguage();
+    const isNepali = language === 'ne';
     const [categories, setCategories] = useState<ProfessionCategory[]>([]);
     const [loading, setLoading] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
@@ -64,8 +67,8 @@ export default function ProfessionFilter({ selected, onChange }: ProfessionFilte
             >
                 <span>
                     {selected.length === 0
-                        ? "All Professions"
-                        : `${selected.length} selected`}
+                        ? t("सबै पेशा", "All Professions")
+                        : t(`${selected.length} छनोट`, `${selected.length} selected`)}
                 </span>
                 <ChevronDown className={cn(
                     "h-4 w-4 text-slate-400 transition-transform",
@@ -84,13 +87,15 @@ export default function ProfessionFilter({ selected, onChange }: ProfessionFilte
                     {/* Dropdown */}
                     <div className="absolute z-20 mt-2 w-64 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden">
                         <div className="p-2 border-b border-slate-100 flex justify-between items-center">
-                            <span className="text-xs font-medium text-slate-500 uppercase">Filter by Profession</span>
+                            <span className="text-xs font-medium text-slate-500 uppercase">
+                                {t("पेशा अनुसार फिल्टर", "Filter by Profession")}
+                            </span>
                             {selected.length > 0 && (
                                 <button
                                     onClick={clearAll}
                                     className="text-xs text-brand-blue hover:underline"
                                 >
-                                    Clear all
+                                    {t("सबै हटाउनुहोस्", "Clear all")}
                                 </button>
                             )}
                         </div>
@@ -106,7 +111,7 @@ export default function ProfessionFilter({ selected, onChange }: ProfessionFilte
                                             : "hover:bg-slate-50 text-slate-700"
                                     )}
                                 >
-                                    <span>{category.name_en}</span>
+                                    <span>{isNepali && category.name_ne ? category.name_ne : category.name_en}</span>
                                     {selected.includes(category.name_en) && (
                                         <Check className="h-4 w-4" />
                                     )}
@@ -119,3 +124,4 @@ export default function ProfessionFilter({ selected, onChange }: ProfessionFilte
         </div>
     );
 }
+

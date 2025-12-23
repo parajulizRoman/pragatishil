@@ -1,24 +1,28 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 import { ChevronDown } from "lucide-react";
 
 // Types for geo data
 interface GeoProvince {
     id: number;
     name_en: string;
+    name_ne?: string;
     districts: GeoDistrict[];
 }
 
 interface GeoDistrict {
     id: number;
     name_en: string;
+    name_ne?: string;
     localLevels: GeoLocalLevel[];
 }
 
 interface GeoLocalLevel {
     id: number;
     name_en: string;
+    name_ne?: string;
     category_label?: string;
 }
 
@@ -39,6 +43,8 @@ export default function GeoFilter({
     onDistrictChange,
     onLocalLevelChange,
 }: GeoFilterProps) {
+    const { t, language } = useLanguage();
+    const isNepali = language === 'ne';
     const [provinces, setProvinces] = useState<GeoProvince[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -108,10 +114,10 @@ export default function GeoFilter({
                     onChange={(e) => handleProvinceChange(e.target.value)}
                     className="appearance-none bg-white border border-slate-200 rounded-lg px-4 py-2 pr-9 text-sm text-slate-700 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue cursor-pointer"
                 >
-                    <option value="">All Provinces</option>
+                    <option value="">{t("सबै प्रदेश", "All Provinces")}</option>
                     {provinces.map((province) => (
                         <option key={province.id} value={province.id}>
-                            {province.name_en}
+                            {isNepali && province.name_ne ? province.name_ne : province.name_en}
                         </option>
                     ))}
                 </select>
@@ -126,10 +132,10 @@ export default function GeoFilter({
                     disabled={!selectedProvince}
                     className="appearance-none bg-white border border-slate-200 rounded-lg px-4 py-2 pr-9 text-sm text-slate-700 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <option value="">All Districts</option>
+                    <option value="">{t("सबै जिल्ला", "All Districts")}</option>
                     {districts.map((district) => (
                         <option key={district.id} value={district.id}>
-                            {district.name_en}
+                            {isNepali && district.name_ne ? district.name_ne : district.name_en}
                         </option>
                     ))}
                 </select>
@@ -144,10 +150,10 @@ export default function GeoFilter({
                     disabled={!selectedDistrict}
                     className="appearance-none bg-white border border-slate-200 rounded-lg px-4 py-2 pr-9 text-sm text-slate-700 focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <option value="">All Local Levels</option>
+                    <option value="">{t("सबै स्थानीय तह", "All Local Levels")}</option>
                     {localLevels.map((ll) => (
                         <option key={ll.id} value={ll.id}>
-                            {ll.name_en} {ll.category_label ? `(${ll.category_label})` : ""}
+                            {isNepali && ll.name_ne ? ll.name_ne : ll.name_en} {ll.category_label ? `(${ll.category_label})` : ""}
                         </option>
                     ))}
                 </select>
@@ -156,3 +162,4 @@ export default function GeoFilter({
         </div>
     );
 }
+

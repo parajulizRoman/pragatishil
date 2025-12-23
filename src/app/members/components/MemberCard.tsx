@@ -4,6 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Profile, UserRole } from "@/types";
+import { useLanguage } from "@/context/LanguageContext";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatHandle } from "@/lib/handle";
@@ -23,36 +24,32 @@ interface MemberCardProps {
     canSeeContacts?: boolean;  // Central committee+ can see all contacts
 }
 
-// Get role display info
-// Note: Some roles have masked display for privacy/simplicity:
-// - admin (root) → displays as Yantrik
-// - board → displays as Central Committee
-const getRoleDisplay = (role: UserRole) => {
+// Get role display info with Nepali support
+const getRoleDisplay = (role: UserRole, isNepali: boolean) => {
     switch (role) {
         case 'admin':
-            // Root admin displays as Yantrik (technical staff)
-            return { variant: "secondary" as const, icon: <Shield size={12} />, label: "Yantrik" };
+            return { variant: "secondary" as const, icon: <Shield size={12} />, label: isNepali ? "यन्त्रिक" : "Yantrik" };
         case 'admin_party':
-            // Party admin displays as Admin
-            return { variant: "red" as const, icon: <Crown size={12} />, label: "Admin" };
+            return { variant: "red" as const, icon: <Crown size={12} />, label: isNepali ? "प्रशासक" : "Admin" };
         case 'yantrik':
-            return { variant: "secondary" as const, icon: <Shield size={12} />, label: "Yantrik" };
+            return { variant: "secondary" as const, icon: <Shield size={12} />, label: isNepali ? "यन्त्रिक" : "Yantrik" };
         case 'board':
-            // Board displays as Central Committee
-            return { variant: "default" as const, icon: <Building2 size={12} />, label: "Committee" };
+            return { variant: "default" as const, icon: <Building2 size={12} />, label: isNepali ? "समिति" : "Committee" };
         case 'central_committee':
-            return { variant: "default" as const, icon: <Building2 size={12} />, label: "Committee" };
+            return { variant: "default" as const, icon: <Building2 size={12} />, label: isNepali ? "समिति" : "Committee" };
         case 'team_member':
-            return { variant: "outline" as const, icon: <User size={12} />, label: "Team" };
+            return { variant: "outline" as const, icon: <User size={12} />, label: isNepali ? "टिम" : "Team" };
         case 'party_member':
-            return { variant: "party" as const, icon: <User size={12} />, label: "Member" };
+            return { variant: "party" as const, icon: <User size={12} />, label: isNepali ? "सदस्य" : "Member" };
         default:
-            return { variant: "outline" as const, icon: <User size={12} />, label: "Supporter" };
+            return { variant: "outline" as const, icon: <User size={12} />, label: isNepali ? "समर्थक" : "Supporter" };
     }
 };
 
 export default function MemberCard({ member, showDetails = true, canSeeContacts = false }: MemberCardProps) {
-    const role = getRoleDisplay(member.role);
+    const { language } = useLanguage();
+    const isNepali = language === 'ne';
+    const role = getRoleDisplay(member.role, isNepali);
     const placeholderIndex = member.id.charCodeAt(0) % PLACEHOLDERS.length;
     const avatar = member.avatar_url || PLACEHOLDERS[placeholderIndex];
     const handle = formatHandle(member.handle);
