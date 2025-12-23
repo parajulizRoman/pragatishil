@@ -5,12 +5,13 @@ import { createClient } from "@/lib/supabase/server"; // Use helper or direct
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { UserRole, hasRole, Profile } from "@/types";
-import { Shield, MapPin, Mail, Phone, Crown, User } from "lucide-react";
+import { Shield, MapPin, Mail, Phone, Crown, User, AtSign, Linkedin, Globe, Briefcase } from "lucide-react";
 import Link from "next/link";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"; // For public/admin fetch
 import AdminProfileActions from "./AdminProfileActions";
 import { canManageUsers } from "@/lib/permissions";
 import { canManageCms } from "@/lib/cms-utils";
+import { formatHandle } from "@/lib/handle";
 
 // Force dynamic to ensure we check auth every time
 export const dynamic = "force-dynamic";
@@ -31,69 +32,61 @@ export default async function ProfilePage({ params }: { params: { id: string } }
         if (viewerProfile) viewerRole = viewerProfile.role as UserRole;
     }
 
-    // 2. Fetch Target Profile (Use Admin client to bypass RLS for filtering logic, OR rely on RLS)
-    // RLS usually hides non-public. But we might want to show "Private Profile" instead of 404.
-    // Let's use Admin to fetch and then decide what to show.
+    // 2. Fetch Target Profile (Use Admin client to bypass RLS for filtering logic)
     const supabaseAdmin = createSupabaseClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const { data: profile, error } = await supabaseAdmin
-        .from('profiles')
-        .select('*')
-        .eq('id', params.id)
-        .single();
+    // Check if the ID is a @handle (starts with @)
+    const isHandle = params.id.startsWith('@') || params.id.startsWith('%40');
+    const cleanId = isHandle
+        ? decodeURIComponent(params.id).replace(/^@/, '').toLowerCase()
+        : params.id;
 
+    // Fetch profile by ID or handle
+    let query = supabaseAdmin.from('profiles').select('*');
+
+    if (isHandle) {
+        query = query.eq('handle_lower', cleanId);
+    } else {
+        query = query.eq('id', cleanId);
+    }
+
+    const { data: profile, error } = await query.single();
+
+    // Auto-repair only works when accessing via UUID, not handle
+    // And only if the current user is trying to access their own missing profile
     if (error || !profile) {
-        // Fallback: If no profile exists, check if it's the current user and try to auto-fix
-        if (user && user.id === params.id) {
+        // Only auto-fix if:
+        // 1. Not using handle-based lookup
+        // 2. Current user is trying to access their own profile
+        if (!isHandle && user && user.id === cleanId) {
             console.log(`[Profile Page] Profile missing for owner ${user.id}. Attempting auto-repair.`);
             const meta = user.user_metadata;
             const fullName = meta.full_name || meta.name || 'Anonymous Member';
             const avatarUrl = meta.avatar_url || meta.picture;
 
-            // Auto-create
-            const { data: newProfile, error: createError } = await supabaseAdmin
-                .from('profiles')
-                .upsert({
-                    id: user.id,
-                    full_name: fullName,
-                    avatar_url: avatarUrl,
-                    role: 'supporter',
-                    updated_at: new Date().toISOString()
-                })
-                .select()
-                .single();
-
-            if (newProfile && !createError) {
-                // Success: The profile is created.
-                // We don't need to do anything else here.
-                // The subsequent logic flow will re-fetch or use the updated targetProfile logic below.
-            }
+            // Auto-create profile
+            await supabaseAdmin.from('profiles').upsert({
+                id: user.id,
+                full_name: fullName,
+                avatar_url: avatarUrl,
+                role: 'supporter',
+                updated_at: new Date().toISOString()
+            });
         }
     }
 
-    // We need to restart the logic flow a bit.
-    // Let's refactor the fetch part slightly.
-
+    // Re-fetch after potential auto-repair
     let targetProfile = profile;
 
-    if (!targetProfile && user && user.id === params.id) {
-        // Auto-fix block
-        const meta = user.user_metadata;
-        const fullName = meta.full_name || meta.name || 'Anonymous Member';
-        const avatarUrl = meta.avatar_url || meta.picture;
-
-        await supabaseAdmin.from('profiles').upsert({
-            id: user.id,
-            full_name: fullName,
-            avatar_url: avatarUrl,
-            role: 'supporter',
-            updated_at: new Date().toISOString()
-        });
-
-        const { data: fixed } = await supabaseAdmin.from('profiles').select('*').eq('id', params.id).single();
+    if (!targetProfile && !isHandle && user && user.id === cleanId) {
+        const { data: fixed } = await supabaseAdmin
+            .from('profiles')
+            .select('*')
+            .eq('id', cleanId)
+            .single();
         targetProfile = fixed;
     }
 
