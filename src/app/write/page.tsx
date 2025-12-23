@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Save, Send, Clock, Upload, X, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Send, Clock, Upload, X, FileText, Image as ImageIcon, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { convertADtoBS } from "@/lib/dateConverter";
@@ -55,6 +55,7 @@ export default function WritePage() {
     const [attachments, setAttachments] = useState<NewsAttachment[]>([]);
     const [uploadingImage, setUploadingImage] = useState(false);
     const [uploadingDoc, setUploadingDoc] = useState(false);
+    const [aiCompleting, setAiCompleting] = useState(false);
 
     // Video/Interview specific fields
     const [youtubeUrl, setYoutubeUrl] = useState("");
@@ -276,6 +277,58 @@ export default function WritePage() {
 
     const removeAttachment = (index: number) => {
         setAttachments(prev => prev.filter((_, i) => i !== index));
+    };
+
+    // AI-powered form completion
+    const handleAIComplete = async () => {
+        // Require at least some content
+        if (!title.trim() && !bodyEn.trim()) {
+            alert(t("कृपया पहिले शीर्षक वा मुख्य भाग लेख्नुहोस्", "Please enter a title or body content first"));
+            return;
+        }
+
+        setAiCompleting(true);
+        try {
+            const response = await fetch('/api/ai/complete-article', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: title.trim() || undefined,
+                    title_ne: titleNe.trim() || undefined,
+                    body_en: bodyEn.trim() || undefined,
+                    body_ne: bodyNe.trim() || undefined,
+                    summary_en: summaryEn.trim() || undefined
+                })
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'AI completion failed');
+            }
+
+            const { data } = result;
+
+            // Fill in missing fields with AI-generated content
+            if (data.title_ne && !titleNe.trim()) {
+                setTitleNe(data.title_ne);
+            }
+            if (data.body_ne && !bodyNe.trim()) {
+                setBodyNe(data.body_ne);
+            }
+            if (data.summary_en && !summaryEn.trim()) {
+                setSummaryEn(data.summary_en);
+            }
+
+            // Show success message
+            alert(t("✨ AI ले फारम पूरा गर्यो!", "✨ AI completed the form!"));
+
+        } catch (error) {
+            console.error("AI completion error:", error);
+            alert(t("AI पूरा गर्न असफल भयो", "AI completion failed: ") + (error as Error).message);
+        } finally {
+            setAiCompleting(false);
+        }
     };
 
     // Save as draft to database
@@ -502,6 +555,29 @@ export default function WritePage() {
                                 🎙️ {t("भाषण", "Speech")}
                             </button>
                         </div>
+                    </div>
+
+                    {/* AI Complete Button */}
+                    <div className="flex items-center justify-end">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={handleAIComplete}
+                            disabled={aiCompleting || (!title.trim() && !bodyEn.trim())}
+                            className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50 hover:text-purple-800 hover:border-purple-300"
+                        >
+                            {aiCompleting ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    {t("AI पूरा गर्दै...", "Completing...")}
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="w-4 h-4" />
+                                    {t("✨ AI ले पूरा गर्नुहोस्", "✨ Complete with AI")}
+                                </>
+                            )}
+                        </Button>
                     </div>
 
                     {/* Title */}
