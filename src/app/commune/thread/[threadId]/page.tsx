@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import { RichTextWithVideos } from "@/components/ui/VideoEmbed";
+import { getRoleLabel, getRoleBadgeVariant } from "@/lib/roleDisplay";
 
 // Helpers
 const PLACEHOLDERS = [
@@ -27,16 +28,7 @@ const PLACEHOLDERS = [
     "/placeholders/eye-blue.svg",
 ];
 
-const getRoleBadgeVariant = (role?: string) => {
-    switch (role) {
-        case 'admin_party': return "destructive"; // Red
-        case 'yantrik': return "secondary"; // Slate/Gray
-        case 'central_committee': return "leadership"; // Blue
-        case 'team_member': return "outline";
-        case 'party_member': return "party"; // Custom Red/Outline
-        default: return "outline"; // Supporter/Guest
-    }
-};
+// Role badge variant is now imported from @/lib/roleDisplay
 
 const UserAvatar = ({ url, name, size = "w-10 h-10", className = "" }: { url?: string, name?: string, size?: string, className?: string }) => {
     const idx = name ? name.charCodeAt(0) % PLACEHOLDERS.length : 0;
@@ -59,7 +51,7 @@ export default function ThreadPage() {
     const params = useParams();
     const router = useRouter();
     const threadId = params.threadId as string;
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
 
     const [thread, setThread] = useState<DiscussionThread | null>(null);
     const [posts, setPosts] = useState<DiscussionPost[]>([]);
@@ -349,7 +341,7 @@ export default function ThreadPage() {
                                     {thread.author?.full_name || t("सदस्य", "Member")}
                                 </Typography>
                                 <Badge variant={getRoleBadgeVariant(thread.author?.role) as any} className="text-[10px] py-0 h-5 px-1.5 pointer-events-none">
-                                    {thread.author?.role?.replace('_', ' ')}
+                                    {getRoleLabel(thread.author?.role, language)}
                                 </Badge>
                             </Link>
                         )}
@@ -437,7 +429,7 @@ export default function ThreadPage() {
                                                             </div>
                                                             {post.author?.role && (
                                                                 <Badge variant={getRoleBadgeVariant(post.author?.role) as any} className="text-[10px] px-1.5 py-0 h-4 md:h-5">
-                                                                    {post.author?.role.replace('_', ' ')}
+                                                                    {getRoleLabel(post.author?.role, language)}
                                                                 </Badge>
                                                             )}
                                                         </div>

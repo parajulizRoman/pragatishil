@@ -173,17 +173,23 @@ export default function CommuneLayout({
         );
     };
 
-    // Role label translation
+    // Role label translation with disguising (admin → yantrik, board → central committee)
     const getRoleLabel = (role: string | null) => {
         if (!role) return t("अतिथि", "Guest");
+
+        // Disguise roles for public display
+        let displayRole = role;
+        if (role === 'admin') displayRole = 'yantrik';
+        if (role === 'board') displayRole = 'central_committee';
+
         const labels: Record<string, { en: string; ne: string }> = {
-            'admin': { en: 'Admin', ne: 'एडमिन' },
+            'admin_party': { en: 'Party Admin', ne: 'पार्टी प्रशासक' },
             'yantrik': { en: 'Yantrik', ne: 'यान्त्रिक' },
-            'central_committee': { en: 'Central Committee', ne: 'केन्द्रीय समिति' },
+            'central_committee': { en: 'Central Committee', ne: 'केन्द्रीय सदस्य' },
             'party_member': { en: 'Party Member', ne: 'पार्टी सदस्य' },
             'supporter': { en: 'Supporter', ne: 'समर्थक' },
         };
-        const label = labels[role] || { en: role, ne: role };
+        const label = labels[displayRole] || { en: displayRole, ne: displayRole };
         return t(label.ne, label.en);
     };
 

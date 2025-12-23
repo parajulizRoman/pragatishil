@@ -14,11 +14,16 @@ const PLACEHOLDERS = [
     "/placeholders/eye-blue.svg",
 ];
 
-// Helper to get role badge variant/icon
+// Helper to get role badge variant/icon (with disguising for admin/board)
 const getRoleObj = (role: UserRole) => {
-    switch (role) {
+    // Disguise roles for public display
+    let displayRole = role;
+    if (role === 'admin') displayRole = 'yantrik';
+    if (role === 'board') displayRole = 'central_committee';
+
+    switch (displayRole) {
         case 'admin_party': return { variant: "red" as const, icon: <Crown size={12} className="mr-1" />, label: "Admin" };
-        case 'yantrik': return { variant: "secondary" as const, icon: <Shield size={12} className="mr-1" />, label: "Technical" };
+        case 'yantrik': return { variant: "secondary" as const, icon: <Shield size={12} className="mr-1" />, label: "Yantrik" };
         case 'central_committee': return { variant: "default" as const, icon: <Shield size={12} className="mr-1" />, label: "Central Committee" };
         case 'team_member': return { variant: "outline" as const, icon: <User size={12} className="mr-1" />, label: "Team Member" };
         case 'party_member': return { variant: "party" as const, icon: <User size={12} className="mr-1" />, label: "Member" };

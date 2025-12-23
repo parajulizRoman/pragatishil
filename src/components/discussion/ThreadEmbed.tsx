@@ -18,6 +18,7 @@ import { Typography } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { getRoleLabel, getRoleBadgeVariant } from "@/lib/roleDisplay";
 
 // Reuse helpers
 const PLACEHOLDERS = [
@@ -25,16 +26,7 @@ const PLACEHOLDERS = [
     "/placeholders/eye-blue.svg",
 ];
 
-const getRoleBadgeVariant = (role?: string) => {
-    switch (role) {
-        case 'admin_party': return "destructive";
-        case 'yantrik': return "secondary";
-        case 'central_committee': return "leadership";
-        case 'team_member': return "outline";
-        case 'party_member': return "party";
-        default: return "outline";
-    }
-};
+// Role badge variant is now imported from @/lib/roleDisplay
 
 const UserAvatar = ({ url, name, size = "w-10 h-10", className = "" }: { url?: string, name?: string, size?: string, className?: string }) => {
     const idx = name ? name.charCodeAt(0) % PLACEHOLDERS.length : 0;
@@ -281,7 +273,7 @@ export default function ThreadEmbed({ threadId }: { threadId: string }) {
                                                             </div>
                                                             {post.author?.role && (
                                                                 <Badge variant={getRoleBadgeVariant(post.author?.role) as any} className="text-[10px] px-1.5 py-0 h-4 md:h-5">
-                                                                    {post.author?.role.replace('_', ' ')}
+                                                                    {getRoleLabel(post.author?.role, 'ne')}
                                                                 </Badge>
                                                             )}
                                                         </div>
