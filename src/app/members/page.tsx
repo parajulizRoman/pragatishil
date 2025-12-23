@@ -9,10 +9,11 @@ import { MembersLoading } from "./MembersClient";
 export default async function MembersGalleryPage() {
     // Fetch all relevant members with new fields
     // Include leadership (for leadership tab) + public profiles (for community tab)
+    // Note: admin and yantrik are invisible (technical staff) - not included
     const { data: members, error } = await supabaseAdmin
         .from("profiles")
         .select("*")
-        .or("is_public.eq.true,role.in.(admin,yantrik,admin_party,board,central_committee)");
+        .or("is_public.eq.true,role.in.(admin_party,board,central_committee)");
 
     if (error) {
         console.error("Error fetching members:", error);

@@ -15,8 +15,8 @@ interface MembersClientProps {
     members: Profile[];
 }
 
-// Define leadership roles
-const LEADERSHIP_ROLES: UserRole[] = ['admin', 'yantrik', 'admin_party', 'board', 'central_committee'];
+// Define leadership roles - admin and yantrik are invisible (technical staff)
+const LEADERSHIP_ROLES: UserRole[] = ['admin_party', 'board', 'central_committee'];
 const COMMITTEE_ROLES: UserRole[] = ['central_committee'];
 
 export default function MembersClient({ members }: MembersClientProps) {
