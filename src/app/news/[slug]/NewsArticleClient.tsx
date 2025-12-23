@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Calendar, ArrowLeft, ExternalLink, FileText, Download, Languages, Share2, Facebook, Twitter, Linkedin, Copy, Check, ImageIcon, MessageCircle, Pencil } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import ThreadEmbed from "@/components/discussion/ThreadEmbed";
 
 interface NewsArticleClientProps {
@@ -132,16 +131,29 @@ export default function NewsArticleClient({ item, userRole }: NewsArticleClientP
                         {title}
                     </h1>
 
-                    {/* Featured Image */}
+                    {/* Featured Image - Adaptive to image proportions */}
                     {item.image_url && (
-                        <div className="relative w-full aspect-video md:aspect-[2.4/1] bg-slate-100 rounded-2xl overflow-hidden shadow-lg mt-8">
-                            <Image
-                                src={item.image_url}
-                                alt={title}
-                                fill
-                                className="object-cover"
-                                priority
-                            />
+                        <div className="mt-8">
+                            <div className="relative w-full bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl overflow-hidden shadow-xl border border-slate-200/50">
+                                {/* Image container with max-height constraint */}
+                                <div className="relative w-full max-h-[70vh] flex items-center justify-center">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={item.image_url}
+                                        alt={title}
+                                        className="max-w-full max-h-[70vh] w-auto h-auto object-contain"
+                                        style={{ display: 'block' }}
+                                    />
+                                </div>
+                                {/* Image caption overlay */}
+                                {item.summary_ne && (
+                                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent p-4">
+                                        <p className="text-white/90 text-sm font-medium text-center drop-shadow-lg line-clamp-2">
+                                            {lang === "ne" ? item.summary_ne : item.summary_en}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>
@@ -238,34 +250,36 @@ export default function NewsArticleClient({ item, userRole }: NewsArticleClientP
                         </div>
                     </div>
 
-                    {/* Image Gallery Widget */}
                     {imageAttachments.length > 0 && (
                         <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
                             <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
                                 <ImageIcon className="w-5 h-5 text-brand-red" />
                                 {lang === "ne" ? "तस्बिरहरू" : "Photos"} ({imageAttachments.length})
                             </h3>
-                            <div className="grid grid-cols-2 gap-2">
+                            <div className="space-y-3">
                                 {imageAttachments.map((att, idx) => {
                                     const url = typeof att === 'string' ? att : att.url;
+                                    const name = typeof att === 'string' ? `Photo ${idx + 1}` : (att.name || `Photo ${idx + 1}`);
                                     return (
                                         <a
                                             key={idx}
                                             href={url}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="relative aspect-square rounded-lg overflow-hidden bg-slate-100 hover:opacity-90 transition-opacity group"
+                                            className="block group"
                                         >
-                                            <Image
-                                                src={url}
-                                                alt={`Attachment ${idx + 1}`}
-                                                fill
-                                                className="object-cover"
-                                                sizes="150px"
-                                            />
-                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                                                <ExternalLink className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 drop-shadow-lg transition-opacity" />
+                                            <div className="relative rounded-lg overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200/50 shadow-sm hover:shadow-md transition-all">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img
+                                                    src={url}
+                                                    alt={name}
+                                                    className="w-full h-auto max-h-48 object-contain"
+                                                />
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                                    <ExternalLink className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 drop-shadow-lg transition-opacity" />
+                                                </div>
                                             </div>
+                                            <p className="text-xs text-slate-500 mt-1.5 text-center truncate">{name}</p>
                                         </a>
                                     );
                                 })}
