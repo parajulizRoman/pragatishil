@@ -113,11 +113,12 @@ export default function WritePage() {
             let drafts = null;
             let draftsError = null;
 
-            // Try with status column first
+            // Try with status column first - ONLY current user's drafts
             const result1 = await supabase
                 .from("news_items")
-                .select("id, title, title_ne, summary_en, date")
+                .select("id, title, title_ne, summary_en, date, author_id")
                 .eq("status", "draft")
+                .eq("author_id", user.id)  // Only show user's own drafts
                 .order("date", { ascending: false })
                 .limit(10);
 
@@ -125,8 +126,9 @@ export default function WritePage() {
                 // Fallback to is_published for old schema
                 const result2 = await supabase
                     .from("news_items")
-                    .select("id, title, title_ne, summary_en, date")
+                    .select("id, title, title_ne, summary_en, date, author_id")
                     .eq("is_published", false)
+                    .eq("author_id", user.id)  // Only show user's own drafts
                     .order("date", { ascending: false })
                     .limit(10);
                 drafts = result2.data;
