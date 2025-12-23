@@ -149,46 +149,62 @@ export default function HomeClient({ content, news, videos, documents = [] }: Ho
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {n.slice(0, 3).map((item) => (
-                            <Link key={item.id} href={`/news/${item.slug || item.id}`} className="block group h-full">
-                                <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full hover:-translate-y-1">
-                                    {/* Image */}
-                                    {(item.image_url || item.image) && (
-                                        <div className="relative h-56 w-full overflow-hidden">
-                                            <Image
-                                                src={item.image_url || item.image || ''}
-                                                alt={item.title}
-                                                fill
-                                                sizes="(max-width: 768px) 100vw, 400px"
-                                                className="object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                            />
-                                            <div className="absolute top-3 left-3">
-                                                <span className={cn(
-                                                    "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide",
-                                                    item.type === 'Video' ? 'bg-brand-red text-white shadow-md' : 'bg-brand-blue text-white shadow-md'
-                                                )}>
-                                                    {item.type}
-                                                </span>
+                        {n.slice(0, 3).map((item) => {
+                            // For fallback/external news (small IDs), link to external source
+                            // For DB news (id > 10), link to internal page
+                            const isDbItem = typeof item.id === 'number' && item.id > 10;
+                            const href = isDbItem
+                                ? `/news/${item.slug || item.id}`
+                                : (item.link || `/news/${item.slug || item.id}`);
+                            const isExternal = !isDbItem && item.link;
+
+                            return (
+                                <Link
+                                    key={item.id}
+                                    href={href}
+                                    target={isExternal ? "_blank" : undefined}
+                                    rel={isExternal ? "noopener noreferrer" : undefined}
+                                    className="block group h-full"
+                                >
+                                    <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 flex flex-col h-full hover:-translate-y-1">
+                                        {/* Image */}
+                                        {(item.image_url || item.image) && (
+                                            <div className="relative h-56 w-full overflow-hidden">
+                                                <Image
+                                                    src={item.image_url || item.image || ''}
+                                                    alt={item.title}
+                                                    fill
+                                                    sizes="(max-width: 768px) 100vw, 400px"
+                                                    className="object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                                />
+                                                <div className="absolute top-3 left-3">
+                                                    <span className={cn(
+                                                        "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide",
+                                                        item.type === 'Video' ? 'bg-brand-red text-white shadow-md' : 'bg-brand-blue text-white shadow-md'
+                                                    )}>
+                                                        {item.type}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        <div className="p-6 flex-1 flex flex-col">
+                                            <h3 className="text-lg font-bold text-brand-navy mb-3 line-clamp-2 group-hover:text-brand-blue transition-colors">
+                                                {t(item.title, item.title_ne || item.title)}
+                                            </h3>
+                                            {(item.summary_en || item.summary_ne) && (
+                                                <p className="text-sm text-slate-500 line-clamp-3 mb-4 leading-relaxed">
+                                                    {t(item.summary_en || "", item.summary_ne || "")}
+                                                </p>
+                                            )}
+                                            <div className="mt-auto pt-4 border-t border-slate-50 flex justify-between items-center text-xs text-slate-400 font-medium uppercase tracking-wider">
+                                                <span>{item.source}</span>
+                                                <span>{item.date}</span>
                                             </div>
                                         </div>
-                                    )}
-                                    <div className="p-6 flex-1 flex flex-col">
-                                        <h3 className="text-lg font-bold text-brand-navy mb-3 line-clamp-2 group-hover:text-brand-blue transition-colors">
-                                            {t(item.title, item.title_ne || item.title)}
-                                        </h3>
-                                        {(item.summary_en || item.summary_ne) && (
-                                            <p className="text-sm text-slate-500 line-clamp-3 mb-4 leading-relaxed">
-                                                {t(item.summary_en || "", item.summary_ne || "")}
-                                            </p>
-                                        )}
-                                        <div className="mt-auto pt-4 border-t border-slate-50 flex justify-between items-center text-xs text-slate-400 font-medium uppercase tracking-wider">
-                                            <span>{item.source}</span>
-                                            <span>{item.date}</span>
-                                        </div>
-                                    </div>
-                                </article>
-                            </Link>
-                        ))}
+                                    </article>
+                                </Link>
+                            );
+                        })}
                     </div>
                     <div className="mt-8 text-center md:hidden">
                         <Button variant="outline" className="w-full" asChild>
