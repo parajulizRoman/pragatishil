@@ -54,12 +54,53 @@ export interface Profile {
     contact_phone_public: string | null;
     created_at: string;
     updated_at: string;
+
+    // @Handle System
+    handle?: string | null;
+    handle_lower?: string | null;
+
+    // Location Hierarchy
+    province_id?: number | null;
+    district_id?: number | null;
+    local_level_id?: number | null;
+
+    // Profession Info
+    profession?: string | null;
+    profession_category?: string | null;
+    organization?: string | null;
+    position_title?: string | null;
+
+    // Privacy Controls
+    show_contact_email?: boolean;
+    show_contact_phone?: boolean;
+    show_location?: boolean;
+
+    // Social Links
+    linkedin_url?: string | null;
+    facebook_url?: string | null;
+    twitter_url?: string | null;
+    website_url?: string | null;
+
+    // Verification & Metadata
+    member_since?: string | null;
+    verified_at?: string | null;
+    verified_by?: string | null;
+    skills?: string[];
+
     // Ban System
     is_banned?: boolean;
     banned_at?: string | null;
     banned_by?: string | null;
     ban_reason?: string | null;
     ban_expires_at?: string | null;
+}
+
+export interface ProfessionCategory {
+    id: number;
+    name_en: string;
+    name_ne?: string | null;
+    icon?: string | null;
+    sort_order: number;
 }
 
 export interface AdminCouncilMember {
