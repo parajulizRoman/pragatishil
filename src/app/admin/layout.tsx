@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import {
     LayoutDashboard,
-    Settings,
     FileText,
     Newspaper,
     Image,
@@ -49,21 +48,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         checkAuth();
     }, [router, supabase]);
 
-    // Define Role-Based Access
-    const userManagementRoles = ['admin', 'yantrik', 'admin_party', 'board'];
+    // Define Role-Based Access - CMS restricted to yantrik, admin_party, admin only
+    const cmsAllowedRoles = ['admin', 'yantrik', 'admin_party'];
     const auditRoles = ['admin']; // STRICT ROOT ONLY
 
-    const canManageUsers = userRole && userManagementRoles.includes(userRole);
+    const hasCmsAccess = userRole && cmsAllowedRoles.includes(userRole);
     const canViewAudit = userRole && auditRoles.includes(userRole);
+
+    // Redirect if no CMS access
+    if (!hasCmsAccess && !loading) {
+        router.push('/');
+        return null;
+    }
 
     const allNavItems = [
         { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-        { name: "User Management", href: "/admin/users", icon: UserCog, restricted: true, allowIf: canManageUsers },
-        { name: "Council", href: "/admin/council", icon: Users, restricted: true, allowIf: canManageUsers },
+        { name: "User Management", href: "/admin/users", icon: UserCog },
+        { name: "Council", href: "/admin/council", icon: Users },
         { name: "Audit Logs", href: "/admin/audit", icon: Shield, restricted: true, allowIf: canViewAudit },
-        { name: "Graveyard", href: "/admin/graveyard", icon: Skull, restricted: true, allowIf: canManageUsers },
-        { name: "General Settings", href: "/admin/settings", icon: Settings, restricted: true, allowIf: canManageUsers },
-        { name: "Pages Content", href: "/admin/pages", icon: FileText, restricted: true, allowIf: canManageUsers }, // Restricted to admins/party/yantrik
+        { name: "Graveyard", href: "/admin/graveyard", icon: Skull },
+        { name: "Site Configuration", href: "/admin/pages", icon: FileText },
         { name: "News Room", href: "/admin/news", icon: Newspaper },
         { name: "Media Gallery", href: "/admin/media", icon: Image },
     ];

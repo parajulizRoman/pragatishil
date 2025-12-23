@@ -180,8 +180,8 @@ export default function PagesManager() {
             <div className="sticky top-0 z-20 bg-slate-50/80 backdrop-blur-md pb-4 pt-4 mb-8 border-b border-slate-200">
                 <div className="flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-black text-brand-navy tracking-tight">Pages Content</h1>
-                        <p className="text-sm text-slate-500 font-medium mt-1">Manage global site areas and static translations.</p>
+                        <h1 className="text-3xl font-black text-brand-navy tracking-tight">Site Configuration</h1>
+                        <p className="text-sm text-slate-500 font-medium mt-1">Manage site content, pages, and global settings.</p>
                     </div>
                     {/* Hide Save button if restricted tab and somehow active */}
                     {(activeTab !== 'hero' || allowedTabs.find(t => t.id === 'hero')) && (

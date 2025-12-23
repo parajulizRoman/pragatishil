@@ -5,7 +5,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { PenLine } from "lucide-react";
 
-const CONTRIBUTOR_ROLES = ["central_committee", "board", "admin_party", "yantrik", "admin", "party_member"];
+// Only admin, yantrik, admin_party can contribute news/press
+const CONTRIBUTOR_ROLES = ["admin_party", "yantrik", "admin"];
 
 export default function ContributeButton() {
     const [canContribute, setCanContribute] = useState(false);

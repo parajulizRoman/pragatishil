@@ -80,7 +80,8 @@ export async function middleware(request: NextRequest) {
 
         console.log(`Middleware: User ${verifiedUser.email} (ID: ${verifiedUser.id}) has role: ${profile?.role}`)
 
-        const adminRoles = ['admin_party', 'yantrik', 'admin', 'board', 'central_committee'];
+        // CMS restricted to yantrik, admin_party, admin only
+        const adminRoles = ['admin_party', 'yantrik', 'admin'];
         if (!profile || !adminRoles.includes(profile.role)) {
             console.warn(`Unauthorized access attempt to admin by ${verifiedUser.email} with role: ${profile?.role}`)
             return NextResponse.redirect(new URL('/', request.url))
