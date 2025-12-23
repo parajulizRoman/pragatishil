@@ -281,21 +281,55 @@ export default function WritePage() {
 
     // AI-powered form completion
     const handleAIComplete = async () => {
-        // Require at least some content
-        if (!title.trim() && !bodyEn.trim()) {
-            alert(t("कृपया पहिले शीर्षक वा मुख्य भाग लेख्नुहोस्", "Please enter a title or body content first"));
+        // Allow completion if we have title, body, OR attachments
+        if (!title.trim() && !titleNe.trim() && !bodyEn.trim() && !bodyNe.trim() && attachments.length === 0) {
+            alert(t("कृपया पहिले शीर्षक, मुख्य भाग, वा कागजात थप्नुहोस्", "Please enter a title, body content, or add attachments first"));
             return;
         }
 
         setAiCompleting(true);
         try {
+            // Step 1: If attachments exist, analyze them first to extract context
+            let attachmentContext = "";
+            if (attachments.length > 0) {
+                // Analyze first attachment (image or document)
+                const firstAttachment = attachments[0];
+                const attachmentUrl = typeof firstAttachment === 'string' ? firstAttachment : firstAttachment.url;
+
+                try {
+                    const analysisResponse = await fetch('/api/ai/analyze-attachment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ attachmentUrl })
+                    });
+
+                    if (analysisResponse.ok) {
+                        const analysisResult = await analysisResponse.json();
+                        if (analysisResult.data) {
+                            const analysis = analysisResult.data;
+                            attachmentContext = `
+Document Analysis:
+- Title: ${analysis.title || 'Unknown'}
+- Title (Nepali): ${analysis.title_ne || 'Unknown'}
+- Type: ${analysis.document_type || 'Unknown'}
+- Description: ${analysis.caption_en || 'Unknown'}
+- Key Topics: ${analysis.key_topics?.join(', ') || 'Unknown'}`;
+                        }
+                    }
+                } catch (analysisError) {
+                    console.log("Attachment analysis skipped:", analysisError);
+                    // Continue without attachment context
+                }
+            }
+
+            // Step 2: Call article completion with all context including attachment analysis
             const response = await fetch('/api/ai/complete-article', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     title: title.trim() || undefined,
                     title_ne: titleNe.trim() || undefined,
-                    body_en: bodyEn.trim() || undefined,
+                    body_en: (bodyEn.trim() + attachmentContext) || undefined,
                     body_ne: bodyNe.trim() || undefined,
                     summary_en: summaryEn.trim() || undefined
                 })
