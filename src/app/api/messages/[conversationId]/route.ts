@@ -1,17 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-
-// Roles that can initiate AND reply to messages
-const MESSAGING_ROLES = ['party_member', 'team_member', 'central_committee', 'board', 'admin_party', 'admin', 'yantrik'];
-
-// Roles that can ONLY reply (not initiate)
-const REPLY_ONLY_ROLES = ['member'];
-
-// Roles with full history access (no inactivity timeout)
-const LEADERSHIP_ROLES = ['central_committee', 'board', 'admin_party', 'admin', 'yantrik'];
-
-// Inactivity timeout in minutes for lower-rank members
-const INACTIVITY_MINUTES = 5;
+import {
+    canReplyToConversation,
+    hasFullHistoryAccess,
+    INACTIVITY_MINUTES
+} from "@/lib/roleHierarchy";
 
 /**
  * Get messages for a specific conversation
@@ -38,7 +31,7 @@ export async function GET(
         .single();
 
     const userRole = profile?.role || 'guest';
-    const hasFullAccess = LEADERSHIP_ROLES.includes(userRole);
+    const hasFullAccess = hasFullHistoryAccess(userRole);
 
     // Check if user is participant
     const { data: participation } = await supabase
@@ -159,10 +152,10 @@ export async function POST(
         .eq("id", user.id)
         .single();
 
-    // Allow messaging roles AND reply-only roles (member can reply but not initiate)
-    const canMessage = MESSAGING_ROLES.includes(profile?.role) || REPLY_ONLY_ROLES.includes(profile?.role);
+    // Check if user can reply to conversations using role hierarchy
+    const canMessage = canReplyToConversation(profile?.role || 'guest');
     if (!profile?.role || !canMessage) {
-        return NextResponse.json({ error: "Messaging requires member role or higher" }, { status: 403 });
+        return NextResponse.json({ error: "Messaging requires ward_committee role or higher" }, { status: 403 });
     }
 
     // Check if user is participant
