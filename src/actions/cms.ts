@@ -220,8 +220,8 @@ export async function upsertNewsItem(item: any) {
     if (error) throw new Error(error.message);
 
     // --- NOTIFICATION FOR REVIEW REQUESTS ---
-    // If status is 'submitted' and pending_reviewer_id is set, notify the reviewer
-    if (finalStatus === 'submitted' && item.pending_reviewer_id) {
+    // If status is 'submitted', notify the assigned reviewer OR all admins
+    if (finalStatus === 'submitted') {
         try {
             // Get author's name for the notification
             const { data: authorProfile } = await supabase
@@ -231,21 +231,48 @@ export async function upsertNewsItem(item: any) {
                 .single();
 
             const authorName = authorProfile?.full_name || 'A member';
+            const savedReviewerId = newData.pending_reviewer_id;
 
-            // Create notification using admin client to bypass RLS
-            const { error: notifError } = await supabaseAdmin.from('notifications').insert({
-                user_id: item.pending_reviewer_id,
-                type: 'review_request',
-                title: 'New Blog Post for Review',
-                body: `${authorName} submitted "${item.title.slice(0, 50)}${item.title.length > 50 ? '...' : ''}" for your review`,
-                link: `/blogs/${newData.slug}`,
-                actor_id: user.id
-            });
+            // If a specific reviewer was assigned, notify only them
+            if (savedReviewerId) {
+                const { error: notifError } = await supabaseAdmin.from('notifications').insert({
+                    user_id: savedReviewerId,
+                    type: 'review_request',
+                    title: 'New Blog Post for Review',
+                    body: `${authorName} submitted "${item.title.slice(0, 50)}${item.title.length > 50 ? '...' : ''}" for your review`,
+                    link: `/blogs/${newData.slug}`,
+                    actor_id: user.id
+                });
 
-            if (notifError) {
-                console.error("[CMS] Failed to create review notification:", notifError);
+                if (notifError) {
+                    console.error("[CMS] Failed to create review notification:", notifError);
+                } else {
+                    console.log(`[CMS] Review notification sent to ${savedReviewerId}`);
+                }
             } else {
-                console.log(`[CMS] Review notification sent to ${item.pending_reviewer_id}`);
+                // No specific reviewer assigned - notify all admin-level users
+                const { data: admins } = await supabaseAdmin
+                    .from('profiles')
+                    .select('id')
+                    .in('role', ['admin', 'yantrik', 'admin_party', 'board']);
+
+                if (admins && admins.length > 0) {
+                    const notifications = admins.map(admin => ({
+                        user_id: admin.id,
+                        type: 'review_request',
+                        title: 'New Blog Post Submitted',
+                        body: `${authorName} submitted "${item.title.slice(0, 50)}${item.title.length > 50 ? '...' : ''}" for review`,
+                        link: `/blogs/${newData.slug}`,
+                        actor_id: user.id
+                    }));
+
+                    const { error: notifError } = await supabaseAdmin.from('notifications').insert(notifications);
+                    if (notifError) {
+                        console.error("[CMS] Failed to notify admins:", notifError);
+                    } else {
+                        console.log(`[CMS] Review notifications sent to ${admins.length} admins`);
+                    }
+                }
             }
         } catch (notifErr) {
             console.error("[CMS] Notification creation exception:", notifErr);
