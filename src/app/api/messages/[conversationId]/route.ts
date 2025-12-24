@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// Roles that can use messaging
+// Roles that can initiate AND reply to messages
 const MESSAGING_ROLES = ['party_member', 'team_member', 'central_committee', 'board', 'admin_party', 'admin', 'yantrik'];
+
+// Roles that can ONLY reply (not initiate)
+const REPLY_ONLY_ROLES = ['member'];
+
+// Roles with full history access (no inactivity timeout)
+const LEADERSHIP_ROLES = ['central_committee', 'board', 'admin_party', 'admin', 'yantrik'];
+
+// Inactivity timeout in minutes for lower-rank members
+const INACTIVITY_MINUTES = 5;
 
 /**
  * Get messages for a specific conversation
@@ -21,6 +30,16 @@ export async function GET(
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Get user role
+    const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", user.id)
+        .single();
+
+    const userRole = profile?.role || 'guest';
+    const hasFullAccess = LEADERSHIP_ROLES.includes(userRole);
+
     // Check if user is participant
     const { data: participation } = await supabase
         .from("conversation_participants")
@@ -31,6 +50,34 @@ export async function GET(
 
     if (!participation) {
         return NextResponse.json({ error: "Not a participant" }, { status: 403 });
+    }
+
+    // Get conversation details including last_message_at
+    const { data: conversation } = await supabase
+        .from("conversations")
+        .select("last_message_at, status")
+        .eq("id", conversationId)
+        .single();
+
+    // Check inactivity for non-leadership roles
+    let isExpired = false;
+    let timeRemainingMs = 0;
+
+    if (!hasFullAccess && conversation?.last_message_at) {
+        const lastMessageTime = new Date(conversation.last_message_at).getTime();
+        const now = Date.now();
+        const expiresAt = lastMessageTime + (INACTIVITY_MINUTES * 60 * 1000);
+        timeRemainingMs = expiresAt - now;
+        isExpired = timeRemainingMs <= 0;
+    }
+
+    // If expired for this user, return empty with status
+    if (isExpired) {
+        return NextResponse.json({
+            messages: [],
+            conversationStatus: 'closed',
+            reason: 'Conversation inactive for more than 5 minutes'
+        });
     }
 
     const { searchParams } = new URL(request.url);
@@ -81,7 +128,9 @@ export async function GET(
 
     // Reverse to show oldest first in UI
     return NextResponse.json({
-        messages: (messages || []).reverse()
+        messages: (messages || []).reverse(),
+        conversationStatus: 'open',
+        timeRemainingMs: hasFullAccess ? null : timeRemainingMs
     });
 }
 
@@ -110,8 +159,10 @@ export async function POST(
         .eq("id", user.id)
         .single();
 
-    if (!profile?.role || !MESSAGING_ROLES.includes(profile.role)) {
-        return NextResponse.json({ error: "Messaging requires party_member role or higher" }, { status: 403 });
+    // Allow messaging roles AND reply-only roles (member can reply but not initiate)
+    const canMessage = MESSAGING_ROLES.includes(profile?.role) || REPLY_ONLY_ROLES.includes(profile?.role);
+    if (!profile?.role || !canMessage) {
+        return NextResponse.json({ error: "Messaging requires member role or higher" }, { status: 403 });
     }
 
     // Check if user is participant
@@ -166,6 +217,12 @@ export async function POST(
         console.error("Send message error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
+
+    // Update conversation's last_message_at to reset inactivity timer
+    await supabase
+        .from("conversations")
+        .update({ last_message_at: new Date().toISOString() })
+        .eq("id", conversationId);
 
     // Create notification for other participants
     const { data: otherParticipants } = await supabase

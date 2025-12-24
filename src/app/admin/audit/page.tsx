@@ -171,6 +171,7 @@ export default async function AuditLogsPage({ searchParams }: { searchParams: { 
 }
 
 function getActionColor(action: string) {
+    if (!action) return "bg-slate-50 text-slate-600 border border-slate-200";
     if (action.includes("BAN")) return "bg-red-50 text-red-700 border border-red-100";
     if (action.includes("VETO")) return "bg-amber-50 text-amber-700 border border-amber-100";
     if (action.includes("CHANNEL")) return "bg-purple-50 text-purple-700 border border-purple-100";
