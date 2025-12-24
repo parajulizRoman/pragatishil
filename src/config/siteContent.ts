@@ -12,7 +12,7 @@ export const siteContent = {
     nav: {
         home: { en: "Home", ne: "गृहपृष्ठ" },
         news: { en: "News", ne: "समाचार" },
-        media: { en: "Media", ne: "मिडिया" },
+        media: { en: "Pragatishil Bichar", ne: "प्रगतिशील विचार" },  // Progressive Blogs
         about: { en: "About", ne: "हाम्रो बारेमा" },
         contact: { en: "Contact", ne: "सम्पर्क" },
         members: { en: "Members", ne: "सदस्यहरू" },

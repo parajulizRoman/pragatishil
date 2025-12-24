@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { ButtonHTMLAttributes, ReactNode } from "react";
+import { ButtonHTMLAttributes, ReactNode, MouseEventHandler } from "react";
 
 interface BrandButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: "primary" | "secondary" | "solid-blue" | "danger";
     href?: string; // If provided, renders as Link
     className?: string; // Additional classes
     children: ReactNode;
+    onClick?: MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
 }
 
 export function BrandButton({
@@ -13,6 +14,7 @@ export function BrandButton({
     href,
     className = "",
     children,
+    onClick,
     ...props
 }: BrandButtonProps) {
 
@@ -32,14 +34,18 @@ export function BrandButton({
 
     if (href) {
         return (
-            <Link href={href} className={combinedClasses}>
+            <Link
+                href={href}
+                className={combinedClasses}
+                onClick={onClick as MouseEventHandler<HTMLAnchorElement>}
+            >
                 {children}
             </Link>
         );
     }
 
     return (
-        <button className={combinedClasses} {...props}>
+        <button className={combinedClasses} onClick={onClick} {...props}>
             {children}
         </button>
     );
