@@ -300,15 +300,21 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
 
                             <div className="grid grid-cols-2 gap-5">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('दृश्यता', 'Visibility')}</label>
+                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">{t('पहुँच प्रकार', 'Access Type')}</label>
                                     <NativeSelect
                                         value={visibility}
                                         onChange={e => setVisibility(e.target.value as "public" | "logged_in" | "party_only")}
                                     >
                                         <option value="public">{t('सार्वजनिक (सबै)', 'Public (Everyone)')}</option>
-                                        <option value="logged_in">{t('सदस्यहरू मात्र', 'Members Only')}</option>
-                                        <option value="party_only">{t('पार्टी मात्र', 'Party Only')}</option>
+                                        <option value="logged_in">{t('लग-इन मात्र', 'Logged In Users')}</option>
+                                        <option value="party_only">{t('पार्टी मात्र', 'Party Members Only')}</option>
+                                        <option value="private">{t('निजी (आमन्त्रित मात्र)', 'Private (Invite Only)')}</option>
                                     </NativeSelect>
+                                    {visibility === 'private' as unknown && editChannel && (
+                                        <p className="text-xs text-amber-600 mt-1">
+                                            {t('सेभ पछि सदस्य व्यवस्थापन गर्नुहोस्', 'After saving, manage members from channel page')}
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex justify-between">
