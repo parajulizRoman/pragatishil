@@ -100,7 +100,7 @@ BEGIN
     END IF;
 
     -- Public channels: everyone can access
-    IF v_channel.access_type = 'public' OR v_channel.visibility = 'public' THEN
+    IF v_channel.access_type = 'public' OR v_channel.visibility::TEXT = 'public' THEN
         RETURN TRUE;
     END IF;
 
@@ -147,11 +147,12 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- 7. Update existing channels to maintain backward compatibility
+-- Cast visibility to TEXT to handle enum type
 UPDATE discussion_channels
 SET access_type = CASE
-    WHEN visibility = 'public' THEN 'public'
-    WHEN visibility IN ('logged_in', 'members') THEN 'members'
-    WHEN visibility IN ('party_only', 'central_committee', 'board_only', 'leadership', 'internal') THEN 'role_based'
+    WHEN visibility::TEXT = 'public' THEN 'public'
+    WHEN visibility::TEXT = 'logged_in' THEN 'members'
+    WHEN visibility::TEXT IN ('party_only', 'central_committee', 'board_only', 'leadership', 'internal') THEN 'role_based'
     ELSE 'public'
 END
 WHERE access_type IS NULL OR access_type = 'public';
@@ -159,11 +160,11 @@ WHERE access_type IS NULL OR access_type = 'public';
 -- Set min_role_level for role_based channels
 UPDATE discussion_channels
 SET min_role_level = CASE
-    WHEN visibility = 'party_only' THEN 2  -- ward_committee+
-    WHEN visibility = 'central_committee' THEN 6
-    WHEN visibility = 'board_only' THEN 9  -- advisor_board
-    WHEN visibility = 'leadership' THEN 6  -- central_committee+
-    WHEN visibility = 'internal' THEN 8    -- admin_panel+
+    WHEN visibility::TEXT = 'party_only' THEN 2  -- ward_committee+
+    WHEN visibility::TEXT = 'central_committee' THEN 6
+    WHEN visibility::TEXT = 'board_only' THEN 9  -- advisor_board
+    WHEN visibility::TEXT = 'leadership' THEN 6  -- central_committee+
+    WHEN visibility::TEXT = 'internal' THEN 8    -- admin_panel+
     ELSE 0
 END
 WHERE access_type = 'role_based';
