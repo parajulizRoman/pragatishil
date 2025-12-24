@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useLanguage } from "@/context/LanguageContext";
 import { createT, Lang } from "@/lib/translations";
 import { NewsItem, NewsAttachment, NewsReference } from "@/types";
@@ -337,7 +339,24 @@ export default function NewsArticleClient({ item, userRole, userId }: NewsArticl
                     {/* Article Body - Only showing selected language */}
                     {body ? (
                         <article className={`prose prose-slate lg:prose-lg max-w-none ${lang === "ne" ? "font-nepali leading-loose" : ""}`}>
-                            <div className="whitespace-pre-wrap">{body}</div>
+                            <ReactMarkdown
+                                remarkPlugins={[remarkGfm]}
+                                components={{
+                                    h1: ({ children }) => <h1 className="text-3xl font-bold text-brand-navy mb-4">{children}</h1>,
+                                    h2: ({ children }) => <h2 className="text-2xl font-bold text-brand-navy mt-8 mb-3">{children}</h2>,
+                                    h3: ({ children }) => <h3 className="text-xl font-semibold text-brand-navy mt-6 mb-2">{children}</h3>,
+                                    p: ({ children }) => <p className="mb-4 leading-relaxed">{children}</p>,
+                                    ul: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
+                                    ol: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
+                                    li: ({ children }) => <li className="ml-2">{children}</li>,
+                                    blockquote: ({ children }) => <blockquote className="border-l-4 border-brand-blue pl-4 py-2 my-4 bg-slate-50 italic">{children}</blockquote>,
+                                    strong: ({ children }) => <strong className="font-bold text-brand-navy">{children}</strong>,
+                                    em: ({ children }) => <em className="italic">{children}</em>,
+                                    a: ({ href, children }) => <a href={href} className="text-brand-blue hover:underline" target="_blank" rel="noopener noreferrer">{children}</a>,
+                                }}
+                            >
+                                {body}
+                            </ReactMarkdown>
                         </article>
                     ) : (
                         <p className="text-slate-500 italic">

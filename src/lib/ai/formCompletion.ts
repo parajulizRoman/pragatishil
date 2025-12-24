@@ -75,33 +75,45 @@ FIELDS TO GENERATE:
    - If English title exists, TRANSLATE it to Nepali
    - If only body content exists, create an appropriate title in Nepali
 
-3. body_en: English body content
-   - If Nepali body exists, provide a COMPLETE FULL TRANSLATION (not a summary!)
-   - The translation should preserve ALL paragraphs and details from the original
-   - Match the length and structure of the original content
+3. body_en: English body content (MARKDOWN FORMATTED)
+   - If Nepali body exists, provide a COMPLETE FULL TRANSLATION
+   - FORMAT THE CONTENT WITH MARKDOWN:
+     * Use ## for section headings
+     * Use **bold** for emphasis on key terms
+     * Use *italic* for quotes or foreign words
+     * Use numbered lists (1. 2. 3.) for sequential points
+     * Use bullet lists (- item) for non-sequential points
+     * Use proper paragraph breaks between sections
+     * Add > blockquotes for important statements
+   - Preserve all content and meaning from the original
 
-4. body_ne: Nepali body content
-   - If English body exists, provide a COMPLETE FULL TRANSLATION (not a summary!)
-   - The translation should preserve ALL paragraphs and details from the original
-   - Match the length and structure of the original content
+4. body_ne: Nepali body content (MARKDOWN FORMATTED)
+   - If English body exists, provide a COMPLETE FULL TRANSLATION
+   - FORMAT THE CONTENT WITH MARKDOWN:
+     * Use ## for section headings (in Nepali)
+     * Use **bold** for emphasis
+     * Use proper paragraph breaks
+     * Use numbered and bullet lists where appropriate
+   - Preserve all content and meaning from the original
 
 5. summary_en: English summary
-   - Generate a SHORT 2-3 sentence summary of the article content
-   - This is DIFFERENT from body - it should be a brief overview only
+   - Generate a SHORT 2-3 sentence summary
    - ALWAYS generate this (never return null)
 
 6. summary_ne: Nepali summary
    - Generate a SHORT 2-3 sentence summary in Nepali
-   - This is DIFFERENT from body - it should be a brief overview only  
    - ALWAYS generate this (never return null)
 
 7. suggested_tags: Array of 3-5 topic tags in English (lowercase, use underscores)
 
 CRITICAL RULES:
-- body_en and body_ne are FULL TRANSLATIONS, preserving all content and length
-- summary_en and summary_ne are SHORT overviews (2-3 sentences only)
-- Translations should be natural and fluent
-- ALWAYS generate summaries even if other fields exist`;
+- body_en and body_ne should be WELL-FORMATTED MARKDOWN with headings, lists, emphasis
+- Analyze the content structure and apply appropriate formatting
+- Break long paragraphs into logical sections with headings
+- Use bold for names, organizations, key concepts
+- summary_en and summary_ne are plain text (no markdown needed)
+- Translations should be natural and fluent`;
+
 
 
     const responseSchema: Schema = {
