@@ -51,6 +51,7 @@ export default function WritePage() {
     const [bodyEn, setBodyEn] = useState("");
     const [bodyNe, setBodyNe] = useState("");
     const [summaryEn, setSummaryEn] = useState("");
+    const [summaryNe, setSummaryNe] = useState("");
     const [imageUrl, setImageUrl] = useState("");
     const [visibility, setVisibility] = useState("party");
     const [attachments, setAttachments] = useState<NewsAttachment[]>([]);
@@ -344,26 +345,30 @@ Document Analysis:
 
                 const { data } = result;
 
-                // Fill in missing fields with AI-generated content (BIDIRECTIONAL)
-                // English → Nepali
+                // Fill ALL missing fields with AI-generated content (COMPREHENSIVE)
+                // 1. Titles - bidirectional
                 if (data.title_ne && !titleNe.trim()) {
                     setTitleNe(data.title_ne);
                 }
-                if (data.body_ne && !bodyNe.trim()) {
-                    setBodyNe(data.body_ne);
-                }
-                // Nepali → English
                 if (data.title_en && !title.trim()) {
                     setTitle(data.title_en);
+                }
+
+                // 2. Body content - bidirectional
+                if (data.body_ne && !bodyNe.trim()) {
+                    setBodyNe(data.body_ne);
                 }
                 if (data.body_en && !bodyEn.trim()) {
                     setBodyEn(data.body_en);
                 }
-                // Summary (always generate if missing)
+
+                // 3. Summaries - both English and Nepali
                 if (data.summary_en && !summaryEn.trim()) {
                     setSummaryEn(data.summary_en);
                 }
-                // No popup - form fields are visually updated
+                if (data.summary_ne && !summaryNe.trim()) {
+                    setSummaryNe(data.summary_ne);
+                }
             }
 
         } catch (error) {
