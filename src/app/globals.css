@@ -123,12 +123,22 @@ body {
 
 /* Centralized Form Input Style */
 /* Ensures high contrast and consistent branding */
+/* Mobile-friendly: min-height 44px for touch targets, text-base prevents iOS zoom */
 @layer components {
   .form-input {
-    @apply w-full bg-white text-slate-950 font-medium border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all placeholder:text-slate-500;
+    @apply w-full min-h-[44px] bg-white text-slate-950 font-medium border border-slate-300 rounded-lg px-3 py-2.5 text-base focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue outline-none transition-all placeholder:text-slate-500;
   }
 
   .form-label {
     @apply block text-xs font-black uppercase tracking-widest text-brand-navy mb-1.5;
+  }
+
+  /* Mobile-friendly buttons */
+  .btn-primary {
+    @apply min-h-[44px] px-6 py-3 bg-brand-blue text-white font-bold rounded-lg transition-all hover:bg-blue-700 focus:ring-2 focus:ring-brand-blue/50 disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply min-h-[44px] px-6 py-3 bg-slate-100 text-slate-700 font-medium rounded-lg transition-all hover:bg-slate-200 focus:ring-2 focus:ring-slate-300/50;
   }
 }
