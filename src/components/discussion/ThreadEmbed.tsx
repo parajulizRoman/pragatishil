@@ -9,7 +9,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { flagContent, votePost, toggleThreadInteraction } from "@/app/commune/actions";
 import Link from "next/link";
 import { X, User, Paperclip, FileText, Loader2, MessageSquare, ArrowUp, ArrowDown, Flag } from "lucide-react";
-import TextareaAutosize from 'react-textarea-autosize';
+import MentionAutocomplete from "@/components/ui/MentionAutocomplete";
 import { Skeleton } from "@/components/ui/skeleton";
 import PostActions from "@/components/PostActions";
 import { Card, CardContent, CardTitle, CardHeader } from "@/components/ui/card";
@@ -368,23 +368,21 @@ export default function ThreadEmbed({ threadId }: { threadId: string }) {
                         </div>
                         <div className="flex-1">
                             <form onSubmit={handleReply}>
-                                <div className="relative">
-                                    <TextareaAutosize
-                                        minRows={2}
-                                        maxRows={6}
-                                        placeholder={!isAuthenticated ? "Share your anonymous thoughts..." : "Join the discussion..."}
-                                        className="w-full text-base p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue transition-all resize-none mb-2 bg-white"
-                                        value={replyContent}
-                                        onChange={e => setReplyContent(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                                                e.preventDefault();
-                                                // @ts-ignore
-                                                handleReply(e);
-                                            }
-                                        }}
-                                    />
-                                </div>
+                                <MentionAutocomplete
+                                    minRows={2}
+                                    maxRows={6}
+                                    placeholder={!isAuthenticated ? "Share your anonymous thoughts..." : "Join the discussion... (@ to mention)"}
+                                    className="w-full text-base p-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue transition-all resize-none mb-2 bg-white"
+                                    value={replyContent}
+                                    onChange={setReplyContent}
+                                    onKeyDown={(e) => {
+                                        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                                            e.preventDefault();
+                                            // @ts-ignore
+                                            handleReply(e);
+                                        }
+                                    }}
+                                />
 
                                 {replyAttachments.length > 0 && (
                                     <div className="flex gap-2 mb-3 flex-wrap">

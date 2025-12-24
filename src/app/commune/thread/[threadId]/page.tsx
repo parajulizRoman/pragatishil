@@ -10,7 +10,7 @@ import { flagContent, votePost, toggleThreadInteraction, toggleReaction } from "
 import Link from "next/link";
 import Image from "next/image";
 import { X, Shield, User, Crown, Paperclip, FileText, Image as ImageIcon, Loader2, MessageSquare, Heart, Bookmark, EyeOff, Flag, ArrowLeft, ArrowUp, ArrowDown } from "lucide-react";
-import TextareaAutosize from 'react-textarea-autosize';
+import MentionAutocomplete from "@/components/ui/MentionAutocomplete";
 import { Skeleton } from "@/components/ui/skeleton";
 import PostActions from "@/components/PostActions";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -560,24 +560,21 @@ export default function ThreadPage() {
                                         </div>
                                     ) : (
                                         <form onSubmit={handleReply}>
-                                            <div className="relative">
-                                                <TextareaAutosize
-                                                    minRows={3}
-                                                    maxRows={10}
-                                                    placeholder={!isAuthenticated ? t("आफ्नो बेनामी विचारहरू साझा गर्नुहोस्...", "Share your anonymous thoughts...") : t("यहाँ आफ्नो जवाफ टाइप गर्नुहोस्...", "Type your reply here...")}
-                                                    className="w-full text-base bg-transparent focus:outline-none resize-none mb-2"
-                                                    value={replyContent}
-                                                    onChange={e => setReplyContent(e.target.value)}
-                                                    onKeyDown={(e) => {
-                                                        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                                                            e.preventDefault();
-                                                            // @ts-ignore
-                                                            handleReply(e);
-                                                        }
-                                                    }}
-                                                    autoFocus
-                                                />
-                                            </div>
+                                            <MentionAutocomplete
+                                                minRows={3}
+                                                maxRows={10}
+                                                placeholder={!isAuthenticated ? t("आफ्नो बेनामी विचारहरू साझा गर्नुहोस्...", "Share your anonymous thoughts...") : t("यहाँ आफ्नो जवाफ टाइप गर्नुहोस्... (@ ले सदस्य उल्लेख गर्न)", "Type your reply here... (@ to mention members)")}
+                                                className="w-full text-base bg-transparent focus:outline-none resize-none mb-2 border-0 focus:ring-0"
+                                                value={replyContent}
+                                                onChange={setReplyContent}
+                                                onKeyDown={(e) => {
+                                                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                                                        e.preventDefault();
+                                                        // @ts-ignore
+                                                        handleReply(e);
+                                                    }
+                                                }}
+                                            />
 
                                             {replyAttachments.length > 0 && (
                                                 <div className="flex gap-2 mb-3 flex-wrap">
