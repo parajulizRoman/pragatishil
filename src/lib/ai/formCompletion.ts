@@ -56,30 +56,52 @@ export async function completeArticle(input: ArticleCompletionInput): Promise<Ar
         throw new Error("At least one field must be provided for AI completion");
     }
 
-    const prompt = `You are a helpful assistant for a Nepali political party website. 
-Based on the following article content, generate ALL MISSING fields. This is COMPREHENSIVE - use any available context to fill all gaps:
+    const prompt = `You are a translator and content writer for a Nepali political party website.
 
+CURRENT INPUT:
 ${context.join("\n\n")}
 
-Generate the following as valid JSON. For EACH field:
-- If the corresponding field is MISSING from the input, generate it from the available context
-- If the corresponding field is already in the input, return null for that field
+YOUR TASK: Generate ALL missing fields as JSON. For each field:
+- If the field is MISSING from input → Generate it
+- If the field is ALREADY in input → Return null
 
-Fields to generate:
-1. title_en: English title - Generate from Nepali title OR from body content if missing
-2. title_ne: Nepali title - Generate from English title OR from body content if missing
-3. body_en: English body - Generate from Nepali body if missing
-4. body_ne: Nepali body - Generate from English body if missing  
-5. summary_en: English summary - ALWAYS generate a 2-3 sentence summary from available content
-6. summary_ne: Nepali summary - ALWAYS generate a 2-3 sentence summary from available content
-7. suggested_tags: An array of 3-5 relevant topic tags in English (lowercase, use underscores)
+FIELDS TO GENERATE:
 
-IMPORTANT RULES:
-- summary_en and summary_ne should ALWAYS be generated (never return null for these)
-- Use ANY available context (title, body, or both) to generate missing fields
-- Generate title from body if title is missing but body is available
-- Translations should be natural and fluent, not word-for-word
-- Tags should be relevant to Nepali politics and governance topics`;
+1. title_en: English title
+   - If Nepali title exists, TRANSLATE it to English
+   - If only body content exists, create an appropriate title
+
+2. title_ne: Nepali title  
+   - If English title exists, TRANSLATE it to Nepali
+   - If only body content exists, create an appropriate title in Nepali
+
+3. body_en: English body content
+   - If Nepali body exists, provide a COMPLETE FULL TRANSLATION (not a summary!)
+   - The translation should preserve ALL paragraphs and details from the original
+   - Match the length and structure of the original content
+
+4. body_ne: Nepali body content
+   - If English body exists, provide a COMPLETE FULL TRANSLATION (not a summary!)
+   - The translation should preserve ALL paragraphs and details from the original
+   - Match the length and structure of the original content
+
+5. summary_en: English summary
+   - Generate a SHORT 2-3 sentence summary of the article content
+   - This is DIFFERENT from body - it should be a brief overview only
+   - ALWAYS generate this (never return null)
+
+6. summary_ne: Nepali summary
+   - Generate a SHORT 2-3 sentence summary in Nepali
+   - This is DIFFERENT from body - it should be a brief overview only  
+   - ALWAYS generate this (never return null)
+
+7. suggested_tags: Array of 3-5 topic tags in English (lowercase, use underscores)
+
+CRITICAL RULES:
+- body_en and body_ne are FULL TRANSLATIONS, preserving all content and length
+- summary_en and summary_ne are SHORT overviews (2-3 sentences only)
+- Translations should be natural and fluent
+- ALWAYS generate summaries even if other fields exist`;
 
 
     const responseSchema: Schema = {
