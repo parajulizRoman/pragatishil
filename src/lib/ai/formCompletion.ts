@@ -57,25 +57,30 @@ export async function completeArticle(input: ArticleCompletionInput): Promise<Ar
     }
 
     const prompt = `You are a helpful assistant for a Nepali political party website. 
-Based on the following article content, generate the missing fields. This is BIDIRECTIONAL translation:
-- If English is provided, generate Nepali
-- If Nepali is provided, generate English
+Based on the following article content, generate ALL MISSING fields. This is COMPREHENSIVE - use any available context to fill all gaps:
 
 ${context.join("\n\n")}
 
-Generate the following as valid JSON:
-1. title_en: English title (if only Nepali title was provided, translate to English; otherwise null)
-2. title_ne: Nepali title (if only English title was provided, translate to Nepali; otherwise null)
-3. body_en: English body content (if only Nepali body was provided, translate to English; otherwise null)
-4. body_ne: Nepali body content (if only English body was provided, translate to Nepali; otherwise null)
-5. summary_en: A concise 2-3 sentence summary in English
-6. summary_ne: A concise 2-3 sentence summary in Nepali
-7. suggested_tags: An array of 3-5 relevant topic tags in English (lowercase, no spaces, use underscores)
+Generate the following as valid JSON. For EACH field:
+- If the corresponding field is MISSING from the input, generate it from the available context
+- If the corresponding field is already in the input, return null for that field
 
-Important:
-- If a field is already provided in the input, return null for that field
+Fields to generate:
+1. title_en: English title - Generate from Nepali title OR from body content if missing
+2. title_ne: Nepali title - Generate from English title OR from body content if missing
+3. body_en: English body - Generate from Nepali body if missing
+4. body_ne: Nepali body - Generate from English body if missing  
+5. summary_en: English summary - ALWAYS generate a 2-3 sentence summary from available content
+6. summary_ne: Nepali summary - ALWAYS generate a 2-3 sentence summary from available content
+7. suggested_tags: An array of 3-5 relevant topic tags in English (lowercase, use underscores)
+
+IMPORTANT RULES:
+- summary_en and summary_ne should ALWAYS be generated (never return null for these)
+- Use ANY available context (title, body, or both) to generate missing fields
+- Generate title from body if title is missing but body is available
 - Translations should be natural and fluent, not word-for-word
-- Tags should be relevant to Nepali politics and governance topics when applicable`;
+- Tags should be relevant to Nepali politics and governance topics`;
+
 
     const responseSchema: Schema = {
         type: Type.OBJECT,
