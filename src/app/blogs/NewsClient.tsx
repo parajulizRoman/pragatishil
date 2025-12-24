@@ -7,18 +7,22 @@ import { createBrowserClient } from "@supabase/ssr";
 import { useLanguage } from "@/context/LanguageContext";
 import { NewsItem } from "@/types";
 import { canManageChannels, canDeleteContent } from "@/lib/permissions";
-import { Calendar, ExternalLink, Pencil, Trash2, Search, X, Filter } from "lucide-react";
+import { Calendar, ExternalLink, Pencil, Trash2, Search, X, Filter, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface NewsClientProps {
     initialNews: NewsItem[];
+    userRole?: string | null;
+    userId?: string | null;
 }
 
-export default function NewsClient({ initialNews }: NewsClientProps) {
+export default function NewsClient({ initialNews, userRole: serverUserRole, userId }: NewsClientProps) {
     const { t } = useLanguage();
     const [newsItems, setNewsItems] = useState(initialNews);
-    const [userRole, setUserRole] = useState<string | null>(null);
+    const [userRole, setUserRole] = useState<string | null>(serverUserRole || null);
     const [editingItem, setEditingItem] = useState<NewsItem | null>(null);
+    const [statusFilter, setStatusFilter] = useState<string>("");
 
     // Search & Filter state
     const [searchQuery, setSearchQuery] = useState("");
@@ -47,16 +51,22 @@ export default function NewsClient({ initialNews }: NewsClientProps) {
                 item.summary_ne?.includes(searchQuery);
             const matchesType = !typeFilter || item.type === typeFilter;
             const matchesSource = !sourceFilter || item.source === sourceFilter;
-            return matchesSearch && matchesType && matchesSource;
+            const matchesStatus = !statusFilter || item.status === statusFilter;
+            return matchesSearch && matchesType && matchesSource && matchesStatus;
         });
-    }, [newsItems, searchQuery, typeFilter, sourceFilter]);
+    }, [newsItems, searchQuery, typeFilter, sourceFilter, statusFilter]);
 
-    const hasActiveFilters = searchQuery || typeFilter || sourceFilter;
+    const hasActiveFilters = searchQuery || typeFilter || sourceFilter || statusFilter;
+
+    // Count pending reviews
+    const pendingReviewCount = newsItems.filter(item => item.status === 'submitted').length;
+    const canReview = ["admin", "yantrik", "admin_party", "board"].includes(userRole || "");
 
     const clearFilters = () => {
         setSearchQuery("");
         setTypeFilter("");
         setSourceFilter("");
+        setStatusFilter("");
     };
 
     useEffect(() => {
@@ -153,6 +163,21 @@ export default function NewsClient({ initialNews }: NewsClientProps) {
                         ))}
                     </select>
 
+                    {/* Status Filter - Only for reviewers */}
+                    {canReview && pendingReviewCount > 0 && (
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            className={`px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue bg-white text-slate-700 ${statusFilter === 'submitted' ? 'border-amber-400 bg-amber-50' : 'border-slate-200'}`}
+                        >
+                            <option value="">{t("सबै स्थिति", "All Status")}</option>
+                            <option value="published">{t("प्रकाशित", "Published")}</option>
+                            <option value="submitted">
+                                {t(`समीक्षाको लागि (${pendingReviewCount})`, `Pending Review (${pendingReviewCount})`)}
+                            </option>
+                        </select>
+                    )}
+
                     {/* Clear Filters */}
                     {hasActiveFilters && (
                         <Button
@@ -232,8 +257,16 @@ export default function NewsClient({ initialNews }: NewsClientProps) {
                                 )}
 
                                 {/* Type Pill */}
-                                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-brand-blue text-xs font-bold px-3 py-1 rounded-full shadow-sm z-10">
-                                    {item.type}
+                                <div className="absolute top-4 right-4 flex gap-2 z-10">
+                                    {item.status === 'submitted' && (
+                                        <Badge className="bg-amber-500 hover:bg-amber-600 text-white font-semibold shadow-sm flex items-center gap-1">
+                                            <Clock className="w-3 h-3" />
+                                            {t("समीक्षा बाँकी", "Pending Review")}
+                                        </Badge>
+                                    )}
+                                    <div className="bg-white/90 backdrop-blur text-brand-blue text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                                        {item.type}
+                                    </div>
                                 </div>
 
                                 {/* Edit/Delete buttons */}
