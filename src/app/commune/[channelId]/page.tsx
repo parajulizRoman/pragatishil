@@ -8,7 +8,7 @@ import { DiscussionThread, DiscussionChannel } from "@/types";
 import { createBrowserClient } from "@supabase/ssr";
 import { flagContent, votePost } from "@/app/commune/actions";
 import TextareaAutosize from 'react-textarea-autosize';
-import { Paperclip, X, FileText, Image as ImageIcon, Loader2, ArrowLeft, MessageSquare, ThumbsUp, ThumbsDown, Flag } from "lucide-react";
+import { Paperclip, X, FileText, Image as ImageIcon, Loader2, ArrowLeft, MessageSquare, ThumbsUp, ThumbsDown, Flag, Users } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,8 @@ import { Typography } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
+import ChannelMembersModal from "../ChannelMembersModal";
+import { canManageChannels } from "@/lib/permissions";
 
 export default function ChannelPage() {
     const params = useParams();
@@ -48,14 +50,26 @@ export default function ChannelPage() {
 
     // Auth check
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userRole, setUserRole] = useState<string>('guest');
+
+    // Members modal
+    const [showMembersModal, setShowMembersModal] = useState(false);
 
     useEffect(() => {
         const supabase = createBrowserClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         );
-        supabase.auth.getUser().then(({ data }) => {
+        supabase.auth.getUser().then(async ({ data }) => {
             setIsAuthenticated(!!data.user);
+            if (data.user) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', data.user.id)
+                    .single();
+                setUserRole(profile?.role || 'guest');
+            }
         });
     }, []);
 
@@ -260,6 +274,7 @@ export default function ChannelPage() {
     if (error || !channel) return <div className="p-10 text-center text-destructive font-medium">Error: {error || "Channel Not Found"}</div>;
 
     const canCreateThread = isAuthenticated || channel.min_role_to_create_threads === 'anonymous_visitor';
+    const canManageMembers = canManageChannels(userRole);
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-5xl min-h-[80vh]">
@@ -282,6 +297,16 @@ export default function ChannelPage() {
                             className="bg-brand-red hover:bg-brand-red/90 text-white"
                         >
                             {t("नयाँ थ्रेड", "New Thread")}
+                        </Button>
+                    )}
+                    {canManageMembers && (channel as any).access_type === 'private' && (
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowMembersModal(true)}
+                            className="border-brand-blue text-brand-blue hover:bg-brand-blue/5"
+                        >
+                            <Users className="mr-2 h-4 w-4" />
+                            {t("सदस्यहरू व्यवस्थापन", "Manage Members")}
                         </Button>
                     )}
                 </div>
@@ -653,6 +678,14 @@ export default function ChannelPage() {
                     </Card>
                 </div>
             )}
+
+            {/* Channel Members Modal */}
+            <ChannelMembersModal
+                isOpen={showMembersModal}
+                onClose={() => setShowMembersModal(false)}
+                channelId={channelId}
+                channelName={channel?.name || ''}
+            />
         </div>
     );
 }
