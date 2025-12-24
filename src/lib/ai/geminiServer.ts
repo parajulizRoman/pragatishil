@@ -31,28 +31,42 @@ export interface VoterIdResult {
 // ... existing code ...
 
 export async function parseVoterId(base64Image: string, imgMimeType: string): Promise<VoterIdResult> {
-    const prompt = `You are a Nepali document reader AI. Read the attached ID Card (Citizenship or Voter ID) carefully.
-     Extract the following details as valid JSON:
-       - name_ne
-       - name_en
-       - dob_bs (e.g. 2045/10/12)
-       - dob_ad (if available)
-       - citizenship_number
-       - voter_id_number
-       - father_name
-       - mother_name
-       - spouse_name
-       - address_full
-       - province
-       - district
-       - municipality
-       - ward
-       - gender_raw (Exact text for gender e.g. 'Male', 'Female', 'Purush', 'Mahila')
-       - gender_code (Normalize to: 'male', 'female', 'third_gender', 'other')
-       - inclusion_clues (Array of strings: any derived ethnicity/caste context from Surname or direct text, e.g. 'Tharu', 'Yadav', 'Sherpa')
+    const prompt = `You are an expert Nepali document reader AI. Analyze this ID document (Citizenship card, Voter ID, or National ID) carefully.
 
-     Return only strict JSON with snake_case keys, no extra text.
-     If a field is missing, set it to null.`;
+IMPORTANT: Extract ALL fields even if they appear in Nepali (Devanagari) script. Convert Nepali numbers to Arabic numerals.
+
+Required fields to extract:
+1. full_name / name_en - Full name in English (transliterate if in Nepali)
+2. name_ne - Name in Nepali (if visible)
+3. date_of_birth / dob_bs - Date of birth in BS (Bikram Sambat), format: YYYY/MM/DD or YYYY-MM-DD
+4. dob_ad - Date in AD if available
+5. citizenship_number - The citizenship number (नागरिकता नं., often like "123-456-78901" or similar)  
+6. voter_id_number - Voter ID number if on the document
+
+ADDRESS - Extract carefully:
+7. address_full - Complete address as written
+8. province - Province/प्रदेश (1-7 or name like "Bagmati", "Koshi", etc.)
+   - If document is old format without province, INFER from old district list:
+     * Province 1 (Koshi): Bhojpur, Dhankuta, Ilam, Jhapa, Khotang, Morang, Okhaldhunga, Panchthar, Sankhuwasabha, Solukhumbu, Sunsari, Taplejung, Terhathum, Udayapur
+     * Province 2 (Madhesh): Bara, Dhanusha, Mahottari, Parsa, Rautahat, Saptari, Sarlahi, Siraha
+     * Bagmati: Bhaktapur, Chitwan, Dhading, Dolakha, Kathmandu, Kavrepalanchok, Lalitpur, Makwanpur, Nuwakot, Ramechhap, Rasuwa, Sindhuli, Sindhupalchok
+     * Gandaki: Baglung, Gorkha, Kaski, Lamjung, Manang, Mustang, Myagdi, Nawalpur, Parbat, Syangja, Tanahun
+     * Lumbini: Arghakhanchi, Banke, Bardiya, Dang, Eastern Rukum, Gulmi, Kapilvastu, Nawalparasi West, Palpa, Pyuthan, Rolpa, Rupandehi
+     * Karnali: Dailekh, Dolpa, Humla, Jajarkot, Jumla, Kalikot, Mugu, Salyan, Surkhet, Western Rukum
+     * Sudurpashchim: Achham, Baitadi, Bajhang, Bajura, Dadeldhura, Darchula, Doti, Kailali, Kanchanpur
+9. district - District/जिल्ला name
+10. municipality - Municipality (नगरपालिका/गाउँपालिका) name - Look for words ending in "नगरपालिका", "गाँउपालिका", "Municipality", "Rural Municipality" 
+11. ward - Ward number (वडा नं.) - Usually a number like ५ or 5
+
+DEMOGRAPHICS:
+12. gender_raw - Exact text for gender (e.g., "Male", "Female", "Purush", "Mahila", "पुरुष", "महिला")
+13. gender_code - Normalize to: 'male', 'female', 'third_gender', 'other'
+14. inclusion_clues - Array of ethnicity/caste hints from surname (e.g., ['Tamang'], ['Rai'], ['Yadav'])
+
+15. raw_text - All readable text on the document
+
+Return ONLY valid JSON with snake_case keys. If a field is not visible or cannot be extracted, set it to null.
+Do NOT leave citizenship_number as null if you can see any ID number - old cards show it differently.`;
 
     const responseSchema: Schema = {
         type: Type.OBJECT,
