@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import {
-    canReplyToConversation,
-    hasFullHistoryAccess,
-    INACTIVITY_MINUTES
-} from "@/lib/roleHierarchy";
+import { canReplyToConversation } from "@/lib/roleHierarchy";
 
 /**
  * Get messages for a specific conversation
@@ -23,16 +19,6 @@ export async function GET(
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user role
-    const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-
-    const userRole = profile?.role || 'guest';
-    const hasFullAccess = hasFullHistoryAccess(userRole);
-
     // Check if user is participant
     const { data: participation } = await supabase
         .from("conversation_participants")
@@ -45,33 +31,7 @@ export async function GET(
         return NextResponse.json({ error: "Not a participant" }, { status: 403 });
     }
 
-    // Get conversation details including last_message_at
-    const { data: conversation } = await supabase
-        .from("conversations")
-        .select("last_message_at, status")
-        .eq("id", conversationId)
-        .single();
-
-    // Check inactivity for non-leadership roles
-    let isExpired = false;
-    let timeRemainingMs = 0;
-
-    if (!hasFullAccess && conversation?.last_message_at) {
-        const lastMessageTime = new Date(conversation.last_message_at).getTime();
-        const now = Date.now();
-        const expiresAt = lastMessageTime + (INACTIVITY_MINUTES * 60 * 1000);
-        timeRemainingMs = expiresAt - now;
-        isExpired = timeRemainingMs <= 0;
-    }
-
-    // If expired for this user, return empty with status
-    if (isExpired) {
-        return NextResponse.json({
-            messages: [],
-            conversationStatus: 'closed',
-            reason: 'Conversation inactive for more than 5 minutes'
-        });
-    }
+    // NOTE: Inactivity timeout disabled - all participants can see all messages
 
     const { searchParams } = new URL(request.url);
     const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
@@ -122,8 +82,7 @@ export async function GET(
     // Reverse to show oldest first in UI
     return NextResponse.json({
         messages: (messages || []).reverse(),
-        conversationStatus: 'open',
-        timeRemainingMs: hasFullAccess ? null : timeRemainingMs
+        conversationStatus: 'open'
     });
 }
 

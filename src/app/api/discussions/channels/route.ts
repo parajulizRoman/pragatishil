@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { DiscussionChannel } from "@/types";
 import { canManageChannels } from "@/lib/permissions";
 import { supabaseAdmin } from "@/lib/supabase/serverAdmin";
+import { ROLE_LEVELS } from "@/lib/roleHierarchy";
 
 export async function GET(request: Request) {
     try {
@@ -13,28 +14,82 @@ export async function GET(request: Request) {
 
         const supabase = await createClient();
 
+        // Get current user and role
+        const { data: { user } } = await supabase.auth.getUser();
+        let userRole = 'guest';
+        let userMemberships: string[] = [];
+
+        if (user) {
+            // Get user profile
+            const { data: profile } = await supabase
+                .from("profiles")
+                .select("role")
+                .eq("id", user.id)
+                .single();
+            userRole = profile?.role || 'guest';
+
+            // Get user's private channel memberships
+            const { data: memberships } = await supabase
+                .from("channel_members")
+                .select("channel_id")
+                .eq("user_id", user.id);
+            userMemberships = (memberships || []).map(m => m.channel_id);
+        }
+
+        const userLevel = ROLE_LEVELS[userRole] || 0;
+
+        // Fetch all channels first, then filter
         let query = supabase
             .from("discussion_channels")
             .select("*, resources:discussion_channel_resources(*)");
 
-        if (id) {
-            query = query.eq("id", id);
-        }
-        if (slug) {
-            query = query.eq("slug", slug);
-        }
+        if (id) query = query.eq("id", id);
+        if (slug) query = query.eq("slug", slug);
 
-        // Add explicit type assertion for result
-        const { data: channels, error } = await query.order("created_at", { ascending: true });
+        const { data: allChannels, error } = await query.order("created_at", { ascending: true });
 
         if (error) {
             console.error("Error fetching channels:", error);
-            // If the error is regarding "discussion_channel_resources", it might be RLS
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        return NextResponse.json({ channels: channels as DiscussionChannel[] });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // Filter channels by access
+        const accessibleChannels = (allChannels || []).filter(channel => {
+            // Public: everyone
+            if (channel.access_type === 'public' || channel.visibility === 'public') {
+                return true;
+            }
+
+            // Not logged in: only public
+            if (!user) return false;
+
+            // Members: any logged-in user
+            if (channel.access_type === 'members') {
+                return true;
+            }
+
+            // Role-based: check level
+            if (channel.access_type === 'role_based') {
+                return userLevel >= (channel.min_role_level || 0);
+            }
+
+            // Private: check membership
+            if (channel.access_type === 'private') {
+                return userMemberships.includes(channel.id);
+            }
+
+            // Legacy visibility fallback
+            if (channel.visibility === 'logged_in' || channel.visibility === 'members') {
+                return !!user;
+            }
+            if (['party_only', 'central_committee', 'board_only', 'leadership', 'internal'].includes(channel.visibility)) {
+                return userLevel >= 2; // ward_committee+
+            }
+
+            return true;
+        });
+
+        return NextResponse.json({ channels: accessibleChannels as DiscussionChannel[] });
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }

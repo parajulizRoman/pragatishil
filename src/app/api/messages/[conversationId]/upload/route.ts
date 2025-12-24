@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-
-// Roles that can use messaging
-const MESSAGING_ROLES = ['party_member', 'team_member', 'central_committee', 'board', 'admin_party', 'admin', 'yantrik'];
+import { canReplyToConversation } from "@/lib/roleHierarchy";
 
 // Allowed file types
 const ALLOWED_TYPES = [
@@ -33,15 +31,16 @@ export async function POST(
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Check role
+    // Check role using role hierarchy
     const { data: profile } = await supabase
         .from("profiles")
         .select("role")
         .eq("id", user.id)
         .single();
 
-    if (!profile?.role || !MESSAGING_ROLES.includes(profile.role)) {
-        return NextResponse.json({ error: "Messaging requires party_member role or higher" }, { status: 403 });
+    const userRole = profile?.role || 'guest';
+    if (!canReplyToConversation(userRole)) {
+        return NextResponse.json({ error: "Messaging requires ward_committee level or higher" }, { status: 403 });
     }
 
     // Check if user is participant

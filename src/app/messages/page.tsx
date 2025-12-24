@@ -255,6 +255,11 @@ export default function MessagesPage() {
                 if (res.ok && isMounted) {
                     const data = await res.json();
                     setMessages(data.messages || []);
+
+                    // Reset unread count for this conversation in the sidebar
+                    setConversations(prev => prev.map(conv =>
+                        conv.id === activeId ? { ...conv, unreadCount: 0 } : conv
+                    ));
                 }
             } catch (e) {
                 console.error("Fetch messages error:", e);

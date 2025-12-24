@@ -121,12 +121,12 @@ export default async function AuditLogsPage({ searchParams }: { searchParams: { 
                                     <td className="px-6 py-4">
                                         <span className={`inline-block px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider 
                                             ${getActionColor(log.action_type)}`}>
-                                            {log.action_type.replace(/_/g, " ")}
+                                            {(log.action_type || 'unknown').replace(/_/g, " ")}
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 text-xs text-slate-600">
-                                        {log.target_type}
-                                        <span className="block text-[10px] text-slate-400 font-mono mt-0.5">{log.target_id.slice(0, 8)}...</span>
+                                        {log.target_type || 'N/A'}
+                                        <span className="block text-[10px] text-slate-400 font-mono mt-0.5">{log.target_id?.slice(0, 8) || '?'}...</span>
                                     </td>
                                     <td className="px-6 py-4 text-xs text-slate-500 max-w-xs overflow-hidden text-ellipsis italic">
                                         {log.reason || "N/A"}

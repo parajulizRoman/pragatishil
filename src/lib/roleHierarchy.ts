@@ -4,7 +4,9 @@
  */
 
 // Role levels (0 = lowest, 11 = highest)
+// Includes both new names and legacy names for backward compatibility
 export const ROLE_LEVELS: Record<string, number> = {
+    // New role names
     'guest': 0,
     'supporter': 1,
     'ward_committee': 2,
@@ -16,7 +18,14 @@ export const ROLE_LEVELS: Record<string, number> = {
     'admin_panel': 8,
     'advisor_board': 9,
     'yantrik': 10,
-    'admin': 11
+    'admin': 11,
+
+    // Legacy role names (backward compatibility)
+    'member': 2,           // maps to ward_committee level
+    'party_member': 2,     // maps to ward_committee level
+    'team_member': 3,      // maps to palika_committee level
+    'board': 9,            // maps to advisor_board level
+    'admin_party': 8       // maps to admin_panel level
 };
 
 // Who can each role initiate conversations with?
@@ -40,7 +49,11 @@ export const MESSAGING_PERMISSIONS: Record<string, string[]> = {
 export const FULL_ACCESS_ROLES = ['admin'];
 
 // Roles that can see full message history (no inactivity timeout)
-export const LEADERSHIP_ROLES = ['central_committee', 'department', 'admin_panel', 'advisor_board', 'yantrik', 'admin'];
+// Includes legacy role names for backward compatibility
+export const LEADERSHIP_ROLES = [
+    'central_committee', 'department', 'admin_panel', 'advisor_board', 'yantrik', 'admin',
+    'board', 'admin_party' // Legacy names
+];
 
 // Inactivity timeout in minutes for non-leadership
 export const INACTIVITY_MINUTES = 5;
