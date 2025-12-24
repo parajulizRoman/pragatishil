@@ -127,10 +127,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: "Valid userId required" }, { status: 400 });
     }
 
-    // Check if other user can also use messaging
-    if (!await canUseMessaging(supabase, userId)) {
-        return NextResponse.json({ error: "Cannot message this user (insufficient role)" }, { status: 403 });
-    }
+    // Note: All members can RECEIVE messages, only sender needs party_member+ role
+    // No target role check needed
 
     // Check if conversation already exists
     const { data: existingConv } = await supabase.rpc('find_existing_conversation', {

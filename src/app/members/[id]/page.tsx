@@ -156,7 +156,6 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                             </div>
                             <ProfileActions
                                 targetUserId={target.id}
-                                targetRole={target.role}
                                 isOwner={isOwner}
                                 canManageUsers={canManageUsers(viewerRole)}
                                 canManageCms={canManageCms(viewerRole)}

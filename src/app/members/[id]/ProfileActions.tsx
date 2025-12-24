@@ -12,7 +12,6 @@ const MESSAGING_ROLES = ['party_member', 'team_member', 'central_committee', 'bo
 
 interface ProfileActionsProps {
     targetUserId: string;
-    targetRole: string | null;
     isOwner: boolean;
     canManageUsers: boolean;
     canManageCms: boolean;
@@ -23,7 +22,6 @@ interface ProfileActionsProps {
  */
 export default function ProfileActions({
     targetUserId,
-    targetRole,
     isOwner,
     canManageUsers,
     canManageCms
@@ -52,16 +50,11 @@ export default function ProfileActions({
         });
     }, []);
 
-    // Check messaging eligibility
+    // Check messaging eligibility - only sender needs party_member+ role
+    // All members can RECEIVE messages, only party_member+ can SEND
     const viewerCanMessage = viewerRole && MESSAGING_ROLES.includes(viewerRole);
-    const targetCanMessage = targetRole && MESSAGING_ROLES.includes(targetRole);
 
     const handleMessage = async () => {
-        if (!targetCanMessage) {
-            alert("This member's role doesn't support direct messaging. Only party members and above can receive messages.");
-            return;
-        }
-
         setMessaging(true);
         try {
             const res = await fetch("/api/messages/conversations", {
@@ -91,16 +84,13 @@ export default function ProfileActions({
                 <FollowButton userId={targetUserId} showCounts />
             )}
 
-            {/* Message Button - show for party_member+ viewers */}
+            {/* Message Button - show for party_member+ viewers (all members can receive) */}
             {!isOwner && viewerLoaded && viewerCanMessage && (
                 <button
                     onClick={handleMessage}
                     disabled={messaging}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border shadow-sm ${targetCanMessage
-                        ? "bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
-                        : "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
-                        }`}
-                    title={!targetCanMessage ? "This member cannot receive messages (requires party_member role or higher)" : "Send a message"}
+                    className="px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border shadow-sm bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+                    title="Send a message"
                 >
                     {messaging ? (
                         <Loader2 size={16} className="animate-spin" />
