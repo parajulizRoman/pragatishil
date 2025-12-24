@@ -14,6 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { convertADtoBS } from "@/lib/dateConverter";
 import Image from "next/image";
 import { NewsAttachment } from "@/types";
+import { cn } from "@/lib/utils";
 
 const DRAFT_KEY = "pragatishil_article_draft";
 
@@ -65,7 +66,7 @@ export default function WritePage() {
     const [admins, setAdmins] = useState<any[]>([]);
     const [selectedAdmin, setSelectedAdmin] = useState("");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const [myDrafts, setMyDrafts] = useState<any[]>([]);
+    const [myArticles, setMyArticles] = useState<any[]>([]);
     const [editingId, setEditingId] = useState<number | null>(null);
 
     // Check auth and load draft
@@ -108,38 +109,17 @@ export default function WritePage() {
 
             if (adminList) setAdmins(adminList);
 
-            // Load user's drafts from database
-            // Try status first (new schema), fallback to is_published (old schema)
-            let drafts = null;
-            let draftsError = null;
-
-            // Try with status column first - ONLY current user's drafts
-            const result1 = await supabase
+            // Load ALL user's articles from database (draft, submitted, published)
+            const { data: articles, error: articlesError } = await supabase
                 .from("news_items")
-                .select("id, title, title_ne, summary_en, date, author_id")
-                .eq("status", "draft")
-                .eq("author_id", user.id)  // Only show user's own drafts
-                .order("date", { ascending: false })
-                .limit(10);
+                .select("id, title, title_ne, status, date, updated_at, pending_reviewer_id, content_type")
+                .eq("author_id", user.id)
+                .in("content_type", ["article"])  // Only articles, not official news
+                .order("updated_at", { ascending: false })
+                .limit(20);
 
-            if (result1.error) {
-                // Fallback to is_published for old schema
-                const result2 = await supabase
-                    .from("news_items")
-                    .select("id, title, title_ne, summary_en, date, author_id")
-                    .eq("is_published", false)
-                    .eq("author_id", user.id)  // Only show user's own drafts
-                    .order("date", { ascending: false })
-                    .limit(10);
-                drafts = result2.data;
-                draftsError = result2.error;
-            } else {
-                drafts = result1.data;
-                draftsError = result1.error;
-            }
-
-            console.log("Drafts query:", { drafts, draftsError, userId: user.id });
-            if (drafts) setMyDrafts(drafts);
+            console.log("Articles query:", { articles, articlesError, userId: user.id });
+            if (articles) setMyArticles(articles);
 
             // Load draft from localStorage
             const savedDraft = localStorage.getItem(DRAFT_KEY);
@@ -555,50 +535,79 @@ Document Analysis:
                     )}
                 </div>
 
-                {/* My Drafts Section */}
-                {myDrafts.length > 0 && !editingId && (
-                    <div className="bg-amber-50 rounded-2xl border border-amber-200 p-4 mb-6">
-                        <h3 className="font-semibold text-amber-800 mb-3 flex items-center gap-2">
-                            📝 {t(`तपाईंका सुरक्षित ड्राफ्टहरू (${myDrafts.length})`, `Your Saved Drafts (${myDrafts.length})`)}
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {myDrafts.map((draft) => (
+                {/* My Articles Section */}
+                {(myArticles.length > 0 || editingId) && (
+                    <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4 mb-6">
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+                                📝 {t("तपाईंका लेखहरू", "Your Articles")} ({myArticles.length})
+                            </h3>
+                            {editingId && (
                                 <button
-                                    key={draft.id}
-                                    onClick={() => loadDraft(draft.id)}
-                                    className="text-left p-3 bg-white rounded-lg border border-amber-100 hover:border-amber-300 hover:shadow-sm transition-all"
+                                    onClick={() => {
+                                        setEditingId(null);
+                                        setTitle("");
+                                        setTitleNe("");
+                                        setBodyEn("");
+                                        setBodyNe("");
+                                        setSummaryEn("");
+                                        setImageUrl("");
+                                        setAttachments([]);
+                                        setYoutubeUrl("");
+                                        setSpeakerName("");
+                                        localStorage.removeItem(DRAFT_KEY);
+                                    }}
+                                    className="px-3 py-1.5 bg-brand-blue text-white text-sm rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-1"
                                 >
-                                    <div className="font-medium text-slate-800 truncate">
-                                        {draft.title || "Untitled"}
-                                    </div>
-                                    <div className="text-xs text-slate-500 mt-1">
-                                        {draft.updated_at ? new Date(draft.updated_at).toLocaleDateString() : draft.date}
-                                    </div>
+                                    + {t("नयाँ लेख", "New Article")}
                                 </button>
-                            ))}
+                            )}
                         </div>
-                    </div>
-                )}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {myArticles.map((article) => {
+                                const statusColors: Record<string, string> = {
+                                    draft: "bg-amber-100 text-amber-700 border-amber-200",
+                                    submitted: "bg-blue-100 text-blue-700 border-blue-200",
+                                    published: "bg-green-100 text-green-700 border-green-200",
+                                    rejected: "bg-red-100 text-red-700 border-red-200"
+                                };
+                                const statusLabels: Record<string, string> = {
+                                    draft: t("ड्राफ्ट", "Draft"),
+                                    submitted: t("समीक्षामा", "Under Review"),
+                                    published: t("प्रकाशित", "Published"),
+                                    rejected: t("अस्वीकृत", "Rejected")
+                                };
+                                const isActive = editingId === article.id;
 
-                {/* Editing Indicator */}
-                {editingId && (
-                    <div className="bg-blue-50 rounded-xl border border-blue-200 p-3 mb-6 flex items-center justify-between">
-                        <span className="text-blue-800 font-medium">✏️ Editing draft</span>
-                        <button
-                            onClick={() => {
-                                setEditingId(null);
-                                setTitle("");
-                                setTitleNe("");
-                                setBodyEn("");
-                                setBodyNe("");
-                                setSummaryEn("");
-                                setImageUrl("");
-                                setAttachments([]);
-                            }}
-                            className="text-blue-600 hover:text-blue-800 text-sm underline"
-                        >
-                            Start fresh instead
-                        </button>
+                                return (
+                                    <button
+                                        key={article.id}
+                                        onClick={() => loadDraft(article.id)}
+                                        className={cn(
+                                            "text-left p-3 bg-white rounded-lg border transition-all",
+                                            isActive
+                                                ? "border-brand-blue ring-2 ring-brand-blue/20"
+                                                : "border-slate-200 hover:border-slate-300 hover:shadow-sm"
+                                        )}
+                                    >
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="font-medium text-slate-800 truncate flex-1">
+                                                {article.title || "Untitled"}
+                                            </div>
+                                            <span className={cn(
+                                                "text-[10px] px-1.5 py-0.5 rounded border shrink-0",
+                                                statusColors[article.status || 'draft'] || statusColors.draft
+                                            )}>
+                                                {statusLabels[article.status || 'draft'] || statusLabels.draft}
+                                            </span>
+                                        </div>
+                                        <div className="text-xs text-slate-500 mt-1">
+                                            {article.updated_at ? new Date(article.updated_at).toLocaleDateString() : article.date}
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
                     </div>
                 )}
 
