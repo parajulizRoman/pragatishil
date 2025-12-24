@@ -477,29 +477,15 @@ Document Analysis:
                 attachments: attachments
             });
 
-            // Create notification for the reviewer
-            if (user && result?.id) {
-                const { data: authorProfile } = await supabase
-                    .from('profiles')
-                    .select('full_name')
-                    .eq('id', user.id)
-                    .single();
+            // Notification is now created server-side in cms.ts
 
-                const authorName = authorProfile?.full_name || 'A member';
-
-                await supabase.from('notifications').insert({
-                    user_id: selectedAdmin,
-                    type: 'review_request',
-                    title: 'New Article for Review',
-                    body: `${authorName} submitted "${title.slice(0, 50)}${title.length > 50 ? '...' : ''}" for your review`,
-                    link: `/admin/review/${result.id}`,
-                    actor_id: user.id
-                });
+            if (result?.success) {
+                localStorage.removeItem(DRAFT_KEY);
+                alert("Submitted for review! The reviewer has been notified.");
+                router.push("/blogs");
+            } else {
+                throw new Error("Failed to submit article");
             }
-
-            localStorage.removeItem(DRAFT_KEY);
-            alert("Submitted for review! The reviewer has been notified.");
-            router.push("/blogs");
         } catch (error) {
             alert("Failed to submit: " + (error as Error).message);
         } finally {

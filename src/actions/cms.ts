@@ -207,7 +207,8 @@ export async function upsertNewsItem(item: any) {
         content_type: contentType,
         author_id: author_id,
         visibility: visibility,
-        updated_by: user.id
+        updated_by: user.id,
+        pending_reviewer_id: item.pending_reviewer_id ?? null
     };
 
     const { data: newData, error } = await supabase
@@ -217,6 +218,40 @@ export async function upsertNewsItem(item: any) {
         .single();
 
     if (error) throw new Error(error.message);
+
+    // --- NOTIFICATION FOR REVIEW REQUESTS ---
+    // If status is 'submitted' and pending_reviewer_id is set, notify the reviewer
+    if (finalStatus === 'submitted' && item.pending_reviewer_id) {
+        try {
+            // Get author's name for the notification
+            const { data: authorProfile } = await supabase
+                .from('profiles')
+                .select('full_name')
+                .eq('id', user.id)
+                .single();
+
+            const authorName = authorProfile?.full_name || 'A member';
+
+            // Create notification using admin client to bypass RLS
+            const { error: notifError } = await supabaseAdmin.from('notifications').insert({
+                user_id: item.pending_reviewer_id,
+                type: 'review_request',
+                title: 'New Blog Post for Review',
+                body: `${authorName} submitted "${item.title.slice(0, 50)}${item.title.length > 50 ? '...' : ''}" for your review`,
+                link: `/blogs/${newData.slug}`,
+                actor_id: user.id
+            });
+
+            if (notifError) {
+                console.error("[CMS] Failed to create review notification:", notifError);
+            } else {
+                console.log(`[CMS] Review notification sent to ${item.pending_reviewer_id}`);
+            }
+        } catch (notifErr) {
+            console.error("[CMS] Notification creation exception:", notifErr);
+            // Non-blocking: don't fail the save if notification fails
+        }
+    }
 
     // Audit Log
     await supabaseAdmin.from('audit_logs').insert({
