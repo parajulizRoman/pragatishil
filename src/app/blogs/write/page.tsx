@@ -482,7 +482,6 @@ Document Analysis:
 
         setSubmitting(true);
         try {
-            const supabase = createClient();
             const today = new Date().toISOString().split("T")[0];
             const newsType = contentType === 'article' ? 'Article' : contentType === 'interview' ? 'Interview' : 'Video';
             const link = contentType === 'article' ? '' : youtubeUrl;

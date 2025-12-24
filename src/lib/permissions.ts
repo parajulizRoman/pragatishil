@@ -2,10 +2,11 @@ import { UserRole, ROLE_HIERARCHY, getRoleLevel } from '@/types';
 
 /**
  * Checks if a user has permission to manage channels (Create, Edit, Archive).
- * Minimum Role: Central Committee
+ * Minimum Role: Yantrik (Admin Party, Yantrik, Admin only)
  */
 export function canManageChannels(role: UserRole | string | null | undefined): boolean {
-    return getRoleLevel(role) >= ROLE_HIERARCHY.central_committee;
+    const r = role as UserRole;
+    return ['admin_party', 'yantrik', 'admin'].includes(r);
 }
 
 /**

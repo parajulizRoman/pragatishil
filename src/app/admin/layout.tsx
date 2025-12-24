@@ -15,7 +15,8 @@ import {
     Users,
     UserCog,
     Shield,
-    Skull
+    Skull,
+    Bot
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -51,9 +52,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     // Define Role-Based Access - CMS restricted to yantrik, admin_party, admin only
     const cmsAllowedRoles = ['admin', 'yantrik', 'admin_party'];
     const auditRoles = ['admin']; // STRICT ROOT ONLY
+    const aiPromptRoles = ['admin', 'yantrik']; // AI prompt editing - admin_party excluded
 
     const hasCmsAccess = userRole && cmsAllowedRoles.includes(userRole);
     const canViewAudit = userRole && auditRoles.includes(userRole);
+    const canViewAIPrompts = userRole && aiPromptRoles.includes(userRole);
 
     // Redirect if no CMS access
     if (!hasCmsAccess && !loading) {
@@ -66,6 +69,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: "User Management", href: "/admin/users", icon: UserCog },
         { name: "Council", href: "/admin/council", icon: Users },
         { name: "Audit Logs", href: "/admin/audit", icon: Shield, restricted: true, allowIf: canViewAudit },
+        { name: "AI Prompts", href: "/admin/ai-prompts", icon: Bot, restricted: true, allowIf: canViewAIPrompts },
         { name: "Graveyard", href: "/admin/graveyard", icon: Skull },
         { name: "Site Configuration", href: "/admin/pages", icon: FileText },
         { name: "News Room", href: "/admin/news", icon: Newspaper },

@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { Check, X, Clock, ArrowLeft, Eye, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 
 interface PendingBlog {
     id: number;
@@ -32,7 +31,7 @@ export default function AdminReviewsPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [blogs, setBlogs] = useState<PendingBlog[]>([]);
-    const [userRole, setUserRole] = useState<string | null>(null);
+    const [, setUserRole] = useState<string | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
     const [actionLoading, setActionLoading] = useState<number | null>(null);
 

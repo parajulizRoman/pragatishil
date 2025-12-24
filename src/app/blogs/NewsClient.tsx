@@ -17,7 +17,7 @@ interface NewsClientProps {
     userId?: string | null;
 }
 
-export default function NewsClient({ initialNews, userRole: serverUserRole, userId }: NewsClientProps) {
+export default function NewsClient({ initialNews, userRole: serverUserRole }: NewsClientProps) {
     const { t } = useLanguage();
     const [newsItems, setNewsItems] = useState(initialNews);
     const [userRole, setUserRole] = useState<string | null>(serverUserRole || null);
