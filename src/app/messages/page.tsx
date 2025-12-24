@@ -56,6 +56,115 @@ interface SearchUser {
 
 const PLACEHOLDERS = ["/placeholders/eye-red.svg", "/placeholders/eye-blue.svg"];
 
+// Video URL parsing helpers
+function getYouTubeId(url: string): string | null {
+    const patterns = [
+        /youtube\.com\/watch\?v=([^&]+)/,
+        /youtu\.be\/([^?]+)/,
+        /youtube\.com\/embed\/([^?]+)/,
+        /youtube\.com\/live\/([^?]+)/
+    ];
+    for (const pattern of patterns) {
+        const match = url.match(pattern);
+        if (match) return match[1];
+    }
+    return null;
+}
+
+function getTikTokId(url: string): string | null {
+    const match = url.match(/tiktok\.com\/@[\w.-]+\/video\/(\d+)/);
+    return match ? match[1] : null;
+}
+
+function getFacebookVideoUrl(url: string): string | null {
+    if (url.includes('facebook.com') && (url.includes('/videos/') || url.includes('/watch'))) {
+        return url;
+    }
+    return null;
+}
+
+interface VideoEmbedInfo {
+    type: 'youtube' | 'tiktok' | 'facebook';
+    id: string;
+    originalUrl: string;
+}
+
+function parseVideoUrl(text: string): VideoEmbedInfo | null {
+    const urlMatch = text.match(/(https?:\/\/[^\s]+)/);
+    if (!urlMatch) return null;
+
+    const url = urlMatch[1];
+
+    const ytId = getYouTubeId(url);
+    if (ytId) return { type: 'youtube', id: ytId, originalUrl: url };
+
+    const ttId = getTikTokId(url);
+    if (ttId) return { type: 'tiktok', id: ttId, originalUrl: url };
+
+    const fbUrl = getFacebookVideoUrl(url);
+    if (fbUrl) return { type: 'facebook', id: fbUrl, originalUrl: url };
+
+    return null;
+}
+
+// Video Embed Component
+function VideoEmbed({ video, isOwn }: { video: VideoEmbedInfo; isOwn: boolean }) {
+    if (video.type === 'youtube') {
+        return (
+            <div className="mb-2 rounded-lg overflow-hidden">
+                <iframe
+                    width="280"
+                    height="158"
+                    src={`https://www.youtube.com/embed/${video.id}`}
+                    title="YouTube video"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full max-w-[280px]"
+                />
+            </div>
+        );
+    }
+
+    if (video.type === 'tiktok') {
+        // TikTok requires their embed script, show a link card instead
+        return (
+            <a
+                href={video.originalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                    "flex items-center gap-2 p-2 rounded-lg mb-2",
+                    isOwn ? "bg-blue-500" : "bg-slate-100"
+                )}
+            >
+                <div className="w-8 h-8 bg-black rounded flex items-center justify-center text-white text-xs font-bold">TT</div>
+                <span className={cn("text-sm", isOwn ? "text-white" : "text-slate-700")}>TikTok Video</span>
+            </a>
+        );
+    }
+
+    if (video.type === 'facebook') {
+        // Facebook video - show link card
+        return (
+            <a
+                href={video.originalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={cn(
+                    "flex items-center gap-2 p-2 rounded-lg mb-2",
+                    isOwn ? "bg-blue-500" : "bg-slate-100"
+                )}
+            >
+                <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center text-white text-xs font-bold">FB</div>
+                <span className={cn("text-sm", isOwn ? "text-white" : "text-slate-700")}>Facebook Video</span>
+            </a>
+        );
+    }
+
+    return null;
+}
+
 // Format timestamp helper
 function formatTime(date: Date): string {
     if (isToday(date)) return format(date, "h:mm a");
@@ -568,6 +677,7 @@ export default function MessagesPage() {
                                         const showName = !isOwn && (idx === 0 || messages[idx - 1]?.sender.id !== msg.sender.id);
                                         const hasAttachment = !!msg.attachment_url;
                                         const isImage = msg.attachment_type?.startsWith('image/');
+                                        const videoEmbed = msg.content ? parseVideoUrl(msg.content) : null;
 
                                         return (
                                             <div
@@ -626,6 +736,10 @@ export default function MessagesPage() {
                                                                     </a>
                                                                 )}
                                                             </div>
+                                                        )}
+                                                        {/* Video embed display */}
+                                                        {videoEmbed && (
+                                                            <VideoEmbed video={videoEmbed} isOwn={isOwn} />
                                                         )}
                                                         {msg.content && (
                                                             <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
