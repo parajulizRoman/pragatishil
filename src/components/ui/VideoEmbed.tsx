@@ -99,15 +99,18 @@ export default function VideoEmbed({ url, className = "" }: VideoEmbedProps) {
 }
 
 /**
- * Component to render text with embedded videos
+ * Component to render text with embedded videos and clickable @mentions
  */
 export function RichTextWithVideos({ content }: { content: string }) {
     const urlPattern = /(https?:\/\/[^\s]+)/g;
-    const parts = content.split(urlPattern);
+    const mentionPattern = /@([a-zA-Z][a-zA-Z0-9_]{2,29})/g;
+
+    // First split by URLs
+    const urlParts = content.split(urlPattern);
 
     return (
         <div className="space-y-4">
-            {parts.map((part, index) => {
+            {urlParts.map((part, index) => {
                 if (part.match(urlPattern)) {
                     const video = parseVideoUrl(part);
                     if (video.platform !== 'unknown' && video.embedUrl) {
@@ -130,8 +133,31 @@ export function RichTextWithVideos({ content }: { content: string }) {
                         </a>
                     );
                 }
-                // Regular text
-                return part ? <span key={index}>{part}</span> : null;
+
+                // For regular text, also parse @mentions
+                if (part) {
+                    const mentionParts = part.split(mentionPattern);
+                    return (
+                        <span key={index}>
+                            {mentionParts.map((subPart, subIndex) => {
+                                // Every odd index is a captured mention handle
+                                if (subIndex % 2 === 1) {
+                                    return (
+                                        <a
+                                            key={`${index}-${subIndex}`}
+                                            href={`/members/@${subPart}`}
+                                            className="text-brand-blue font-semibold hover:underline"
+                                        >
+                                            @{subPart}
+                                        </a>
+                                    );
+                                }
+                                return subPart || null;
+                            })}
+                        </span>
+                    );
+                }
+                return null;
             })}
         </div>
     );
