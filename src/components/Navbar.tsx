@@ -7,6 +7,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useSiteSettings } from "@/context/SiteSettingsContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { createBrowserClient } from "@supabase/ssr";
+import NotificationBell from "./NotificationBell";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -76,6 +77,7 @@ export default function Navbar() {
                             </Link>
                             {user ? (
                                 <div className="flex items-center gap-4">
+                                    <NotificationBell />
                                     <Link
                                         href={`/members/${user.id}`}
                                         className="text-sm font-medium text-slate-700 hover:text-brand-blue"

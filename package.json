@@ -16,6 +16,7 @@
     "@supabase/supabase-js": "^2.88.0",
     "cheerio": "^1.0.0",
     "class-variance-authority": "^0.7.1",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
     "framer-motion": "^12.23.26",
     "isomorphic-dompurify": "^2.16.0",

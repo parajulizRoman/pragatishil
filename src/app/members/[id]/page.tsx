@@ -9,6 +9,7 @@ import { Shield, MapPin, Mail, Phone, Crown, User, AtSign, Linkedin, Globe, Brie
 import Link from "next/link";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"; // For public/admin fetch
 import AdminProfileActions from "./AdminProfileActions";
+import ProfileActions from "./ProfileActions";
 import { canManageUsers } from "@/lib/permissions";
 import { canManageCms } from "@/lib/cms-utils";
 import { formatHandle } from "@/lib/handle";
@@ -153,25 +154,12 @@ export default async function ProfilePage({ params }: { params: { id: string } }
                                     />
                                 </div>
                             </div>
-                            <div className="flex gap-2 mb-4">
-                                {(canManageUsers(viewerRole) || canManageCms(viewerRole)) && (
-                                    <Link
-                                        href="/admin"
-                                        className="px-4 py-2 bg-brand-navy text-white hover:bg-slate-800 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-sm"
-                                    >
-                                        <Shield size={16} />
-                                        CMS Admin
-                                    </Link>
-                                )}
-                                {isOwner && (
-                                    <Link
-                                        href="/settings/profile"
-                                        className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition-colors border border-slate-200"
-                                    >
-                                        Edit Profile
-                                    </Link>
-                                )}
-                            </div>
+                            <ProfileActions
+                                targetUserId={target.id}
+                                isOwner={isOwner}
+                                canManageUsers={canManageUsers(viewerRole)}
+                                canManageCms={canManageCms(viewerRole)}
+                            />
                         </div>
 
                         <div>
