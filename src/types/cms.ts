@@ -1,3 +1,4 @@
+import { NewsAttachment, NewsReference } from "@/types";
 
 // Types for Dynamic Site Content (matching siteContent.ts structure but ready for DB)
 
@@ -69,13 +70,23 @@ export interface NewsItem {
     summary_ne: string | null;
     source: string;
     date: string;
-    type: 'Article' | 'Video' | 'Interview';
+    date_bs?: string | null;
+    type: 'Article' | 'Video' | 'Interview' | 'Speech';
     link: string;
     image_url?: string;
     image?: string; // legacy fallback
-    status: 'draft' | 'published' | 'archived';
+    status: 'draft' | 'submitted' | 'published' | 'rejected' | 'archived';
     published_at: string | null;
     author_name: string | null;
+    author_id?: string | null;
+    content_type?: 'official' | 'article';
+    body_en?: string | null;
+    body_ne?: string | null;
+    visibility?: 'public' | 'party' | 'private';
+    pending_reviewer_id?: string | null;
+    thread_id?: number | null;
+    attachments?: NewsAttachment[];
+    references?: NewsReference[];
 }
 
 export interface MediaVideo {

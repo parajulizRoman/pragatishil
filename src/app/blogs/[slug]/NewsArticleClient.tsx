@@ -7,20 +7,31 @@ import { NewsItem, NewsAttachment, NewsReference } from "@/types";
 import { canManageNews } from "@/lib/permissions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, ArrowLeft, ExternalLink, FileText, Download, Languages, Share2, Facebook, Twitter, Linkedin, Copy, Check, ImageIcon, MessageCircle, Pencil } from "lucide-react";
+import { Calendar, ArrowLeft, ExternalLink, FileText, Download, Languages, Share2, Facebook, Twitter, Linkedin, Copy, Check, ImageIcon, MessageCircle, Pencil, X, Loader2, Clock, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import ThreadEmbed from "@/components/discussion/ThreadEmbed";
+import { createBrowserClient } from "@supabase/ssr";
+import { useRouter } from "next/navigation";
 
 interface NewsArticleClientProps {
     item: NewsItem;
     userRole?: string | null;
+    userId?: string | null;
 }
 
-export default function NewsArticleClient({ item, userRole }: NewsArticleClientProps) {
+export default function NewsArticleClient({ item, userRole, userId }: NewsArticleClientProps) {
     const { language, toggleLanguage } = useLanguage();
     const lang = language as Lang;
     const T = createT(lang);
+    const router = useRouter();
     const [copied, setCopied] = useState(false);
+    const [actionLoading, setActionLoading] = useState<string | null>(null);
+    const [blogStatus, setBlogStatus] = useState(item.status);
+
+    // Check if user can review this blog
+    const canReview = ["admin", "yantrik", "admin_party", "board"].includes(userRole || "") &&
+        (blogStatus === "submitted" || blogStatus === "draft");
+    const isAssignedReviewer = item.pending_reviewer_id === userId;
 
     // Compute language-aware content with fallbacks
     const title = (lang === "ne" && item.title_ne?.trim()) ? item.title_ne : item.title;
@@ -43,7 +54,7 @@ export default function NewsArticleClient({ item, userRole }: NewsArticleClientP
     // Generate share URL
     const shareUrl = typeof window !== 'undefined'
         ? window.location.href
-        : `https://pragatishil.org.np/news/${item.slug || item.id}`;
+        : `https://pragatishil.org.np/blogs/${item.slug || item.id}`;
     const shareTitle = encodeURIComponent(title);
 
     const handleCopyLink = async () => {
@@ -52,8 +63,169 @@ export default function NewsArticleClient({ item, userRole }: NewsArticleClientP
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const handleApprove = async () => {
+        if (!confirm(lang === "ne" ? "यो ब्लग प्रकाशित गर्ने हो?" : `Publish "${item.title}"?`)) return;
+
+        setActionLoading("approve");
+        try {
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+
+            const { error } = await supabase
+                .from("news_items")
+                .update({
+                    status: "published",
+                    published_at: new Date().toISOString(),
+                    pending_reviewer_id: null
+                })
+                .eq("id", item.id);
+
+            if (error) throw error;
+
+            // Notify author
+            if (item.author_id) {
+                await supabase.from("notifications").insert({
+                    user_id: item.author_id,
+                    type: "blog_approved",
+                    title: lang === "ne" ? "ब्लग प्रकाशित भयो!" : "Blog Published!",
+                    body: lang === "ne"
+                        ? `तपाईंको ब्लग "${item.title.slice(0, 30)}..." प्रकाशित भएको छ।`
+                        : `Your blog "${item.title.slice(0, 30)}..." has been published.`,
+                    link: `/blogs/${item.slug}`,
+                    actor_id: userId
+                });
+            }
+
+            setBlogStatus("published");
+            alert(lang === "ne" ? "ब्लग प्रकाशित भयो!" : "Blog published!");
+            router.refresh();
+        } catch (error) {
+            alert("Failed to approve: " + (error as Error).message);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    const handleReject = async () => {
+        const reason = prompt(lang === "ne" ? "अस्वीकार गर्ने कारण:" : "Reason for rejection:");
+        if (!reason) return;
+
+        setActionLoading("reject");
+        try {
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+
+            const { error } = await supabase
+                .from("news_items")
+                .update({
+                    status: "rejected",
+                    pending_reviewer_id: null
+                })
+                .eq("id", item.id);
+
+            if (error) throw error;
+
+            // Notify author
+            if (item.author_id) {
+                await supabase.from("notifications").insert({
+                    user_id: item.author_id,
+                    type: "blog_rejected",
+                    title: lang === "ne" ? "ब्लग अस्वीकृत" : "Blog Rejected",
+                    body: `${lang === "ne" ? "कारण:" : "Reason:"} ${reason}`,
+                    link: `/blogs/write?edit=${item.id}`,
+                    actor_id: userId
+                });
+            }
+
+            setBlogStatus("rejected");
+            alert(lang === "ne" ? "ब्लग अस्वीकृत गरियो" : "Blog rejected");
+            router.push("/admin/reviews");
+        } catch (error) {
+            alert("Failed to reject: " + (error as Error).message);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-50/50">
+            {/* Review Action Bar for Admins */}
+            {canReview && blogStatus === "submitted" && (
+                <div className="bg-amber-50 border-b border-amber-200 px-4 py-3 sticky top-0 z-50">
+                    <div className="max-w-4xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+                        <div className="flex items-center gap-3">
+                            <Clock className="w-5 h-5 text-amber-600" />
+                            <span className="font-medium text-amber-800">
+                                {lang === "ne" ? "समीक्षा पर्खिरहेको छ" : "Pending Review"}
+                            </span>
+                            {isAssignedReviewer && (
+                                <Badge className="bg-amber-200 text-amber-800 border-amber-300">
+                                    {lang === "ne" ? "तपाईंलाई तोकिएको" : "Assigned to you"}
+                                </Badge>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={handleApprove}
+                                disabled={actionLoading !== null}
+                                className="gap-1 bg-green-600 hover:bg-green-700"
+                                size="sm"
+                            >
+                                {actionLoading === "approve" ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Check className="w-4 h-4" />
+                                )}
+                                {lang === "ne" ? "प्रकाशित गर्नुहोस्" : "Publish"}
+                            </Button>
+                            <Button
+                                onClick={handleReject}
+                                disabled={actionLoading !== null}
+                                variant="destructive"
+                                size="sm"
+                                className="gap-1"
+                            >
+                                {actionLoading === "reject" ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <X className="w-4 h-4" />
+                                )}
+                                {lang === "ne" ? "अस्वीकार" : "Reject"}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Rejected Status Bar */}
+            {blogStatus === "rejected" && (
+                <div className="bg-red-50 border-b border-red-200 px-4 py-3">
+                    <div className="max-w-4xl mx-auto flex items-center gap-3">
+                        <AlertTriangle className="w-5 h-5 text-red-600" />
+                        <span className="font-medium text-red-800">
+                            {lang === "ne" ? "यो ब्लग अस्वीकृत गरिएको छ" : "This blog has been rejected"}
+                        </span>
+                    </div>
+                </div>
+            )}
+
+            {/* Draft Status Bar */}
+            {blogStatus === "draft" && (
+                <div className="bg-slate-100 border-b border-slate-200 px-4 py-3">
+                    <div className="max-w-4xl mx-auto flex items-center gap-3">
+                        <Clock className="w-5 h-5 text-slate-500" />
+                        <span className="font-medium text-slate-700">
+                            {lang === "ne" ? "ड्राफ्ट - अप्रकाशित" : "Draft - Not Published"}
+                        </span>
+                    </div>
+                </div>
+            )}
+
+            {/* Header / Hero */}
             {/* Header / Hero */}
             <div className="bg-white border-b border-slate-100 pb-8 pt-24 md:pt-32 px-4 shadow-sm">
                 <div className="max-w-4xl mx-auto space-y-6">

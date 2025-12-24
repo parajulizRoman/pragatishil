@@ -295,7 +295,7 @@ export interface MembershipRequestPayload {
 
 // --- CMS Types ---
 
-export type NewsStatus = 'draft' | 'published' | 'archived';
+export type NewsStatus = 'draft' | 'submitted' | 'published' | 'rejected' | 'archived';
 export type NewsType = 'Article' | 'Video' | 'Interview';
 
 export interface NewsReference {
@@ -346,6 +346,7 @@ export interface NewsItem {
     content_type: 'official' | 'article';
     author_id: string | null;
     visibility: 'public' | 'party' | 'team';
+    pending_reviewer_id?: string | null;
 }
 
 export type MediaType = 'image' | 'video' | 'document';

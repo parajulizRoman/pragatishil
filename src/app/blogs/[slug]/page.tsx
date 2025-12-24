@@ -85,15 +85,19 @@ export default async function NewsArticlePage({ params }: { params: { slug: stri
         }
     }
 
-    // Check if not found or if draft/archived
-    // Support both new 'status' field and legacy 'is_published' field
+    // Check if not found or access denied
+    // Reviewers can see submitted content, others only see published
     const isPublished = news?.status === 'published' || news?.is_published === true;
-    if (error || !news || !isPublished) {
+    const isSubmitted = news?.status === 'submitted';
+    const canReview = ["admin", "yantrik", "admin_party", "board"].includes(userRole || "");
+
+    if (error || !news || (!isPublished && !(isSubmitted && canReview))) {
         notFound();
     }
 
     const item = news as NewsItem;
+    const userId = user?.id || null;
 
     // Delegate all rendering to client component for language toggle
-    return <NewsArticleClient item={item} userRole={userRole} />;
+    return <NewsArticleClient item={item} userRole={userRole} userId={userId} />;
 }
