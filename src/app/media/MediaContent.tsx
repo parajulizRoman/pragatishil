@@ -14,7 +14,6 @@ interface MediaContentProps {
 
 export default function MediaContent({ initialNews, initialMedia }: MediaContentProps) {
     const { t } = useLanguage();
-    const [newsFilter, setNewsFilter] = useState("All");
 
     // Fallback logic
     const news = initialNews.length > 0 ? initialNews : (fallbackContent.news as unknown as NewsItem[]);
@@ -24,58 +23,44 @@ export default function MediaContent({ initialNews, initialMedia }: MediaContent
     const galleryImages = media.length > 0 ? media.filter(m => m.media_type === 'image') : (fallbackContent.galleryImages as unknown as MediaItem[]);
     const videos = media.length > 0 ? media.filter(m => m.media_type === 'video') : (fallbackContent.videos as unknown as MediaItem[]);
 
-    // News Filtering Logic
-    const filteredNews = news.filter(item => {
-        if (newsFilter === "All") return true;
-        if (newsFilter === "Articles") return item.type === "Article" || item.type === "Interview";
-        if (newsFilter === "Videos") return item.type === "Video";
-        return true;
-    });
+    // Show only articles (filter out videos since we have separate video section)
+    const articles = news.filter(item => item.type === "Article" || item.type === "Interview");
 
     return (
         <div className="container mx-auto px-4 max-w-7xl">
             {/* Header */}
             <div className="text-center mb-16">
-                <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Media Center</h1>
+                <h1 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">
+                    Progressive Blogs
+                    <span className="block text-2xl font-bold text-brand-blue mt-2">प्रगतिशील विचार</span>
+                </h1>
                 <p className="text-slate-600 max-w-2xl mx-auto font-medium">
-                    Explore our journey through press coverage, speeches, and photo galleries.
+                    Progressive ideas, thought leadership, and insights from our members.
                 </p>
             </div>
 
             <div className="space-y-24">
-                {/* --- SECTION 1: NEWS & ARTICLES --- */}
+                {/* --- SECTION 1: BLOGS & ARTICLES --- */}
                 <section>
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-6 border-b border-slate-200">
-                        <Link href="/news" className="hover:opacity-80 transition-opacity">
-                            <h2 className="text-3xl font-black text-slate-800 border-l-8 border-brand-red pl-4">News & Media Coverage</h2>
-                            <p className="text-slate-500 mt-2 pl-5 font-bold uppercase text-[10px] tracking-widest">Latest updates from press and digital media.</p>
-                        </Link>
+                        <div>
+                            <h2 className="text-3xl font-black text-slate-800 border-l-8 border-brand-blue pl-4">Latest Articles</h2>
+                            <p className="text-slate-500 mt-2 pl-5 font-bold uppercase text-[10px] tracking-widest">Insights and ideas from our committee members.</p>
+                        </div>
 
-                        {/* News Filters */}
+                        {/* Blog Link Button */}
                         <div className="flex gap-2">
-                            {["All", "Articles", "Videos"].map((f) => (
-                                <button
-                                    key={f}
-                                    onClick={() => setNewsFilter(f)}
-                                    className={`px-5 py-2 rounded-xl text-xs font-black transition-all border-2 ${newsFilter === f
-                                        ? "bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-200"
-                                        : "bg-white text-slate-500 border-slate-100 hover:border-slate-300"
-                                        }`}
-                                >
-                                    {f.toUpperCase()}
-                                </button>
-                            ))}
                             <Link
-                                href="/news"
+                                href="/blogs"
                                 className="px-5 py-2 rounded-xl text-xs font-black transition-all border-2 bg-brand-blue text-white border-brand-blue hover:bg-brand-navy hover:border-brand-navy"
                             >
-                                VIEW ALL NEWS →
+                                VIEW ALL BLOGS →
                             </Link>
                         </div>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
-                        {filteredNews.map((item) => {
+                        {articles.map((item) => {
                             // For fallback/external news, link to external source
                             // For DB news (id > 10 typically indicates DB content), link to internal page
                             const isDbItem = typeof item.id === 'number' && item.id > 10;
@@ -129,7 +114,7 @@ export default function MediaContent({ initialNews, initialMedia }: MediaContent
                             );
                         })}
                     </div>
-                    {filteredNews.length === 0 && (
+                    {articles.length === 0 && (
                         <div className="text-center py-16 bg-slate-50 rounded-3xl border-4 border-dashed border-slate-100">
                             <p className="text-slate-400 font-bold uppercase tracking-widest">No news items found for this filter.</p>
                         </div>

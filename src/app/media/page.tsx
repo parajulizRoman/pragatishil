@@ -2,8 +2,8 @@ import MediaContent from "./MediaContent";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata = {
-    title: "Media Center | Pragatishil Loktantrik Party",
-    description: "Explore our media gallery, press releases, video interviews, and latest news coverage.",
+    title: "Pragatishil Bichar | Progressive Blogs | प्रगतिशील विचार",
+    description: "Progressive ideas, thought leadership articles, and insights from Pragatishil Loktantrik Party members.",
 };
 
 export const dynamic = 'force-dynamic';
