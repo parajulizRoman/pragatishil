@@ -3,12 +3,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { MessageSquare, Loader2, Search, Plus, X, Send, ArrowLeft } from "lucide-react";
+import { MessageSquare, Loader2, Search, Plus, X, Send, ArrowLeft, Paperclip, FileText, Download, AlertCircle } from "lucide-react";
 import { format, isToday, isYesterday } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
+
+// Constants
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
 
 // Types
 interface Participant {
@@ -36,6 +40,10 @@ interface Message {
     content: string;
     created_at: string;
     sender: Participant;
+    attachment_url?: string | null;
+    attachment_type?: string | null;
+    attachment_name?: string | null;
+    attachment_size?: number | null;
 }
 
 interface SearchUser {
@@ -82,6 +90,12 @@ export default function MessagesPage() {
     const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
     const [searching, setSearching] = useState(false);
 
+    // Attachment state
+    const [pendingFile, setPendingFile] = useState<File | null>(null);
+    const [uploading, setUploading] = useState(false);
+    const [attachmentError, setAttachmentError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     // Get current user
     useEffect(() => {
         const supabase = createBrowserClient(
@@ -121,25 +135,53 @@ export default function MessagesPage() {
             setMessages([]);
             return;
         }
-        const fetchMessages = async () => {
+
+        let isMounted = true;
+
+        // Initial load with loading indicator
+        const loadInitialMessages = async () => {
             setLoadingMessages(true);
             try {
                 const res = await fetch(`/api/messages/${activeId}`);
-                if (res.ok) {
+                if (res.ok && isMounted) {
                     const data = await res.json();
                     setMessages(data.messages || []);
                 }
             } catch (e) {
                 console.error("Fetch messages error:", e);
             } finally {
-                setLoadingMessages(false);
+                if (isMounted) setLoadingMessages(false);
             }
         };
-        fetchMessages();
 
-        // Poll for new messages
-        const interval = setInterval(fetchMessages, 5000);
-        return () => clearInterval(interval);
+        // Silent background poll - only adds new messages
+        const pollNewMessages = async () => {
+            try {
+                const res = await fetch(`/api/messages/${activeId}`);
+                if (res.ok && isMounted) {
+                    const data = await res.json();
+                    const newMessages = data.messages || [];
+                    // Only update if there are new messages
+                    setMessages(prev => {
+                        if (newMessages.length > prev.length) {
+                            return newMessages;
+                        }
+                        return prev;
+                    });
+                }
+            } catch (e) {
+                console.error("Poll messages error:", e);
+            }
+        };
+
+        loadInitialMessages();
+
+        // Poll for new messages silently
+        const interval = setInterval(pollNewMessages, 5000);
+        return () => {
+            isMounted = false;
+            clearInterval(interval);
+        };
     }, [activeId]);
 
     // Scroll to bottom
@@ -170,28 +212,101 @@ export default function MessagesPage() {
         return () => clearTimeout(timer);
     }, [memberSearch]);
 
-    // Send message
+    // Handle file selection
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setAttachmentError(null);
+
+        // Check file size
+        if (file.size > MAX_FILE_SIZE) {
+            setAttachmentError("File too large (max 10MB). Upload to Google Drive and share the link instead.");
+            e.target.value = '';
+            return;
+        }
+
+        // Check file type
+        if (!ALLOWED_TYPES.includes(file.type)) {
+            setAttachmentError("File type not allowed. Use images, PDFs, or Word documents.");
+            e.target.value = '';
+            return;
+        }
+
+        setPendingFile(file);
+        e.target.value = '';
+    };
+
+    // Clear pending file
+    const clearPendingFile = () => {
+        setPendingFile(null);
+        setAttachmentError(null);
+    };
+
+    // Send message (with optional attachment)
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || sending || !activeId) return;
+        if ((!newMessage.trim() && !pendingFile) || sending || uploading || !activeId) return;
 
+        const messageToSend = newMessage.trim();
+        const fileToSend = pendingFile;
+
+        setNewMessage(""); // Clear immediately for better UX
+        setPendingFile(null);
         setSending(true);
+
+        let attachmentData: { url: string; type: string; name: string; size: number } | null = null;
+
         try {
+            // Upload attachment first if present
+            if (fileToSend) {
+                setUploading(true);
+                const formData = new FormData();
+                formData.append('file', fileToSend);
+
+                const uploadRes = await fetch(`/api/messages/${activeId}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadRes.ok) {
+                    const data = await uploadRes.json();
+                    throw new Error(data.suggestion || data.error || 'Upload failed');
+                }
+
+                attachmentData = await uploadRes.json();
+                setUploading(false);
+            }
+
+            // Send message with attachment data
             const res = await fetch(`/api/messages/${activeId}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ content: newMessage.trim() })
+                body: JSON.stringify({
+                    content: messageToSend,
+                    attachment_url: attachmentData?.url,
+                    attachment_type: attachmentData?.type,
+                    attachment_name: attachmentData?.name,
+                    attachment_size: attachmentData?.size
+                })
             });
+
             if (res.ok) {
                 const data = await res.json();
                 setMessages(prev => [...prev, data.message]);
-                setNewMessage("");
-                inputRef.current?.focus();
             }
         } catch (e) {
             console.error("Send error:", e);
+            // Restore on failure
+            setNewMessage(messageToSend);
+            if (fileToSend) setPendingFile(fileToSend);
+            setAttachmentError(e instanceof Error ? e.message : 'Failed to send');
         } finally {
             setSending(false);
+            setUploading(false);
+            requestAnimationFrame(() => {
+                inputRef.current?.focus();
+            });
         }
     };
 
@@ -235,7 +350,7 @@ export default function MessagesPage() {
 
     if (loading) {
         return (
-            <div className="h-screen flex items-center justify-center bg-slate-100">
+            <div className="fixed inset-0 top-[64px] flex items-center justify-center bg-slate-100 z-10">
                 <Loader2 className="w-8 h-8 animate-spin text-brand-blue" />
             </div>
         );
@@ -243,7 +358,7 @@ export default function MessagesPage() {
 
     if (error) {
         return (
-            <div className="h-screen flex items-center justify-center bg-slate-100">
+            <div className="fixed inset-0 top-[64px] flex items-center justify-center bg-slate-100 z-10">
                 <div className="text-center p-8">
                     <MessageSquare className="w-16 h-16 mx-auto mb-4 text-slate-300" />
                     <p className="text-slate-500 mb-4">{error}</p>
@@ -256,7 +371,7 @@ export default function MessagesPage() {
     }
 
     return (
-        <div className="h-screen flex bg-slate-100 overflow-hidden">
+        <div className="fixed inset-0 top-[64px] flex bg-slate-100 overflow-hidden z-10">
             {/* Left Panel - Conversation List */}
             <div className={cn(
                 "w-full md:w-[360px] bg-white border-r border-slate-200 flex flex-col",
@@ -451,6 +566,8 @@ export default function MessagesPage() {
                                     {messages.map((msg, idx) => {
                                         const isOwn = msg.sender.id === currentUserId;
                                         const showName = !isOwn && (idx === 0 || messages[idx - 1]?.sender.id !== msg.sender.id);
+                                        const hasAttachment = !!msg.attachment_url;
+                                        const isImage = msg.attachment_type?.startsWith('image/');
 
                                         return (
                                             <div
@@ -471,7 +588,48 @@ export default function MessagesPage() {
                                                                 : "bg-white border border-slate-200 text-slate-800 rounded-bl-sm"
                                                         )}
                                                     >
-                                                        <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                                                        {/* Attachment display */}
+                                                        {hasAttachment && (
+                                                            <div className="mb-2">
+                                                                {isImage ? (
+                                                                    <a href={msg.attachment_url!} target="_blank" rel="noopener noreferrer">
+                                                                        <Image
+                                                                            src={msg.attachment_url!}
+                                                                            alt={msg.attachment_name || 'Image'}
+                                                                            width={200}
+                                                                            height={150}
+                                                                            className="rounded-lg max-w-full h-auto cursor-pointer hover:opacity-90"
+                                                                        />
+                                                                    </a>
+                                                                ) : (
+                                                                    <a
+                                                                        href={msg.attachment_url!}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className={cn(
+                                                                            "flex items-center gap-2 p-2 rounded-lg",
+                                                                            isOwn ? "bg-blue-500" : "bg-slate-100"
+                                                                        )}
+                                                                    >
+                                                                        <FileText size={20} className={isOwn ? "text-white" : "text-slate-500"} />
+                                                                        <div className="flex-1 min-w-0 text-left">
+                                                                            <p className={cn("text-sm truncate", isOwn ? "text-white" : "text-slate-700")}>
+                                                                                {msg.attachment_name || 'File'}
+                                                                            </p>
+                                                                            {msg.attachment_size && (
+                                                                                <p className={cn("text-xs", isOwn ? "text-blue-100" : "text-slate-400")}>
+                                                                                    {(msg.attachment_size / 1024).toFixed(1)} KB
+                                                                                </p>
+                                                                            )}
+                                                                        </div>
+                                                                        <Download size={16} className={isOwn ? "text-white" : "text-slate-400"} />
+                                                                    </a>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                        {msg.content && (
+                                                            <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                                                        )}
                                                     </div>
                                                     <p className={cn(
                                                         "text-[10px] mt-1 mx-1",
@@ -490,7 +648,60 @@ export default function MessagesPage() {
 
                         {/* Input */}
                         <form onSubmit={handleSend} className="p-4 border-t border-slate-100 bg-white">
-                            <div className="flex items-center gap-3">
+                            {/* Pending file preview */}
+                            {pendingFile && (
+                                <div className="flex items-center gap-2 mb-2 p-2 bg-slate-50 rounded-lg">
+                                    {pendingFile.type.startsWith('image/') ? (
+                                        <Image
+                                            src={URL.createObjectURL(pendingFile)}
+                                            alt="Preview"
+                                            width={48}
+                                            height={48}
+                                            className="w-12 h-12 rounded object-cover"
+                                        />
+                                    ) : (
+                                        <FileText className="w-8 h-8 text-slate-400" />
+                                    )}
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium truncate">{pendingFile.name}</p>
+                                        <p className="text-xs text-slate-400">{(pendingFile.size / 1024).toFixed(1)} KB</p>
+                                    </div>
+                                    <button type="button" onClick={clearPendingFile} className="p-1 hover:bg-slate-200 rounded">
+                                        <X size={16} className="text-slate-500" />
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Error message */}
+                            {attachmentError && (
+                                <div className="flex items-center gap-2 mb-2 p-2 bg-amber-50 text-amber-700 rounded-lg text-sm">
+                                    <AlertCircle size={16} />
+                                    <span>{attachmentError}</span>
+                                    <button type="button" onClick={() => setAttachmentError(null)} className="ml-auto">
+                                        <X size={14} />
+                                    </button>
+                                </div>
+                            )}
+
+                            <div className="flex items-center gap-2">
+                                {/* Attachment button */}
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/*,.pdf,.doc,.docx,.txt"
+                                    onChange={handleFileSelect}
+                                    className="hidden"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={sending || uploading}
+                                    className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-500 hover:text-slate-700"
+                                    title="Add attachment"
+                                >
+                                    <Paperclip size={20} />
+                                </button>
+
                                 <input
                                     ref={inputRef}
                                     type="text"
@@ -498,19 +709,19 @@ export default function MessagesPage() {
                                     onChange={e => setNewMessage(e.target.value)}
                                     placeholder={t("सन्देश लेख्नुहोस्...", "Type a message...")}
                                     className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue/20"
-                                    disabled={sending}
+                                    disabled={sending || uploading}
                                 />
                                 <button
                                     type="submit"
-                                    disabled={!newMessage.trim() || sending}
+                                    disabled={(!newMessage.trim() && !pendingFile) || sending || uploading}
                                     className={cn(
                                         "p-3 rounded-full transition-colors",
-                                        newMessage.trim()
+                                        (newMessage.trim() || pendingFile)
                                             ? "bg-brand-blue text-white hover:bg-blue-600"
                                             : "bg-slate-100 text-slate-400"
                                     )}
                                 >
-                                    {sending ? (
+                                    {(sending || uploading) ? (
                                         <Loader2 size={18} className="animate-spin" />
                                     ) : (
                                         <Send size={18} />

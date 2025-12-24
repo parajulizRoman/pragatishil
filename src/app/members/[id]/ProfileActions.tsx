@@ -64,7 +64,7 @@ export default function ProfileActions({
             });
             if (res.ok) {
                 const data = await res.json();
-                router.push(`/messages/${data.conversationId}`);
+                router.push(`/messages?id=${data.conversationId}`);
             } else {
                 const data = await res.json();
                 alert(data.error || "Failed to start conversation");

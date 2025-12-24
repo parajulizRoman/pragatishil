@@ -45,6 +45,10 @@ export async function GET(
             content,
             created_at,
             is_deleted,
+            attachment_url,
+            attachment_type,
+            attachment_name,
+            attachment_size,
             sender:profiles!direct_messages_sender_id_fkey (
                 id,
                 full_name,
@@ -122,10 +126,11 @@ export async function POST(
         return NextResponse.json({ error: "Not a participant" }, { status: 403 });
     }
 
-    const { content } = await request.json();
+    const { content, attachment_url, attachment_type, attachment_name, attachment_size } = await request.json();
 
-    if (!content?.trim()) {
-        return NextResponse.json({ error: "Message content required" }, { status: 400 });
+    // Either content or attachment is required
+    if (!content?.trim() && !attachment_url) {
+        return NextResponse.json({ error: "Message content or attachment required" }, { status: 400 });
     }
 
     // Insert message
@@ -134,12 +139,20 @@ export async function POST(
         .insert({
             conversation_id: conversationId,
             sender_id: user.id,
-            content: content.trim()
+            content: content?.trim() || '',
+            attachment_url: attachment_url || null,
+            attachment_type: attachment_type || null,
+            attachment_name: attachment_name || null,
+            attachment_size: attachment_size || null
         })
         .select(`
             id,
             content,
             created_at,
+            attachment_url,
+            attachment_type,
+            attachment_name,
+            attachment_size,
             sender:profiles!direct_messages_sender_id_fkey (
                 id,
                 full_name,
@@ -162,12 +175,16 @@ export async function POST(
         .neq("user_id", user.id);
 
     if (otherParticipants && otherParticipants.length > 0) {
+        const notificationBody = attachment_url
+            ? `Sent an attachment${content ? `: ${content.slice(0, 30)}...` : ''}`
+            : content.length > 50 ? content.slice(0, 50) + '...' : content;
+
         const notifications = otherParticipants.map(p => ({
             user_id: p.user_id,
             type: 'dm',
             title: `New message from ${profile.full_name || 'Someone'}`,
-            body: content.length > 50 ? content.slice(0, 50) + '...' : content,
-            link: `/messages/${conversationId}`,
+            body: notificationBody,
+            link: `/messages?id=${conversationId}`,
             actor_id: user.id
         }));
 
