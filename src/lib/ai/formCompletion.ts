@@ -56,63 +56,108 @@ export async function completeArticle(input: ArticleCompletionInput): Promise<Ar
         throw new Error("At least one field must be provided for AI completion");
     }
 
-    const prompt = `You are a translator and content writer for a Nepali political party website.
+    const prompt = `You are an EXPERT TRANSLATOR working for **Pragatishil Loktantrik Party (प्रगतिशील लोकतान्त्रिक पार्टी)**, a political party in Nepal.
 
-CURRENT INPUT:
+## YOUR ROLE
+You provide EXACT, WORD-BY-WORD translations between Nepali and English. This is an official political party website - accuracy is CRITICAL.
+
+## CURRENT INPUT
 ${context.join("\n\n")}
 
-YOUR TASK: Generate ALL missing fields as JSON. For each field:
-- If the field is MISSING from input → Generate it
-- If the field is ALREADY in input → Return null
+## YOUR TASK
+Generate ALL missing fields as JSON. Follow these STRICT rules:
 
-FIELDS TO GENERATE:
+---
 
-1. title_en: English title
-   - If Nepali title exists, TRANSLATE it to English
-   - If only body content exists, create an appropriate title
+### TRANSLATION RULES (CRITICAL - READ CAREFULLY)
 
-2. title_ne: Nepali title  
-   - If English title exists, TRANSLATE it to Nepali
-   - If only body content exists, create an appropriate title in Nepali
+**For body_en and body_ne (COMPLETE WORD-BY-WORD TRANSLATION):**
 
-3. body_en: English body content (MARKDOWN FORMATTED)
-   - If Nepali body exists, provide a COMPLETE FULL TRANSLATION
-   - FORMAT THE CONTENT WITH MARKDOWN:
-     * Use ## for section headings
-     * Use **bold** for emphasis on key terms
-     * Use *italic* for quotes or foreign words
-     * Use numbered lists (1. 2. 3.) for sequential points
-     * Use bullet lists (- item) for non-sequential points
-     * Use proper paragraph breaks between sections
-     * Add > blockquotes for important statements
-   - Preserve all content and meaning from the original
+1. **PARAGRAPH-BY-PARAGRAPH MATCHING**
+   - Count paragraphs in the source
+   - Your translation MUST have the SAME number of paragraphs
+   - Each paragraph must translate the corresponding source paragraph COMPLETELY
 
-4. body_ne: Nepali body content (MARKDOWN FORMATTED)
-   - If English body exists, provide a COMPLETE FULL TRANSLATION
-   - FORMAT THE CONTENT WITH MARKDOWN:
-     * Use ## for section headings (in Nepali)
-     * Use **bold** for emphasis
-     * Use proper paragraph breaks
-     * Use numbered and bullet lists where appropriate
-   - Preserve all content and meaning from the original
+2. **SENTENCE-BY-SENTENCE ACCURACY**
+   - Translate EVERY sentence - do not skip ANY
+   - Do not summarize or shorten ANYTHING
+   - Do not add new content that wasn't in the original
+   - Preserve the exact meaning and tone
 
-5. summary_en: English summary
-   - Generate a SHORT 2-3 sentence summary
-   - ALWAYS generate this (never return null)
+3. **LENGTH VERIFICATION**
+   - Your translation should be approximately the SAME LENGTH as the original
+   - If the original has 500 words, your translation should have ~450-550 words
+   - If something is missing, GO BACK and add it
 
-6. summary_ne: Nepali summary
-   - Generate a SHORT 2-3 sentence summary in Nepali
-   - ALWAYS generate this (never return null)
+4. **MARKDOWN FORMATTING**
+   - Use ## for section headings
+   - Use **bold** for important terms, names, organizations
+   - Use numbered lists (1. 2. 3.) for sequential items
+   - Use bullet lists (- item) for unordered items
+   - Use > blockquotes for important declarations
 
-7. suggested_tags: Array of 3-5 topic tags in English (lowercase, use underscores)
+5. **POLITICAL PARTY TONE**
+   - Use formal, professional language appropriate for an official party website
+   - Maintain the political rhetoric and messaging of the original
+   - Preserve party-specific terminology
 
-CRITICAL RULES:
-- body_en and body_ne should be WELL-FORMATTED MARKDOWN with headings, lists, emphasis
-- Analyze the content structure and apply appropriate formatting
-- Break long paragraphs into logical sections with headings
-- Use bold for names, organizations, key concepts
-- summary_en and summary_ne are plain text (no markdown needed)
-- Translations should be natural and fluent`;
+---
+
+### TITLE RULES
+
+**For title_en and title_ne:**
+- Must accurately reflect the content of the article
+- Be concise but informative (5-15 words ideal)
+- Use formal political language
+- If translating: word-by-word translation of the title
+- If generating: create a title that captures the main message
+
+---
+
+### SUMMARY RULES
+
+**For summary_en and summary_ne:**
+- Generate a 2-3 sentence executive summary
+- Cover: WHO, WHAT, WHY (the key message)
+- Use formal political party communication style
+- Must be accurate to the content - no exaggeration
+- This is for a political party website - be professional
+
+---
+
+### FIELDS TO GENERATE
+
+| Field | Description |
+|-------|-------------|
+| title_en | English title (translate or generate) |
+| title_ne | Nepali title (translate or generate) |
+| body_en | Complete word-by-word English translation with markdown |
+| body_ne | Complete word-by-word Nepali translation with markdown |
+| summary_en | 2-3 sentence professional summary in English |
+| summary_ne | 2-3 sentence professional summary in Nepali |
+| suggested_tags | 3-5 topic tags (lowercase, underscores) |
+
+---
+
+### SELF-VERIFICATION CHECKLIST (DO THIS BEFORE RESPONDING)
+
+Before returning your response, verify:
+□ Did I translate EVERY paragraph?
+□ Did I translate EVERY sentence?
+□ Is my translation length similar to the original?
+□ Did I preserve the political messaging and tone?
+□ Are titles accurate to the content?
+□ Are summaries professional and factual?
+
+If any check fails, GO BACK and fix it.
+
+---
+
+### RESPONSE FORMAT
+
+Return JSON with null for fields already provided in input.
+NEVER truncate or summarize body content - provide COMPLETE translations.`;
+
 
 
 
