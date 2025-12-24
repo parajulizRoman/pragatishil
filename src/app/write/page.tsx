@@ -363,6 +363,17 @@ Document Analysis:
                 if (data.summary_en && !summaryEn.trim()) {
                     setSummaryEn(data.summary_en);
                 }
+
+                // IMPORTANT: Apply formatted versions of source content
+                // This replaces plain text with nicely formatted markdown
+                if (data.body_ne_formatted && bodyNe.trim()) {
+                    setBodyNe(data.body_ne_formatted);
+                    console.log("[AI] Applied formatted version of Nepali content");
+                }
+                if (data.body_en_formatted && bodyEn.trim()) {
+                    setBodyEn(data.body_en_formatted);
+                    console.log("[AI] Applied formatted version of English content");
+                }
                 // No popup - form fields are visually updated
             }
 

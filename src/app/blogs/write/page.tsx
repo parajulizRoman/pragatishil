@@ -345,13 +345,24 @@ Document Analysis:
 
                 const { data } = result;
 
-                // Fill ALL missing fields with AI-generated content
+                // Fill missing fields with AI-generated content (translations)
                 if (data.title_ne && !titleNe.trim()) setTitleNe(data.title_ne);
                 if (data.title_en && !title.trim()) setTitle(data.title_en);
                 if (data.body_ne && !bodyNe.trim()) setBodyNe(data.body_ne);
                 if (data.body_en && !bodyEn.trim()) setBodyEn(data.body_en);
                 if (data.summary_en && !summaryEn.trim()) setSummaryEn(data.summary_en);
                 if (data.summary_ne && !summaryNe.trim()) setSummaryNe(data.summary_ne);
+
+                // IMPORTANT: Apply formatted versions of source content
+                // This replaces plain text with nicely formatted markdown
+                if (data.body_ne_formatted && bodyNe.trim()) {
+                    setBodyNe(data.body_ne_formatted);
+                    console.log("[AI] Applied formatted version of Nepali content");
+                }
+                if (data.body_en_formatted && bodyEn.trim()) {
+                    setBodyEn(data.body_en_formatted);
+                    console.log("[AI] Applied formatted version of English content");
+                }
 
                 // Check what's still missing for potential retry
                 const checkMissing = () => {

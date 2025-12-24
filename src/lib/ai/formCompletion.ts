@@ -17,6 +17,8 @@ export interface ArticleCompletionResult {
     title_ne: string | null;
     body_en: string | null;
     body_ne: string | null;
+    body_en_formatted: string | null;  // Formatted version if body_en was provided
+    body_ne_formatted: string | null;  // Formatted version if body_ne was provided
     summary_en: string | null;
     summary_ne: string | null;
     suggested_tags: string[];
@@ -133,9 +135,21 @@ Generate ALL missing fields as JSON. Follow these STRICT rules:
 | title_ne | Nepali title (translate or generate) |
 | body_en | Complete word-by-word English translation with markdown |
 | body_ne | Complete word-by-word Nepali translation with markdown |
+| body_en_formatted | If body_en was provided as input, return FORMATTED version with markdown |
+| body_ne_formatted | If body_ne was provided as input, return FORMATTED version with markdown |
 | summary_en | 2-3 sentence professional summary in English |
 | summary_ne | 2-3 sentence professional summary in Nepali |
 | suggested_tags | 3-5 topic tags (lowercase, underscores) |
+
+---
+
+### IMPORTANT: FORMATTING SOURCE CONTENT
+
+If the user provides body_en or body_ne as plain text:
+- STILL return a formatted version in body_en_formatted or body_ne_formatted
+- Apply markdown: ## headings, **bold**, lists, > blockquotes
+- Preserve EXACT content - only add formatting, no content changes
+- This ensures both languages display beautifully on the website
 
 ---
 
@@ -148,6 +162,7 @@ Before returning your response, verify:
 □ Did I preserve the political messaging and tone?
 □ Are titles accurate to the content?
 □ Are summaries professional and factual?
+□ Did I format the source content with markdown?
 
 If any check fails, GO BACK and fix it.
 
@@ -155,7 +170,8 @@ If any check fails, GO BACK and fix it.
 
 ### RESPONSE FORMAT
 
-Return JSON with null for fields already provided in input.
+Return JSON with null only for fields that don't need to be generated.
+For body_en_formatted and body_ne_formatted: return formatted version if source was provided, null otherwise.
 NEVER truncate or summarize body content - provide COMPLETE translations.`;
 
 
@@ -168,11 +184,13 @@ NEVER truncate or summarize body content - provide COMPLETE translations.`;
             title_ne: { type: Type.STRING, nullable: true },
             body_en: { type: Type.STRING, nullable: true },
             body_ne: { type: Type.STRING, nullable: true },
+            body_en_formatted: { type: Type.STRING, nullable: true },
+            body_ne_formatted: { type: Type.STRING, nullable: true },
             summary_en: { type: Type.STRING, nullable: true },
             summary_ne: { type: Type.STRING, nullable: true },
             suggested_tags: { type: Type.ARRAY, items: { type: Type.STRING } }
         },
-        required: ["title_en", "title_ne", "body_en", "body_ne", "summary_en", "summary_ne", "suggested_tags"]
+        required: ["title_en", "title_ne", "body_en", "body_ne", "body_en_formatted", "body_ne_formatted", "summary_en", "summary_ne", "suggested_tags"]
     };
 
     try {
