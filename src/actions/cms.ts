@@ -277,7 +277,7 @@ export async function upsertNewsItem(item: any) {
 
     revalidatePath("/news");
     revalidatePath("/");
-    return { success: true };
+    return { success: true, id: newData.id, slug: newData.slug };
 }
 
 export async function deleteNewsItem(id: number, reason?: string) {
