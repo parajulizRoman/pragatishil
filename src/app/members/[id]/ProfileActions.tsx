@@ -30,6 +30,7 @@ export default function ProfileActions({
 }: ProfileActionsProps) {
     const router = useRouter();
     const [viewerRole, setViewerRole] = useState<string | null>(null);
+    const [viewerLoaded, setViewerLoaded] = useState(false);
     const [messaging, setMessaging] = useState(false);
 
     // Get viewer's role
@@ -47,15 +48,20 @@ export default function ProfileActions({
                     .single();
                 setViewerRole(profile?.role || null);
             }
+            setViewerLoaded(true);
         });
     }, []);
 
-    // Check if both users can message
-    const canMessage = !isOwner &&
-        viewerRole && MESSAGING_ROLES.includes(viewerRole) &&
-        targetRole && MESSAGING_ROLES.includes(targetRole);
+    // Check messaging eligibility
+    const viewerCanMessage = viewerRole && MESSAGING_ROLES.includes(viewerRole);
+    const targetCanMessage = targetRole && MESSAGING_ROLES.includes(targetRole);
 
     const handleMessage = async () => {
+        if (!targetCanMessage) {
+            alert("This member's role doesn't support direct messaging. Only party members and above can receive messages.");
+            return;
+        }
+
         setMessaging(true);
         try {
             const res = await fetch("/api/messages/conversations", {
@@ -79,18 +85,22 @@ export default function ProfileActions({
     };
 
     return (
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 mb-4">
             {/* Follow Button - only show if not owner */}
             {!isOwner && (
                 <FollowButton userId={targetUserId} showCounts />
             )}
 
-            {/* Message Button - only for party_member+ */}
-            {canMessage && (
+            {/* Message Button - show for party_member+ viewers */}
+            {!isOwner && viewerLoaded && viewerCanMessage && (
                 <button
                     onClick={handleMessage}
                     disabled={messaging}
-                    className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border border-slate-200 shadow-sm"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 border shadow-sm ${targetCanMessage
+                        ? "bg-white hover:bg-slate-50 text-slate-700 border-slate-200"
+                        : "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed"
+                        }`}
+                    title={!targetCanMessage ? "This member cannot receive messages (requires party_member role or higher)" : "Send a message"}
                 >
                     {messaging ? (
                         <Loader2 size={16} className="animate-spin" />
