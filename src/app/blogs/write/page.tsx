@@ -345,29 +345,62 @@ Document Analysis:
 
                 const { data } = result;
 
+                // Track what we're filling for verification
+                let newTitle = title.trim();
+                let newTitleNe = titleNe.trim();
+                let newBodyEn = bodyEn.trim();
+                let newBodyNe = bodyNe.trim();
+                let newSummaryEn = summaryEn.trim();
+                let newSummaryNe = summaryNe.trim();
+
                 // Fill ALL missing fields with AI-generated content (COMPREHENSIVE)
                 // 1. Titles - bidirectional
                 if (data.title_ne && !titleNe.trim()) {
                     setTitleNe(data.title_ne);
+                    newTitleNe = data.title_ne;
                 }
                 if (data.title_en && !title.trim()) {
                     setTitle(data.title_en);
+                    newTitle = data.title_en;
                 }
 
                 // 2. Body content - bidirectional
                 if (data.body_ne && !bodyNe.trim()) {
                     setBodyNe(data.body_ne);
+                    newBodyNe = data.body_ne;
                 }
                 if (data.body_en && !bodyEn.trim()) {
                     setBodyEn(data.body_en);
+                    newBodyEn = data.body_en;
                 }
 
                 // 3. Summaries - both English and Nepali
                 if (data.summary_en && !summaryEn.trim()) {
                     setSummaryEn(data.summary_en);
+                    newSummaryEn = data.summary_en;
                 }
                 if (data.summary_ne && !summaryNe.trim()) {
                     setSummaryNe(data.summary_ne);
+                    newSummaryNe = data.summary_ne;
+                }
+
+                // VERIFICATION STEP: Check if any required fields are still empty
+                const missingFields = [];
+                if (!newTitle) missingFields.push("English Title");
+                if (!newTitleNe) missingFields.push("Nepali Title");
+                if (!newBodyEn) missingFields.push("English Body");
+                if (!newBodyNe) missingFields.push("Nepali Body");
+                if (!newSummaryEn) missingFields.push("English Summary");
+
+                if (missingFields.length > 0) {
+                    console.log("[AI] Verification: Still missing fields:", missingFields);
+                    // Show user what's still missing
+                    alert(t(
+                        `केही फिल्डहरू अझै रिक्त छन्: ${missingFields.join(", ")}। कृपया पुन: प्रयास गर्नुहोस्।`,
+                        `Some fields are still empty: ${missingFields.join(", ")}. Please try again.`
+                    ));
+                } else {
+                    console.log("[AI] Verification: All fields filled successfully!");
                 }
             }
 
