@@ -26,7 +26,7 @@ CREATE INDEX IF NOT EXISTS idx_channel_tasks_assigned ON channel_tasks(assigned_
 ALTER TABLE channel_tasks ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
--- View: All authenticated users who are members of the channel
+-- View: All authenticated users who are members of the channel OR admins
 CREATE POLICY "channel_tasks_select" ON channel_tasks
     FOR SELECT USING (
         EXISTS (
@@ -37,7 +37,7 @@ CREATE POLICY "channel_tasks_select" ON channel_tasks
         OR EXISTS (
             SELECT 1 FROM profiles p
             WHERE p.id = auth.uid()
-            AND p.role IN ('admin', 'yantrik', 'loktantrik_president', 'loktantrik_incharge')
+            AND p.role IN ('admin', 'yantrik')
         )
     );
 
