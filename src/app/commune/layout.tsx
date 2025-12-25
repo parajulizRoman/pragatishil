@@ -455,7 +455,7 @@ export default function CommuneLayout({
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 lg:ml-64 w-full">
+            <main className="flex-1 w-full min-w-0">
                 {children}
             </main>
 
