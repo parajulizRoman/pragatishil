@@ -151,7 +151,7 @@ export async function POST(request: Request) {
                 title,
                 created_by: user?.id || null, // null for anon if simplified
                 is_anonymous: !!isAnon,
-                last_activity_at: new Date().toISOString()
+                // last_activity_at is set by DB default or migration
             })
             .select()
             .single();
