@@ -156,21 +156,27 @@ export async function POST(request: Request) {
             .select()
             .single();
 
-        if (tErr) throw tErr;
+        if (tErr) {
+            console.error('[Thread Create] Error:', tErr);
+            throw tErr;
+        }
 
         const { data: post, error: pErr } = await supabase
             .from('discussion_posts')
             .insert({
                 thread_id: thread.id,
                 author_id: user?.id || null,
-                content,
+                content: content || '', // Ensure content is never undefined
                 is_anon: !!isAnon,
-                attachments: attachments || []
+                // attachments are handled separately via discussion_post_attachments table
             })
             .select()
             .single();
 
-        if (pErr) throw pErr;
+        if (pErr) {
+            console.error('[Post Create] Error:', pErr);
+            throw pErr;
+        }
 
         // Update Thread with first_post_id (if schema requires it for previews)
         await supabase
@@ -181,6 +187,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ success: true, threadId: thread.id });
 
     } catch (e: unknown) {
+        console.error('[Thread/Post Create] Caught:', e);
         return NextResponse.json({ error: (e as Error).message }, { status: 500 });
     }
 }
