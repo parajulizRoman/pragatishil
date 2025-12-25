@@ -262,7 +262,7 @@ export default function CommuneLayout({
 
         if (hasChildren) {
             return (
-                <details key={node.id} open={depth < 1} className="group/nested">
+                <details key={node.id} className="group/nested">
                     <summary className={`group/item flex items-center justify-between cursor-pointer list-none text-sm py-1.5 px-2 rounded-md hover:bg-slate-50 transition-colors ${isActive ? 'bg-red-50 text-brand-red font-medium' : 'text-slate-600'}`}>
                         <span className="flex items-center gap-1.5 flex-1">
                             <span className="text-xs">{icon}</span>
