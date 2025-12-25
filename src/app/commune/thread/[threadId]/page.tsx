@@ -9,7 +9,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { flagContent, votePost, toggleThreadInteraction, toggleReaction } from "@/app/commune/actions";
 import Link from "next/link";
 import Image from "next/image";
-import { X, Shield, User, Crown, Paperclip, FileText, Image as ImageIcon, Loader2, MessageSquare, Heart, Bookmark, EyeOff, Flag, ArrowLeft, ArrowUp, ArrowDown } from "lucide-react";
+import { X, Shield, User, Crown, Paperclip, FileText, Image as ImageIcon, Loader2, MessageSquare, Heart, Bookmark, EyeOff, Flag, ArrowLeft, ArrowUp, ArrowDown, Trash2 } from "lucide-react";
 import MentionAutocomplete from "@/components/ui/MentionAutocomplete";
 import { Skeleton } from "@/components/ui/skeleton";
 import PostActions from "@/components/PostActions";
@@ -319,6 +319,28 @@ export default function ThreadPage() {
                             {isSaved ? <Bookmark className="fill-current" size={16} /> : <Bookmark size={16} />}
                             {isSaved ? t("सुरक्षित", "Saved") : t("सुरक्षित गर्नुहोस्", "Save")}
                         </Button>
+
+                        {/* Delete Thread - Only for creator or admin */}
+                        {(currentUserId === thread.created_by || ['admin', 'yantrik', 'admin_party'].includes(thread.author?.role || '')) && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={async () => {
+                                    if (!confirm(t("के तपाईं यो थ्रेड मेटाउन निश्चित हुनुहुन्छ? यो कार्य पूर्ववत गर्न सकिँदैन।", "Are you sure you want to delete this thread? This action cannot be undone."))) return;
+                                    try {
+                                        const res = await fetch(`/api/discussions/threads?id=${threadId}`, { method: 'DELETE' });
+                                        if (!res.ok) throw new Error((await res.json()).error);
+                                        router.push(`/commune/${thread.channel?.slug || thread.channel?.id}`);
+                                    } catch (e: any) {
+                                        alert(t("मेटाउन असफल:", "Delete failed:") + " " + e.message);
+                                    }
+                                }}
+                                className="gap-2 text-destructive border-destructive/30 hover:bg-destructive/10"
+                            >
+                                <Trash2 size={16} />
+                                {t("मेटाउनुहोस्", "Delete")}
+                            </Button>
+                        )}
                     </div>
                 </div>
 
