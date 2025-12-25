@@ -1,23 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { Crown, Users, Hash } from "lucide-react";
+import { Crown, Users, Hash, Shield, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Tab components
 import CouncilMembersTab from "./CouncilMembersTab";
 import ChannelsTab from "./ChannelsTab";
 import UserChannelsTab from "./UserChannelsTab";
+import RolesTab from "./RolesTab";
+import DepartmentsTab from "./DepartmentsTab";
 
-type TabType = "council" | "channels" | "user-channels";
+type TabType = "council" | "roles" | "departments" | "channels" | "user-channels";
 
 export default function CouncilPageClient() {
     const [activeTab, setActiveTab] = useState<TabType>("council");
 
     const tabs = [
-        { id: "council" as TabType, label: "Council Members", icon: Crown },
+        { id: "council" as TabType, label: "Council", icon: Crown },
+        { id: "roles" as TabType, label: "Roles", icon: Shield },
+        { id: "departments" as TabType, label: "Departments", icon: Building2 },
         { id: "channels" as TabType, label: "Channels", icon: Hash },
-        { id: "user-channels" as TabType, label: "User Channels", icon: Users },
+        { id: "user-channels" as TabType, label: "User Access", icon: Users },
     ];
 
     return (
@@ -25,13 +29,13 @@ export default function CouncilPageClient() {
             <h1 className="text-3xl font-bold text-brand-navy">Party Council</h1>
 
             {/* Tabs */}
-            <div className="flex border-b border-slate-200">
+            <div className="flex border-b border-slate-200 overflow-x-auto">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={cn(
-                            "px-6 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2",
+                            "px-4 py-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 whitespace-nowrap",
                             activeTab === tab.id
                                 ? "border-brand-blue text-brand-blue"
                                 : "border-transparent text-muted-foreground hover:text-slate-800"
@@ -46,6 +50,8 @@ export default function CouncilPageClient() {
             {/* Tab Content */}
             <div className="min-h-[400px]">
                 {activeTab === "council" && <CouncilMembersTab />}
+                {activeTab === "roles" && <RolesTab />}
+                {activeTab === "departments" && <DepartmentsTab />}
                 {activeTab === "channels" && <ChannelsTab />}
                 {activeTab === "user-channels" && <UserChannelsTab />}
             </div>
