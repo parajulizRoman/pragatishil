@@ -28,7 +28,7 @@ const roleBadgeColors: Record<string, string> = {
     viewer: "bg-slate-100 text-slate-600",
     member: "bg-blue-100 text-blue-700",
     moderator: "bg-purple-100 text-purple-700",
-    admin: "bg-red-100 text-red-700"
+    incharge: "bg-red-100 text-red-700"
 };
 
 export default function ChannelMembersModal({
@@ -224,7 +224,7 @@ export default function ChannelMembersModal({
                                                 <option value="viewer">{t("हेर्ने", "Viewer")}</option>
                                                 <option value="member">{t("सदस्य", "Member")}</option>
                                                 <option value="moderator">{t("मोडेरेटर", "Moderator")}</option>
-                                                <option value="admin">{t("एडमिन", "Admin")}</option>
+                                                <option value="incharge">{t("इन्चार्ज", "Incharge")}</option>
                                             </select>
 
                                             {/* Remove */}

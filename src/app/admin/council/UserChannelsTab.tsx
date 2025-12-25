@@ -37,7 +37,7 @@ const roleBadgeColors: Record<string, string> = {
     viewer: "bg-slate-100 text-slate-600",
     member: "bg-blue-100 text-blue-700",
     moderator: "bg-purple-100 text-purple-700",
-    admin: "bg-red-100 text-red-700",
+    incharge: "bg-red-100 text-red-700",
 };
 
 export default function UserChannelsTab() {
@@ -213,7 +213,7 @@ export default function UserChannelsTab() {
                                             <option value="viewer">Viewer</option>
                                             <option value="member">Member</option>
                                             <option value="moderator">Moderator</option>
-                                            <option value="admin">Admin</option>
+                                            <option value="incharge">Incharge</option>
                                         </select>
                                         <Button
                                             variant="ghost"

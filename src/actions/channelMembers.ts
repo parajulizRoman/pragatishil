@@ -7,7 +7,7 @@ export interface ChannelMember {
     id: string;
     channel_id: string;
     user_id: string;
-    role: 'viewer' | 'member' | 'moderator' | 'admin';
+    role: 'viewer' | 'member' | 'moderator' | 'incharge';
     added_at: string;
     added_by: string | null;
     user?: {

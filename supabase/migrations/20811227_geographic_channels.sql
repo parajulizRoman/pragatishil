@@ -168,7 +168,11 @@ WITH CHECK (
     OR can_create_subchannel(auth.uid(), parent_channel_id)
 );
 
+-- 10. Migrate existing 'admin' roles to 'incharge'
+UPDATE channel_members SET role = 'incharge' WHERE role = 'admin';
+
 COMMENT ON COLUMN discussion_channels.parent_channel_id IS 'Parent channel for hierarchical nesting (ward->municipality->district->state->central)';
 COMMENT ON COLUMN discussion_channels.location_type IS 'Geographic level: central, state, district, municipality, ward, department';
 COMMENT ON COLUMN discussion_channels.location_value IS 'Specific location identifier (e.g., state slug, district name)';
 COMMENT ON COLUMN discussion_channels.can_create_subchannels IS 'Whether members can create sub-channels under this channel';
+

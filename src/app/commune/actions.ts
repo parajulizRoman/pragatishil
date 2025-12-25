@@ -293,11 +293,11 @@ export async function createSubChannel(
 
     if (insertError) throw new Error(insertError.message);
 
-    // Auto-add creator as admin of the new channel
+    // Auto-add creator as incharge of the new channel
     await supabase.from('channel_members').insert({
         channel_id: newChannel.id,
         user_id: user.id,
-        role: 'admin'
+        role: 'incharge'
     });
 
     revalidatePath("/commune");
