@@ -8,7 +8,7 @@ import { DiscussionThread, DiscussionChannel } from "@/types";
 import { createBrowserClient } from "@supabase/ssr";
 import { flagContent, votePost } from "@/app/commune/actions";
 import TextareaAutosize from 'react-textarea-autosize';
-import { Paperclip, X, FileText, Image as ImageIcon, Loader2, ArrowLeft, MessageSquare, ThumbsUp, ThumbsDown, Flag, Users } from "lucide-react";
+import { Paperclip, X, FileText, Image as ImageIcon, Loader2, ArrowLeft, MessageSquare, ThumbsUp, ThumbsDown, Flag, Users, Edit2, Trash2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import ChannelMembersModal from "../ChannelMembersModal";
+import ChannelHeaderEditModal from "../ChannelHeaderEditModal";
 import { canManageChannels } from "@/lib/permissions";
 
 export default function ChannelPage() {
@@ -54,6 +55,9 @@ export default function ChannelPage() {
 
     // Members modal
     const [showMembersModal, setShowMembersModal] = useState(false);
+
+    // Header edit modal
+    const [showHeaderEditModal, setShowHeaderEditModal] = useState(false);
 
     useEffect(() => {
         const supabase = createBrowserClient(
@@ -317,6 +321,90 @@ export default function ChannelPage() {
                         <strong className="block text-brand-blue mb-1">{t("दिशानिर्देश", "Guidelines")}:</strong>
                         <p>{language === 'ne' && channel.guidelines_ne ? channel.guidelines_ne : channel.guidelines_en}</p>
                         {language === 'en' && channel.guidelines_ne && <p className="font-nepali text-slate-600 mt-1">{channel.guidelines_ne}</p>}
+                    </div>
+                )}
+
+                {/* Channel Header Section (for geographic/department channels) */}
+                {(channel.header_image_url || channel.political_intro || (channel.impact_stats && Object.keys(channel.impact_stats).length > 0)) && (
+                    <div className="mt-6 rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
+                        {/* Banner Image */}
+                        {channel.header_image_url && (
+                            <div className="relative h-48 md:h-64">
+                                <img
+                                    src={channel.header_image_url}
+                                    alt={channel.name}
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                            </div>
+                        )}
+
+                        <div className="p-5">
+                            {/* Political Intro */}
+                            {channel.political_intro && (
+                                <div className="mb-4">
+                                    <h3 className="text-sm font-semibold text-brand-navy mb-2">
+                                        {t("राजनीतिक परिचय", "Political Introduction")}
+                                    </h3>
+                                    <div className="prose prose-sm max-w-none text-slate-600">
+                                        {channel.political_intro.split('\n').map((line, i) => (
+                                            <p key={i} className="mb-2">{line}</p>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Impact Stats Cards */}
+                            {channel.impact_stats && Object.keys(channel.impact_stats).length > 0 && (
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    {Object.entries(channel.impact_stats).map(([key, value]) => (
+                                        <div key={key} className="bg-slate-50 rounded-lg p-3 text-center">
+                                            <div className="text-xs text-slate-500 uppercase tracking-wide">{key}</div>
+                                            <div className="text-lg font-bold text-brand-navy">{String(value)}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Edit/Delete Buttons for channel header */}
+                {channel.location_type && (
+                    <div className="mt-4 flex gap-2">
+                        {/* Edit: admin, incharge, or moderator */}
+                        {(canManageChannels(userRole)) && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowHeaderEditModal(true)}
+                                className="text-slate-600 border-slate-300 hover:bg-slate-50"
+                            >
+                                <Edit2 className="w-4 h-4 mr-1" />
+                                {t("हेडर सम्पादन", "Edit Header")}
+                            </Button>
+                        )}
+                        {/* Delete: party_admin only */}
+                        {['admin', 'yantrik'].includes(userRole) && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={async () => {
+                                    if (!confirm(t("के तपाईं यो च्यानल मेटाउन चाहनुहुन्छ?", "Are you sure you want to delete this channel?"))) return;
+                                    try {
+                                        const res = await fetch(`/api/discussions/channels?id=${channel.id}`, { method: 'DELETE' });
+                                        if (!res.ok) throw new Error('Failed to delete');
+                                        window.location.href = '/commune';
+                                    } catch {
+                                        alert('Failed to delete channel');
+                                    }
+                                }}
+                                className="text-red-600 border-red-200 hover:bg-red-50"
+                            >
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                {t("च्यानल मेटाउनुहोस्", "Delete Channel")}
+                            </Button>
+                        )}
                     </div>
                 )}
             </div>
@@ -686,6 +774,16 @@ export default function ChannelPage() {
                 channelId={channelId}
                 channelName={channel?.name || ''}
             />
+
+            {/* Channel Header Edit Modal */}
+            {channel && (
+                <ChannelHeaderEditModal
+                    isOpen={showHeaderEditModal}
+                    onClose={() => setShowHeaderEditModal(false)}
+                    onSuccess={fetchData}
+                    channel={channel}
+                />
+            )}
         </div>
     );
 }

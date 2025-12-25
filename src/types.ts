@@ -186,6 +186,10 @@ export interface DiscussionChannel {
     location_value?: string | null;
     can_create_subchannels?: boolean;
 
+    // Header fields (for geographic/department channels)
+    header_image_url?: string | null;
+    political_intro?: string | null;
+
     created_at: string;
 }
 
