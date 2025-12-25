@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { Hash, Users, Lock, Globe, UserCheck } from "lucide-react";
 import { createBrowserClient } from "@supabase/ssr";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import ChannelMembersModal from "@/app/commune/ChannelMembersModal";
 
@@ -17,11 +16,11 @@ interface Channel {
     member_count?: number;
 }
 
-const accessTypeBadge: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
-    public: { color: "bg-green-100 text-green-700", icon: <Globe size={12} />, label: "Public" },
-    members: { color: "bg-blue-100 text-blue-700", icon: <UserCheck size={12} />, label: "Members" },
-    role_based: { color: "bg-purple-100 text-purple-700", icon: <Users size={12} />, label: "Role-Based" },
-    private: { color: "bg-amber-100 text-amber-700", icon: <Lock size={12} />, label: "Private" },
+const accessTypeBadge: Record<string, { bgColor: string; textColor: string; icon: React.ReactNode; label: string }> = {
+    public: { bgColor: "#dcfce7", textColor: "#166534", icon: <Globe size={12} />, label: "Public" },
+    members: { bgColor: "#dbeafe", textColor: "#1e40af", icon: <UserCheck size={12} />, label: "Members" },
+    role_based: { bgColor: "#f3e8ff", textColor: "#7c3aed", icon: <Users size={12} />, label: "Role-Based" },
+    private: { bgColor: "#fef3c7", textColor: "#92400e", icon: <Lock size={12} />, label: "Private" },
 };
 
 export default function ChannelsTab() {
@@ -114,10 +113,16 @@ export default function ChannelsTab() {
 
                                 {/* Access Type */}
                                 <div className="col-span-3">
-                                    <Badge className={`${accessInfo.color} flex items-center gap-1 w-fit`}>
+                                    <span
+                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
+                                        style={{
+                                            backgroundColor: accessInfo.bgColor,
+                                            color: accessInfo.textColor
+                                        }}
+                                    >
                                         {accessInfo.icon}
                                         {accessInfo.label}
-                                    </Badge>
+                                    </span>
                                 </div>
 
                                 {/* Member Count */}
