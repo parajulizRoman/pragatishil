@@ -180,6 +180,11 @@ export interface DiscussionChannel {
     guidelines_en?: string;
     guidelines_ne?: string;
 
+    // Hierarchy fields (for geographic channels)
+    parent_channel_id?: string | null;
+    location_type?: 'central' | 'state' | 'district' | 'municipality' | 'ward' | 'department' | null;
+    location_value?: string | null;
+
     created_at: string;
 }
 

@@ -41,7 +41,7 @@ export async function GET(request: Request) {
         // Fetch all channels first, then filter
         let query = supabase
             .from("discussion_channels")
-            .select("*, resources:discussion_channel_resources(*)");
+            .select("*, parent_channel_id, location_type, location_value, resources:discussion_channel_resources(*)");
 
         if (id) query = query.eq("id", id);
         if (slug) query = query.eq("slug", slug);

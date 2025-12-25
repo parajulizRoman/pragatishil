@@ -92,8 +92,26 @@ export default function CommuneLayout({
     // Use Capability Helper
     const canEditChannels = canManageChannels(userRole);
 
-    // Dynamic Grouping & Ordering
-    const groupedChannels = channels.reduce((acc, channel) => {
+    // Separate geographic (Council) channels from regular channels
+    const geoChannels = channels.filter(c => c.location_type);
+    const regularChannels = channels.filter(c => !c.location_type);
+
+    // Build nested tree from geographic channels
+    interface ChannelNode extends DiscussionChannel {
+        children: ChannelNode[];
+    }
+
+    const buildChannelTree = (chans: DiscussionChannel[], parentId: string | null = null): ChannelNode[] => {
+        return chans
+            .filter(c => c.parent_channel_id === parentId)
+            .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+            .map(c => ({ ...c, children: buildChannelTree(chans, c.id) }));
+    };
+
+    const councilTree = buildChannelTree(geoChannels);
+
+    // Dynamic Grouping & Ordering for regular channels
+    const groupedChannels = regularChannels.reduce((acc, channel) => {
         const cat = channel.category || 'General';
         if (!acc[cat]) acc[cat] = [];
         acc[cat].push(channel);
@@ -173,6 +191,68 @@ export default function CommuneLayout({
         );
     };
 
+    // Recursive render for Council tree
+    const renderCouncilNode = (node: ChannelNode, depth: number = 0): React.ReactNode => {
+        const hasChildren = node.children && node.children.length > 0;
+        const isActive = pathname.includes(node.id);
+
+        // Location type icons
+        const locationIcons: Record<string, string> = {
+            'central': '🏛️',
+            'state': '🗺️',
+            'district': '📍',
+            'municipality': '🏘️',
+            'ward': '🏠',
+        };
+        const icon = locationIcons[node.location_type || ''] || '#';
+
+        if (hasChildren) {
+            return (
+                <details key={node.id} open={depth < 1} className="group/nested">
+                    <summary className={`flex items-center justify-between cursor-pointer list-none text-sm py-1.5 px-2 rounded-md hover:bg-slate-50 transition-colors ${isActive ? 'bg-red-50 text-brand-red font-medium' : 'text-slate-600'}`}>
+                        <span className="flex items-center gap-1.5">
+                            <span className="text-xs">{icon}</span>
+                            {language === 'ne' && node.name_ne ? node.name_ne : node.name}
+                        </span>
+                        <span className="text-[10px] transform group-open/nested:rotate-180 transition-transform">▼</span>
+                    </summary>
+                    <div className="pl-3 border-l-2 border-red-100 ml-2 mt-1 space-y-0.5">
+                        {node.children.map((child: ChannelNode) => renderCouncilNode(child, depth + 1))}
+                    </div>
+                </details>
+            );
+        }
+
+        // Leaf node (no children) - clickable link
+        return (
+            <Link
+                key={node.id}
+                href={`/commune/${node.id}`}
+                className={`flex items-center gap-1.5 py-1.5 px-2 rounded-md text-sm transition-colors ${isActive ? 'bg-red-50 text-brand-red font-medium' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+            >
+                <span className="text-xs">{icon}</span>
+                {language === 'ne' && node.name_ne ? node.name_ne : node.name}
+            </Link>
+        );
+    };
+
+    // Render Council category with nested tree
+    const renderCouncilCategory = () => {
+        if (councilTree.length === 0) return null;
+
+        return (
+            <details open className="group">
+                <summary className="flex items-center justify-between cursor-pointer list-none text-xs font-bold text-brand-red uppercase tracking-wider mb-2 px-2 hover:text-red-700 transition-colors">
+                    <span>🏛️ {t("परिषद्", "Council")}</span>
+                    <span className="text-[10px] transform group-open:rotate-180 transition-transform">▼</span>
+                </summary>
+                <div className="space-y-1 mb-4 pl-1 border-l-2 border-red-100 ml-1">
+                    {councilTree.map((node: ChannelNode) => renderCouncilNode(node, 0))}
+                </div>
+            </details>
+        );
+    };
+
     // Role label translation with disguising (admin → yantrik, board → central committee)
     const getRoleLabel = (role: string | null) => {
         if (!role) return t("अतिथि", "Guest");
@@ -215,7 +295,13 @@ export default function CommuneLayout({
                         {loading ? (
                             <SidebarSkeleton />
                         ) : (
-                            sortedCategories.map(renderCategoryGroup)
+                            <>
+                                {/* Council (Geographic) Channels First */}
+                                {renderCouncilCategory()}
+
+                                {/* Regular Categories */}
+                                {sortedCategories.map(renderCategoryGroup)}
+                            </>
                         )}
 
                         {/* Fallback if no channels */}
