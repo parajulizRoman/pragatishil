@@ -234,3 +234,120 @@ export async function updateContent(targetId: string, targetType: 'post' | 'thre
     revalidatePath("/commune");
     return { success: true };
 }
+
+// Create a sub-channel under a parent (geographic hierarchy)
+export async function createSubChannel(
+    parentChannelId: string,
+    name: string,
+    description?: string
+) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) throw new Error("Must be logged in to create channels");
+
+    // Verify user can create sub-channel (check via DB function)
+    const { data: canCreate, error: checkError } = await supabase
+        .rpc('can_create_subchannel', {
+            p_user_id: user.id,
+            p_parent_channel_id: parentChannelId
+        });
+
+    if (checkError || !canCreate) {
+        throw new Error("You don't have permission to create channels here");
+    }
+
+    // Get parent channel info
+    const { data: parent } = await supabase
+        .from('discussion_channels')
+        .select('location_type, location_value')
+        .eq('id', parentChannelId)
+        .single();
+
+    if (!parent) throw new Error("Parent channel not found");
+
+    // Create slug from name
+    const slug = name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .substring(0, 50);
+
+    // Insert sub-channel
+    const { data: newChannel, error: insertError } = await supabase
+        .from('discussion_channels')
+        .insert({
+            name,
+            slug: `${parent.location_value}-${slug}-${Date.now().toString(36)}`,
+            description,
+            parent_channel_id: parentChannelId,
+            location_type: parent.location_type, // Inherit location type
+            location_value: parent.location_value, // Inherit location value
+            visibility: 'party_only',
+            access_type: 'members',
+            can_create_subchannels: false, // Sub-sub-channels not allowed by default
+            min_role_to_create_threads: 'party_member'
+        })
+        .select()
+        .single();
+
+    if (insertError) throw new Error(insertError.message);
+
+    // Auto-add creator as admin of the new channel
+    await supabase.from('channel_members').insert({
+        channel_id: newChannel.id,
+        user_id: user.id,
+        role: 'admin'
+    });
+
+    revalidatePath("/commune");
+    return { success: true, channelId: newChannel.id };
+}
+
+// Get channels with hierarchy (for nested display)
+export async function getChannelHierarchy() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    // Get user's profile for location filtering
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('state, district, municipality, ward, role')
+        .eq('id', user.id)
+        .single();
+
+    // Get all channels user has access to
+    const { data: channels } = await supabase
+        .from('discussion_channels')
+        .select(`
+            id, name, slug, description, 
+            parent_channel_id, location_type, location_value,
+            can_create_subchannels
+        `)
+        .order('location_type')
+        .order('name');
+
+    if (!channels) return [];
+
+    // Build hierarchy tree
+    const channelMap = new Map();
+    const rootChannels: typeof channels = [];
+
+    channels.forEach(ch => {
+        channelMap.set(ch.id, { ...ch, children: [] });
+    });
+
+    channels.forEach(ch => {
+        const channel = channelMap.get(ch.id);
+        if (ch.parent_channel_id && channelMap.has(ch.parent_channel_id)) {
+            channelMap.get(ch.parent_channel_id).children.push(channel);
+        } else if (!ch.parent_channel_id || ch.location_type === 'central') {
+            rootChannels.push(channel);
+        }
+    });
+
+    return rootChannels;
+}
+
