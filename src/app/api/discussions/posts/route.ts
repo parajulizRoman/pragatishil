@@ -181,6 +181,64 @@ export async function POST(request: Request) {
     }
 }
 
+// PUT - Edit post (creator only)
+export async function PUT(request: Request) {
+    try {
+        const supabase = await createClient();
+
+        // 1. Authenticate
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError || !user) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        // 2. Parse Body
+        const body = await request.json();
+        const { id, content } = body;
+
+        if (!id || !content) {
+            return NextResponse.json({ error: "Missing post id or content" }, { status: 400 });
+        }
+
+        // 3. Check ownership - only creator can edit
+        const { data: post, error: fetchError } = await supabase
+            .from("discussion_posts")
+            .select("id, author_id")
+            .eq("id", id)
+            .single();
+
+        if (fetchError || !post) {
+            return NextResponse.json({ error: "Post not found" }, { status: 404 });
+        }
+
+        if (post.author_id !== user.id) {
+            return NextResponse.json({ error: "Forbidden: You can only edit your own posts" }, { status: 403 });
+        }
+
+        // 4. Update post
+        const { data: updated, error: updateError } = await supabase
+            .from("discussion_posts")
+            .update({
+                content,
+                updated_at: new Date().toISOString()
+            })
+            .eq("id", id)
+            .select()
+            .single();
+
+        if (updateError) {
+            console.error("Error updating post:", updateError);
+            return NextResponse.json({ error: updateError.message }, { status: 500 });
+        }
+
+        return NextResponse.json({ post: updated as DiscussionPost });
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (err: any) {
+        return NextResponse.json({ error: err.message }, { status: 500 });
+    }
+}
+
 export async function DELETE(request: Request) {
     try {
         const supabase = await createClient();
