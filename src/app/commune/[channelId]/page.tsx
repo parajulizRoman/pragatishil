@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import ChannelMembersModal from "../ChannelMembersModal";
 import ChannelHeaderEditModal from "../ChannelHeaderEditModal";
+import KanbanBoard from "../KanbanBoard";
 import { canManageChannels } from "@/lib/permissions";
 
 export default function ChannelPage() {
@@ -42,7 +43,7 @@ export default function ChannelPage() {
     const [isUploading, setIsUploading] = useState(false);
 
     // UI Tabs
-    const [activeTab, setActiveTab] = useState<'discussions' | 'resources' | 'impact'>('discussions');
+    const [activeTab, setActiveTab] = useState<'discussions' | 'resources' | 'impact' | 'tasks'>('discussions');
 
     // Flagging
     const [flagThreadId, setFlagThreadId] = useState<string | null>(null);
@@ -539,6 +540,18 @@ export default function ChannelPage() {
                 >
                     {t("प्रभाव र तथ्याङ्क", "Impact & Stats")}
                 </button>
+                {/* Tasks Tab - only for geographic/department channels */}
+                {channel.location_type && (
+                    <button
+                        onClick={() => setActiveTab('tasks')}
+                        className={cn(
+                            "px-6 py-3 text-sm font-medium border-b-2 transition-colors",
+                            activeTab === 'tasks' ? "border-brand-blue text-brand-blue" : "border-transparent text-muted-foreground hover:text-slate-800"
+                        )}
+                    >
+                        {t("कार्यहरू", "Tasks")}
+                    </button>
+                )}
             </div>
 
             {/* TAB CONTENT */}
@@ -737,6 +750,15 @@ export default function ChannelPage() {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* Tasks Tab - Kanban Board */}
+            {activeTab === 'tasks' && channel.location_type && (
+                <KanbanBoard
+                    channelId={channel.id}
+                    canEdit={canManageChannels(userRole)}
+                    canDelete={['admin', 'yantrik'].includes(userRole)}
+                />
             )}
 
             {/* Flag Modal */}
