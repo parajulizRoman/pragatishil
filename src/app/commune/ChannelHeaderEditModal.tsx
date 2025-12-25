@@ -44,13 +44,13 @@ export default function ChannelHeaderEditModal({ isOpen, onClose, onSuccess, cha
 
             const filePath = `channel-headers/${channel.id}/${Date.now()}-${file.name}`;
             const { error } = await supabase.storage
-                .from("attachments")
+                .from("channel-media")
                 .upload(filePath, file, { upsert: true });
 
             if (error) throw error;
 
             const { data: { publicUrl } } = supabase.storage
-                .from("attachments")
+                .from("channel-media")
                 .getPublicUrl(filePath);
 
             setHeaderImageUrl(publicUrl);
