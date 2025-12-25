@@ -4,8 +4,8 @@
 -- =============================================
 -- FIRST: Ensure "Council" category exists
 -- =============================================
-INSERT INTO discussion_categories (name, sort_order)
-SELECT 'Council', 0
+INSERT INTO discussion_categories (name)
+SELECT 'Council'
 WHERE NOT EXISTS (
     SELECT 1 FROM discussion_categories WHERE name = 'Council'
 );
