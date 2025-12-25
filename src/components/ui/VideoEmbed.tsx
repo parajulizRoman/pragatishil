@@ -100,8 +100,31 @@ export default function VideoEmbed({ url, className = "" }: VideoEmbedProps) {
 
 /**
  * Component to render text with embedded videos and clickable @mentions
+ * Supports both plain text and Lexical JSON (rich text)
  */
 export function RichTextWithVideos({ content }: { content: string }) {
+    // Check if content is Lexical JSON (rich text)
+    let isRichContent = false;
+    try {
+        const parsed = JSON.parse(content);
+        isRichContent = parsed && typeof parsed === 'object' && 'root' in parsed;
+    } catch {
+        isRichContent = false;
+    }
+
+    // For rich content, use the RichContentRenderer
+    if (isRichContent) {
+        // We need to import this dynamically since it uses Lexical
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const RichContentRenderer = React.lazy(() => import('@/components/RichContentRenderer'));
+        return (
+            <React.Suspense fallback={<div className="animate-pulse bg-slate-100 h-20 rounded" />}>
+                <RichContentRenderer content={content} />
+            </React.Suspense>
+        );
+    }
+
+    // Plain text rendering with URL/mention parsing
     const urlPattern = /(https?:\/\/[^\s]+)/g;
     const mentionPattern = /@([a-zA-Z][a-zA-Z0-9_]{2,29})/g;
 
