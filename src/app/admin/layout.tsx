@@ -68,7 +68,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
         { name: "User Management", href: "/admin/users", icon: UserCog },
         { name: "Council", href: "/admin/council", icon: Users },
-        { name: "Roles", href: "/admin/roles", icon: Shield, restricted: true, allowIf: canViewAudit },
         { name: "Audit Logs", href: "/admin/audit", icon: Shield, restricted: true, allowIf: canViewAudit },
         { name: "AI Prompts", href: "/admin/ai-prompts", icon: Bot, restricted: true, allowIf: canViewAIPrompts },
         { name: "Graveyard", href: "/admin/graveyard", icon: Skull },
