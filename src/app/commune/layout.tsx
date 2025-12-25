@@ -108,7 +108,18 @@ export default function CommuneLayout({
             .map(c => ({ ...c, children: buildChannelTree(chans, c.id) }));
     };
 
-    const councilTree = buildChannelTree(geoChannels);
+    // Separate into 3 categories:
+    // 1. Central Committee (location_type = 'central')
+    // 2. Geographic/States (location_type = 'state', 'district', 'municipality', 'ward')
+    // 3. Departments (location_type = 'department')
+    const centralChannels = geoChannels.filter(c => c.location_type === 'central');
+    const stateChannels = geoChannels.filter(c => ['state', 'district', 'municipality', 'ward'].includes(c.location_type || ''));
+    const departmentChannels = geoChannels.filter(c => c.location_type === 'department');
+
+    // Build trees for each category
+    const centralTree = buildChannelTree(centralChannels);
+    const statesTree = buildChannelTree(stateChannels);
+    const departmentsTree = buildChannelTree(departmentChannels);
 
     // Dynamic Grouping & Ordering for regular channels
     const groupedChannels = regularChannels.reduce((acc, channel) => {
@@ -236,9 +247,13 @@ export default function CommuneLayout({
         );
     };
 
-    // Render Council category with nested tree
+    // Render Council category with 3 sub-sections
     const renderCouncilCategory = () => {
-        if (councilTree.length === 0) return null;
+        const hasCentral = centralTree.length > 0;
+        const hasStates = statesTree.length > 0;
+        const hasDepartments = departmentsTree.length > 0;
+
+        if (!hasCentral && !hasStates && !hasDepartments) return null;
 
         return (
             <details open className="group">
@@ -246,8 +261,46 @@ export default function CommuneLayout({
                     <span>🏛️ {t("परिषद्", "Council")}</span>
                     <span className="text-[10px] transform group-open:rotate-180 transition-transform">▼</span>
                 </summary>
-                <div className="space-y-1 mb-4 pl-1 border-l-2 border-red-100 ml-1">
-                    {councilTree.map((node: ChannelNode) => renderCouncilNode(node, 0))}
+                <div className="space-y-3 mb-4 pl-1 border-l-2 border-red-100 ml-1">
+
+                    {/* Central Committee */}
+                    {hasCentral && (
+                        <details open className="group/central">
+                            <summary className="flex items-center justify-between cursor-pointer text-xs font-semibold text-slate-600 uppercase tracking-wide px-2 hover:text-brand-red transition-colors">
+                                <span className="flex items-center gap-1">🏢 {t("केन्द्रीय समिति", "Central Committee")}</span>
+                                <span className="text-[10px] transform group-open/central:rotate-180 transition-transform">▼</span>
+                            </summary>
+                            <div className="pl-3 border-l-2 border-slate-100 ml-2 mt-1 space-y-0.5">
+                                {centralTree.map((node: ChannelNode) => renderCouncilNode(node, 0))}
+                            </div>
+                        </details>
+                    )}
+
+                    {/* Geographic - States Hierarchy */}
+                    {hasStates && (
+                        <details open className="group/states">
+                            <summary className="flex items-center justify-between cursor-pointer text-xs font-semibold text-slate-600 uppercase tracking-wide px-2 hover:text-brand-red transition-colors">
+                                <span className="flex items-center gap-1">🗺️ {t("प्रादेशिक", "Geographic")}</span>
+                                <span className="text-[10px] transform group-open/states:rotate-180 transition-transform">▼</span>
+                            </summary>
+                            <div className="pl-3 border-l-2 border-slate-100 ml-2 mt-1 space-y-0.5">
+                                {statesTree.map((node: ChannelNode) => renderCouncilNode(node, 0))}
+                            </div>
+                        </details>
+                    )}
+
+                    {/* Departments */}
+                    {hasDepartments && (
+                        <details open className="group/depts">
+                            <summary className="flex items-center justify-between cursor-pointer text-xs font-semibold text-slate-600 uppercase tracking-wide px-2 hover:text-brand-red transition-colors">
+                                <span className="flex items-center gap-1">📁 {t("विभागहरू", "Departments")}</span>
+                                <span className="text-[10px] transform group-open/depts:rotate-180 transition-transform">▼</span>
+                            </summary>
+                            <div className="pl-3 border-l-2 border-slate-100 ml-2 mt-1 space-y-0.5">
+                                {departmentsTree.map((node: ChannelNode) => renderCouncilNode(node, 0))}
+                            </div>
+                        </details>
+                    )}
                 </div>
             </details>
         );
