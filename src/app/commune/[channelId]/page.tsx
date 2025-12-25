@@ -7,8 +7,8 @@ import { useParams } from "next/navigation";
 import { DiscussionThread, DiscussionChannel } from "@/types";
 import { createBrowserClient } from "@supabase/ssr";
 import { flagContent, votePost } from "@/app/commune/actions";
-import TextareaAutosize from 'react-textarea-autosize';
 import { Paperclip, X, FileText, Image as ImageIcon, Loader2, ArrowLeft, MessageSquare, ThumbsUp, ThumbsDown, Flag, Users, Edit2, Trash2 } from "lucide-react";
+import RichTextEditor from "@/components/RichTextEditor";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ export default function ChannelPage() {
     const [showForm, setShowForm] = useState(false);
     const [newTitle, setNewTitle] = useState("");
     const [newBody, setNewBody] = useState("");
+    const [richContentJson, setRichContentJson] = useState<string>(""); // Lexical JSON
     const [isNewThreadAnon, setIsNewThreadAnon] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
 
@@ -216,7 +217,8 @@ export default function ChannelPage() {
             const payload = {
                 channelId,
                 title: newTitle,
-                content: newBody,
+                content: richContentJson || newBody, // Use rich content if available
+                content_type: richContentJson ? 'rich' : 'plain',
                 isAnon: isNewThreadAnon,
                 attachments: attachments.map(a => a.meta)
             };
@@ -234,6 +236,7 @@ export default function ChannelPage() {
 
             setNewTitle("");
             setNewBody("");
+            setRichContentJson("");
             setAttachments([]);
             setShowForm(false);
             fetchData(); // Refresh list
@@ -435,16 +438,16 @@ export default function ChannelPage() {
                                 />
                             </div>
 
-                            {/* Body Input */}
+                            {/* Body Input - Rich Text Editor */}
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">{t("सामग्री", "Content")} <span className="text-muted-foreground font-normal">({t("मार्कडाउन समर्थित", "Markdown supported")})</span></label>
-                                <TextareaAutosize
-                                    minRows={5}
-                                    value={newBody}
-                                    onChange={(e) => setNewBody(e.target.value)}
-                                    className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                                <label className="block text-sm font-medium text-slate-700 mb-1">{t("सामग्री", "Content")}</label>
+                                <RichTextEditor
                                     placeholder={t("आफ्ना विस्तृत विचार, तर्क वा प्रश्नहरू साझा गर्नुहोस्...", "Share your detailed thoughts, arguments, or questions...")}
-                                    required
+                                    minHeight="150px"
+                                    onChange={(json, plainText) => {
+                                        setRichContentJson(json);
+                                        setNewBody(plainText);
+                                    }}
                                 />
 
                                 {/* Attachment List */}
