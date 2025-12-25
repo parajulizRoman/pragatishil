@@ -2,6 +2,15 @@
 -- Run after 20811227_geographic_channels.sql
 
 -- =============================================
+-- FIRST: Ensure "Council" category exists
+-- =============================================
+INSERT INTO discussion_categories (name, sort_order)
+SELECT 'Council', 0
+WHERE NOT EXISTS (
+    SELECT 1 FROM discussion_categories WHERE name = 'Council'
+);
+
+-- =============================================
 -- SEED DEPARTMENT CHANNELS
 -- =============================================
 -- Departments are top-level under Central Committee
