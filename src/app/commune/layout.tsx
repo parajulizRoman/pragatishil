@@ -41,6 +41,7 @@ export default function CommuneLayout({
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingChannel, setEditingChannel] = useState<DiscussionChannel | null>(null);
+    const [parentChannelForCreate, setParentChannelForCreate] = useState<DiscussionChannel | null>(null);
 
     useEffect(() => {
         fetchData();
@@ -79,6 +80,15 @@ export default function CommuneLayout({
 
     const handleCreate = () => {
         setEditingChannel(null);
+        setParentChannelForCreate(null);
+        setIsModalOpen(true);
+    };
+
+    const handleCreateSubChannel = (e: React.MouseEvent, parentChannel: DiscussionChannel) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setEditingChannel(null);
+        setParentChannelForCreate(parentChannel);
         setIsModalOpen(true);
     };
 
@@ -86,6 +96,7 @@ export default function CommuneLayout({
         e.preventDefault();
         e.stopPropagation();
         setEditingChannel(channel);
+        setParentChannelForCreate(null);
         setIsModalOpen(true);
     };
 
@@ -223,6 +234,9 @@ export default function CommuneLayout({
         const hasChildren = node.children && node.children.length > 0;
         const isActive = pathname.includes(node.id);
 
+        // Check if user can create sub-channels under this node
+        const canCreateSub = node.can_create_subchannels && canEditChannels;
+
         // Location type icons
         const locationIcons: Record<string, string> = {
             'central': '🏛️',
@@ -233,15 +247,31 @@ export default function CommuneLayout({
         };
         const icon = locationIcons[node.location_type || ''] || '#';
 
+        // Create sub-channel button
+        const createButton = canCreateSub ? (
+            <button
+                onClick={(e) => handleCreateSubChannel(e, node)}
+                className="opacity-0 group-hover/item:opacity-100 text-slate-400 hover:text-brand-blue p-0.5 rounded hover:bg-slate-100 transition-all"
+                title={t("उप-च्यानल सिर्जना गर्नुहोस्", "Create sub-channel")}
+            >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                </svg>
+            </button>
+        ) : null;
+
         if (hasChildren) {
             return (
                 <details key={node.id} open={depth < 1} className="group/nested">
-                    <summary className={`flex items-center justify-between cursor-pointer list-none text-sm py-1.5 px-2 rounded-md hover:bg-slate-50 transition-colors ${isActive ? 'bg-red-50 text-brand-red font-medium' : 'text-slate-600'}`}>
-                        <span className="flex items-center gap-1.5">
+                    <summary className={`group/item flex items-center justify-between cursor-pointer list-none text-sm py-1.5 px-2 rounded-md hover:bg-slate-50 transition-colors ${isActive ? 'bg-red-50 text-brand-red font-medium' : 'text-slate-600'}`}>
+                        <span className="flex items-center gap-1.5 flex-1">
                             <span className="text-xs">{icon}</span>
                             {language === 'ne' && node.name_ne ? node.name_ne : node.name}
                         </span>
-                        <span className="text-[10px] transform group-open/nested:rotate-180 transition-transform">▼</span>
+                        <span className="flex items-center gap-1">
+                            {createButton}
+                            <span className="text-[10px] transform group-open/nested:rotate-180 transition-transform">▼</span>
+                        </span>
                     </summary>
                     <div className="pl-3 border-l-2 border-red-100 ml-2 mt-1 space-y-0.5">
                         {node.children.map((child: ChannelNode) => renderCouncilNode(child, depth + 1))}
@@ -250,16 +280,18 @@ export default function CommuneLayout({
             );
         }
 
-        // Leaf node (no children) - clickable link
+        // Leaf node (no children) - clickable link with optional create button
         return (
-            <Link
-                key={node.id}
-                href={`/commune/${node.id}`}
-                className={`flex items-center gap-1.5 py-1.5 px-2 rounded-md text-sm transition-colors ${isActive ? 'bg-red-50 text-brand-red font-medium' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
-            >
-                <span className="text-xs">{icon}</span>
-                {language === 'ne' && node.name_ne ? node.name_ne : node.name}
-            </Link>
+            <div key={node.id} className="group/item flex items-center justify-between">
+                <Link
+                    href={`/commune/${node.id}`}
+                    className={`flex-1 flex items-center gap-1.5 py-1.5 px-2 rounded-md text-sm transition-colors ${isActive ? 'bg-red-50 text-brand-red font-medium' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                >
+                    <span className="text-xs">{icon}</span>
+                    {language === 'ne' && node.name_ne ? node.name_ne : node.name}
+                </Link>
+                {createButton}
+            </div>
         );
     };
 
@@ -398,6 +430,7 @@ export default function CommuneLayout({
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={fetchData}
                 editChannel={editingChannel}
+                parentChannel={parentChannelForCreate}
             />
         </div>
     );

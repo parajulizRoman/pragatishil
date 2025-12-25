@@ -184,6 +184,7 @@ export interface DiscussionChannel {
     parent_channel_id?: string | null;
     location_type?: 'central' | 'state' | 'district' | 'municipality' | 'ward' | 'department' | null;
     location_value?: string | null;
+    can_create_subchannels?: boolean;
 
     created_at: string;
 }

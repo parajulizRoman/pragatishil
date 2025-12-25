@@ -33,9 +33,10 @@ interface ChannelModalProps {
     onClose: () => void;
     onSuccess: () => void;
     editChannel?: DiscussionChannel | null;
+    parentChannel?: DiscussionChannel | null; // For creating sub-channels
 }
 
-export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }: ChannelModalProps) {
+export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel, parentChannel }: ChannelModalProps) {
     const { t } = useLanguage();
     const [name, setName] = useState("");
     const [slug, setSlug] = useState("");
@@ -202,6 +203,25 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel }
                 // Default settings for new channels if not explicitly in form
                 body.allow_anonymous_posts = false;
                 body.min_role_to_post = 'member';
+
+                // If creating a sub-channel, inherit parent info
+                if (parentChannel) {
+                    body.parent_channel_id = parentChannel.id;
+                    body.can_create_subchannels = true; // Sub-channels can also have children
+                    body.visibility = parentChannel.visibility; // Inherit visibility
+                    body.category = parentChannel.category || 'Council';
+
+                    // Auto-set child location type
+                    const childLocationTypes: Record<string, string> = {
+                        'state': 'district',
+                        'district': 'municipality',
+                        'municipality': 'ward',
+                    };
+                    if (parentChannel.location_type && childLocationTypes[parentChannel.location_type]) {
+                        body.location_type = childLocationTypes[parentChannel.location_type];
+                        body.location_value = slug; // Use slug as location identifier
+                    }
+                }
             }
 
             const res = await fetch(url, {
