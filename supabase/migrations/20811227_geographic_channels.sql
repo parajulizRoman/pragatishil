@@ -9,12 +9,17 @@ ADD COLUMN IF NOT EXISTS location_type TEXT CHECK (location_type IN ('central', 
 ADD COLUMN IF NOT EXISTS location_value TEXT,
 ADD COLUMN IF NOT EXISTS can_create_subchannels BOOLEAN DEFAULT false;
 
--- 2. Create indexes for hierarchy queries
+-- 2. Add location text columns to profiles (for channel assignment)
+ALTER TABLE profiles
+ADD COLUMN IF NOT EXISTS geo_state TEXT,
+ADD COLUMN IF NOT EXISTS geo_district TEXT,
+ADD COLUMN IF NOT EXISTS geo_municipality TEXT,
+ADD COLUMN IF NOT EXISTS geo_ward TEXT;
+
+-- 3. Create indexes for hierarchy queries
 CREATE INDEX IF NOT EXISTS idx_channels_parent ON discussion_channels(parent_channel_id);
 CREATE INDEX IF NOT EXISTS idx_channels_location ON discussion_channels(location_type, location_value);
-
--- 3. Update min_role_to_create_threads to allow ward members to post
--- (Already exists, just noting it's relevant)
+CREATE INDEX IF NOT EXISTS idx_profiles_geo ON profiles(geo_state, geo_district, geo_municipality);
 
 -- 4. Function to auto-assign user to geographic channels based on their profile location
 CREATE OR REPLACE FUNCTION assign_user_to_geographic_channels()
@@ -23,7 +28,7 @@ DECLARE
     v_channel RECORD;
 BEGIN
     -- Only proceed if location fields are set
-    IF NEW.state IS NULL AND NEW.district IS NULL AND NEW.municipality IS NULL AND NEW.ward IS NULL THEN
+    IF NEW.geo_state IS NULL AND NEW.geo_district IS NULL AND NEW.geo_municipality IS NULL AND NEW.geo_ward IS NULL THEN
         RETURN NEW;
     END IF;
 
@@ -31,19 +36,19 @@ BEGIN
     FOR v_channel IN 
         SELECT id FROM discussion_channels
         WHERE 
-            -- Central committee (all members)
+            -- Central committee (all members with any location)
             (location_type = 'central')
             -- State channels
-            OR (location_type = 'state' AND NEW.state IS NOT NULL AND location_value = NEW.state)
+            OR (location_type = 'state' AND NEW.geo_state IS NOT NULL AND location_value = NEW.geo_state)
             -- District channels  
-            OR (location_type = 'district' AND NEW.district IS NOT NULL AND location_value = NEW.district)
+            OR (location_type = 'district' AND NEW.geo_district IS NOT NULL AND location_value = NEW.geo_district)
             -- Municipality channels
-            OR (location_type = 'municipality' AND NEW.municipality IS NOT NULL AND location_value = NEW.municipality)
+            OR (location_type = 'municipality' AND NEW.geo_municipality IS NOT NULL AND location_value = NEW.geo_municipality)
             -- Ward channels (match ward + parent municipality)
-            OR (location_type = 'ward' AND NEW.ward IS NOT NULL AND location_value = NEW.ward
+            OR (location_type = 'ward' AND NEW.geo_ward IS NOT NULL AND location_value = NEW.geo_ward
                 AND parent_channel_id IN (
                     SELECT id FROM discussion_channels 
-                    WHERE location_type = 'municipality' AND location_value = NEW.municipality
+                    WHERE location_type = 'municipality' AND location_value = NEW.geo_municipality
                 ))
     LOOP
         INSERT INTO channel_members (channel_id, user_id, role, joined_at)
@@ -58,9 +63,8 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- 5. Create trigger on profiles for location changes
 DROP TRIGGER IF EXISTS trg_assign_geographic_channels ON profiles;
 CREATE TRIGGER trg_assign_geographic_channels
-AFTER INSERT OR UPDATE OF state, district, municipality, ward ON profiles
+AFTER INSERT OR UPDATE OF geo_state, geo_district, geo_municipality, geo_ward ON profiles
 FOR EACH ROW 
-WHEN (NEW.state IS NOT NULL OR NEW.district IS NOT NULL OR NEW.municipality IS NOT NULL OR NEW.ward IS NOT NULL)
 EXECUTE FUNCTION assign_user_to_geographic_channels();
 
 -- 6. Function to check if user can create sub-channels
