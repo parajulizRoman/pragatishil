@@ -249,27 +249,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- RLS Policy: Allow reading threads if user has hierarchical access
-DROP POLICY IF EXISTS "hierarchical_read_threads" ON discussion_threads;
-CREATE POLICY "hierarchical_read_threads"
-ON discussion_threads
-FOR SELECT
-TO authenticated
-USING (
-    has_hierarchical_read_access(auth.uid(), channel_id)
-);
-
--- RLS Policy: Allow reading messages if user has hierarchical access to thread's channel
-DROP POLICY IF EXISTS "hierarchical_read_messages" ON discussion_messages;
-CREATE POLICY "hierarchical_read_messages"
-ON discussion_messages
-FOR SELECT
-TO authenticated
-USING (
-    has_hierarchical_read_access(
-        auth.uid(), 
-        (SELECT channel_id FROM discussion_threads WHERE id = thread_id)
-    )
-);
+-- Note: RLS policies for discussion_threads/messages should be added
+-- in the migration that creates those tables, using has_hierarchical_read_access()
 
 COMMENT ON FUNCTION has_hierarchical_read_access IS 'Check if user can read a channel through direct membership or parent channel membership (read-down access)';
