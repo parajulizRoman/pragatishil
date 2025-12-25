@@ -154,7 +154,8 @@ WHERE NOT EXISTS (
 );
 
 -- 9. RLS policy for channel creation
-CREATE POLICY IF NOT EXISTS "Users can create subchannels where allowed"
+DROP POLICY IF EXISTS "Users can create subchannels where allowed" ON discussion_channels;
+CREATE POLICY "Users can create subchannels where allowed"
 ON discussion_channels
 FOR INSERT
 TO authenticated
