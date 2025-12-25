@@ -117,8 +117,24 @@ export default function CommuneLayout({
     const departmentChannels = geoChannels.filter(c => c.location_type === 'department');
 
     // Build trees for each category
+    // Central tree starts from root (no parent)
     const centralTree = buildChannelTree(centralChannels);
-    const statesTree = buildChannelTree(stateChannels);
+
+    // States tree: states are roots (even though they may have parent = central in DB)
+    // First get state-level channels as roots, then build children
+    const buildStatesTree = (): ChannelNode[] => {
+        // State channels are the roots for Geographic section
+        const stateRoots = stateChannels.filter(c => c.location_type === 'state');
+        return stateRoots
+            .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+            .map(s => ({
+                ...s,
+                children: buildChannelTree(stateChannels, s.id)
+            }));
+    };
+    const statesTree = buildStatesTree();
+
+    // Departments tree
     const departmentsTree = buildChannelTree(departmentChannels);
 
     // Dynamic Grouping & Ordering for regular channels
