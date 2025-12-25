@@ -206,20 +206,30 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel, 
 
                 // If creating a sub-channel, inherit parent info
                 if (parentChannel) {
-                    body.parent_channel_id = parentChannel.id;
-                    body.can_create_subchannels = true; // Sub-channels can also have children
-                    body.visibility = parentChannel.visibility; // Inherit visibility
-                    body.category = parentChannel.category || 'Council';
+                    // Special case: creating a new department
+                    if (parentChannel.id === 'new-department') {
+                        body.location_type = 'department';
+                        body.location_value = slug;
+                        body.can_create_subchannels = true;
+                        body.visibility = 'party_only';
+                        body.category = 'Council';
+                        // Parent = Central Committee (will be set by backend or manually)
+                    } else {
+                        body.parent_channel_id = parentChannel.id;
+                        body.can_create_subchannels = true; // Sub-channels can also have children
+                        body.visibility = parentChannel.visibility; // Inherit visibility
+                        body.category = parentChannel.category || 'Council';
 
-                    // Auto-set child location type
-                    const childLocationTypes: Record<string, string> = {
-                        'state': 'district',
-                        'district': 'municipality',
-                        'municipality': 'ward',
-                    };
-                    if (parentChannel.location_type && childLocationTypes[parentChannel.location_type]) {
-                        body.location_type = childLocationTypes[parentChannel.location_type];
-                        body.location_value = slug; // Use slug as location identifier
+                        // Auto-set child location type
+                        const childLocationTypes: Record<string, string> = {
+                            'state': 'district',
+                            'district': 'municipality',
+                            'municipality': 'ward',
+                        };
+                        if (parentChannel.location_type && childLocationTypes[parentChannel.location_type]) {
+                            body.location_type = childLocationTypes[parentChannel.location_type];
+                            body.location_value = slug; // Use slug as location identifier
+                        }
                     }
                 }
             }

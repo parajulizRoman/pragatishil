@@ -338,17 +338,52 @@ export default function CommuneLayout({
                     )}
 
                     {/* Departments */}
-                    {hasDepartments && (
-                        <details open className="group/depts">
-                            <summary className="flex items-center justify-between cursor-pointer text-xs font-semibold text-slate-600 uppercase tracking-wide px-2 hover:text-brand-red transition-colors">
-                                <span className="flex items-center gap-1">📁 {t("विभागहरू", "Departments")}</span>
+                    <details open className="group/depts">
+                        <summary className="flex items-center justify-between cursor-pointer text-xs font-semibold text-slate-600 uppercase tracking-wide px-2 hover:text-brand-red transition-colors">
+                            <span className="flex items-center gap-1">📁 {t("विभागहरू", "Departments")}</span>
+                            <span className="flex items-center gap-1">
+                                {/* Add Department button - admin/yantrik only */}
+                                {canEditChannels && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setEditingChannel(null);
+                                            // Create a "fake" parent for department
+                                            setParentChannelForCreate({
+                                                id: 'new-department',
+                                                name: 'New Department',
+                                                slug: 'new-department',
+                                                description: '',
+                                                visibility: 'party_only',
+                                                access_type: 'role_based',
+                                                category: 'Council',
+                                                location_type: 'department',
+                                                can_create_subchannels: true,
+                                                allow_anonymous_posts: false,
+                                                min_role_to_post: 'party_member',
+                                                min_role_to_create_threads: 'party_member',
+                                                min_role_to_comment: 'party_member',
+                                                min_role_to_vote: 'party_member',
+                                                created_at: new Date().toISOString(),
+                                            } as DiscussionChannel);
+                                            setIsModalOpen(true);
+                                        }}
+                                        className="text-slate-400 hover:text-brand-blue p-0.5 rounded hover:bg-slate-100 transition-all"
+                                        title={t("नयाँ विभाग थप्नुहोस्", "Add new department")}
+                                    >
+                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                    </button>
+                                )}
                                 <span className="text-[10px] transform group-open/depts:rotate-180 transition-transform">▼</span>
-                            </summary>
-                            <div className="pl-3 border-l-2 border-slate-100 ml-2 mt-1 space-y-0.5">
-                                {departmentsTree.map((node: ChannelNode) => renderCouncilNode(node, 0))}
-                            </div>
-                        </details>
-                    )}
+                            </span>
+                        </summary>
+                        <div className="pl-3 border-l-2 border-slate-100 ml-2 mt-1 space-y-0.5">
+                            {departmentsTree.map((node: ChannelNode) => renderCouncilNode(node, 0))}
+                        </div>
+                    </details>
                 </div>
             </details>
         );
