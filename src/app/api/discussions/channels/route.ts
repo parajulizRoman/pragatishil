@@ -39,7 +39,8 @@ export async function GET(request: Request) {
         const userLevel = ROLE_LEVELS[userRole] || 0;
 
         // Fetch all channels first, then filter
-        let query = supabase
+        // Use supabaseAdmin to bypass RLS for fetching, then we apply strict app-level filtering below
+        let query = supabaseAdmin
             .from("discussion_channels")
             .select("*, parent_channel_id, location_type, location_value, resources:discussion_channel_resources(*)");
 
