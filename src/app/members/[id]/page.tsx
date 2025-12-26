@@ -259,7 +259,7 @@ async function ActivityFeed({ userId }: { userId: string }) {
     // Fetch Posts
     const { data: posts } = await supabase
         .from('discussion_posts')
-        .select('id, content, created_at, thread:thread_id(title, channel:channel_id(slug))')
+        .select('id, content, created_at, thread:thread_id(id, title, channel:channel_id(slug))')
         .eq('author_id', userId)
         .neq('is_anonymous', true) // Hide anonymous posts from profile
         .order('created_at', { ascending: false })
