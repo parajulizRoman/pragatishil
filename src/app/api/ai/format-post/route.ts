@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 // POST /api/ai/format-post
 export async function POST(request: NextRequest) {
     try {
-        const cookieStore = await cookies();
+        const cookieStore = cookies();
         const supabase = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -19,13 +19,14 @@ export async function POST(request: NextRequest) {
             }
         );
 
-        // Check auth
+        // Check auth (Optional: Allow anon for now to support public channels)
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        // if (!user) {
+        //     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        // }
 
-        const { content } = await request.json();
+        const body = await request.json();
+        const { content } = body;
 
         if (!content || typeof content !== "string") {
             return NextResponse.json({ error: "Content is required" }, { status: 400 });
@@ -42,7 +43,8 @@ export async function POST(request: NextRequest) {
         }
 
         const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        // Use gemini-1.5-flash for speed and cost effectiveness
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `You are a professional content formatter. Take the following raw text and format it beautifully:
 
