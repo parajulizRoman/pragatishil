@@ -28,8 +28,7 @@ export async function GET(request: Request) {
                 .select(`
                     *,
                     channel:discussion_channels(id, name, slug, allow_anonymous_posts),
-                    author:profiles!fk_thread_author_profile(id, full_name, avatar_url, role),
-                    discussion_posts(count)
+                    author:profiles!fk_thread_author_profile(id, full_name, avatar_url, role)
                 `)
                 .eq('id', id)
                 .single();
@@ -49,7 +48,14 @@ export async function GET(request: Request) {
                 if (vote) userVote = vote.vote_type;
             }
 
-            return NextResponse.json({ thread: { ...thread, user_vote: userVote } });
+            // Get Reply Count
+            const { count } = await supabase
+                .from('discussion_posts')
+                .select('*', { count: 'exact', head: true })
+                .eq('thread_id', thread.id);
+            const reply_count = count ? Math.max(0, count - 1) : 0;
+
+            return NextResponse.json({ thread: { ...thread, user_vote: userVote, reply_count } });
         }
 
         // Fetch List of Threads
@@ -58,10 +64,8 @@ export async function GET(request: Request) {
             .select(`
                 *,
                 channel:discussion_channels!inner(id, name, slug),
-                *,
-                channel:discussion_channels!inner(id, name, slug),
-                author:profiles!fk_thread_author_profile(id, full_name, role),
-                discussion_posts(count)
+
+                author:profiles!fk_thread_author_profile(id, full_name, role)
             `)
             .order('created_at', { ascending: false })
             .limit(limit);
@@ -76,20 +80,32 @@ export async function GET(request: Request) {
             const { data: rawThreads, error } = await query;
             if (error) return { data: null, error };
 
-            // Process votes for list
-            if (user && rawThreads && rawThreads.length > 0) {
-                // Logic to batch get votes is cleaner but loop is ok for small limit
-                const threadsWithVotes = await Promise.all(rawThreads.map(async (t) => {
-                    if (!t.first_post_id) return { ...t, user_vote: 0 };
-                    const { data: vote } = await supabase
-                        .from('discussion_votes')
-                        .select('vote_type')
-                        .eq('post_id', t.first_post_id)
-                        .eq('user_id', user.id)
-                        .single();
-                    return { ...t, user_vote: vote?.vote_type || 0 };
+            // Process votes and counts for list
+            if (rawThreads && rawThreads.length > 0) {
+                const threadsWithDetails = await Promise.all(rawThreads.map(async (t) => {
+                    // 1. Get User Vote
+                    let user_vote = 0;
+                    if (user && t.first_post_id) {
+                        const { data: vote } = await supabase
+                            .from('discussion_votes')
+                            .select('vote_type')
+                            .eq('post_id', t.first_post_id)
+                            .eq('user_id', user.id)
+                            .single();
+                        if (vote) user_vote = vote.vote_type;
+                    }
+
+                    // 2. Get Reply Count (Total posts - 1)
+                    const { count } = await supabase
+                        .from('discussion_posts')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('thread_id', t.id);
+
+                    const reply_count = count ? Math.max(0, count - 1) : 0;
+
+                    return { ...t, user_vote, reply_count };
                 }));
-                return { data: threadsWithVotes, error: null };
+                return { data: threadsWithDetails, error: null };
             }
 
             return { data: rawThreads, error: null };
