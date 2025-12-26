@@ -28,7 +28,8 @@ export async function GET(request: Request) {
                 .select(`
                     *,
                     channel:discussion_channels(id, name, slug, allow_anonymous_posts),
-                    author:profiles!fk_thread_author_profile(id, full_name, avatar_url, role)
+                    author:profiles!fk_thread_author_profile(id, full_name, avatar_url, role),
+                    discussion_posts(count)
                 `)
                 .eq('id', id)
                 .single();
@@ -57,7 +58,10 @@ export async function GET(request: Request) {
             .select(`
                 *,
                 channel:discussion_channels!inner(id, name, slug),
-                author:profiles!fk_thread_author_profile(id, full_name, role)
+                *,
+                channel:discussion_channels!inner(id, name, slug),
+                author:profiles!fk_thread_author_profile(id, full_name, role),
+                discussion_posts(count)
             `)
             .order('created_at', { ascending: false })
             .limit(limit);
