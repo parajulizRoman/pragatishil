@@ -216,6 +216,76 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Missing ID" }, { status: 400 });
 }
 
+// PUT - Update a thread (creator or admin only)
+export async function PUT(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    const cookieStore = cookies();
+    const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        { cookies: { get(name: string) { return cookieStore.get(name)?.value; } } }
+    );
+
+    if (!id) {
+        return NextResponse.json({ error: "Missing thread ID" }, { status: 400 });
+    }
+
+    // Check auth
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        const body = await request.json();
+        const { title } = body;
+
+        if (!title) {
+            return NextResponse.json({ error: "Title is required" }, { status: 400 });
+        }
+
+        // Check if user is creator or admin
+        const { data: thread } = await supabase
+            .from('discussion_threads')
+            .select('id, created_by')
+            .eq('id', id)
+            .single();
+
+        if (!thread) {
+            return NextResponse.json({ error: "Thread not found" }, { status: 404 });
+        }
+
+        // Get user role
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+
+        const isCreator = thread.created_by === user.id;
+        const isAdmin = ['admin', 'yantrik', 'admin_party'].includes(profile?.role || '');
+
+        if (!isCreator && !isAdmin) {
+            return NextResponse.json({ error: "Forbidden: Only creator or admin can update" }, { status: 403 });
+        }
+
+        // Update thread
+        const { error } = await supabase
+            .from('discussion_threads')
+            .update({ title })
+            .eq('id', id);
+
+        if (error) throw error;
+
+        return NextResponse.json({ success: true });
+
+    } catch (e: unknown) {
+        console.error('[Thread Update] Error:', e);
+        return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    }
+}
+
 // DELETE - Delete a thread (creator or admin only)
 export async function DELETE(request: Request) {
     const { searchParams } = new URL(request.url);
