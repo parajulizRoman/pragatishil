@@ -65,13 +65,13 @@ export async function updateSiteSettings(key: string, content: unknown) {
     }
 
     // Fetch old data
-    const { data: oldData } = await supabase
+    const { data: oldData } = await supabaseAdmin
         .from('site_settings')
         .select('*')
         .eq('key', key)
         .single();
 
-    const { data: newData, error } = await supabase
+    const { data: newData, error } = await supabaseAdmin
         .from('site_settings')
         .upsert({
             key,

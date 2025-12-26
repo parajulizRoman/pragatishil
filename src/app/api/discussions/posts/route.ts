@@ -69,6 +69,50 @@ export async function GET(request: Request) {
                 };
             });
 
+            // 4. Fetch Polls for these posts
+            const { data: polls } = await supabase
+                .from('discussion_polls')
+                .select('id, post_id, question, allow_multiple_votes, expires_at, created_at, options:discussion_poll_options(id, option_text, position)')
+                .in('post_id', postIds);
+
+            if (polls && polls.length > 0) {
+                // Fetch votes for these polls to calculate percentages
+                const pollIds = polls.map(p => p.id);
+                const { data: pollVotes } = await supabase
+                    .from('discussion_poll_votes')
+                    .select('poll_id, option_id, user_id')
+                    .in('poll_id', pollIds);
+
+                // Map polls to posts
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const postsWithPolls = postsWithVotes.map((post: any) => {
+                    const poll = polls.find(p => p.post_id === post.id);
+                    if (!poll) return post;
+
+                    // Calculate results
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const optionsWithStats = poll.options.sort((a: any, b: any) => a.position - b.position).map((opt: any) => {
+                        const votesForOption = pollVotes?.filter(v => v.option_id === opt.id) || [];
+                        const count = votesForOption.length;
+                        // specific user vote
+                        const isVoted = user ? votesForOption.some(v => v.user_id === user.id) : false;
+                        return { ...opt, count, isVoted };
+                    });
+
+                    const totalVotes = pollVotes?.filter(v => v.poll_id === poll.id).length || 0;
+
+                    return {
+                        ...post,
+                        poll: {
+                            ...poll,
+                            options: optionsWithStats,
+                            total_votes: totalVotes
+                        }
+                    };
+                });
+                return NextResponse.json({ posts: postsWithPolls });
+            }
+
             return NextResponse.json({ posts: postsWithVotes as DiscussionPost[] });
         }
 
@@ -85,22 +129,22 @@ export async function POST(request: Request) {
 
         // 1. Authenticate
         const { data: { user } } = await supabase.auth.getUser();
-        // Note: We do NOT strictly block if !user anymore, because of General Chautari.
-        // But we need strict checks if !user.
 
         // 2. Parse Body
         const body = await request.json();
-        const { threadId, content, isAnon } = body;
+        const { threadId, content, isAnon, poll } = body;
 
         // 3. Validation
         if (!threadId || !content) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
-        // 4. Permission Check (Crucial for Anon)
+        let createdPost: DiscussionPost | null = null;
+
+        // 4. Permission Check & Post Creation
         if (!user) {
+            // Case A: Anonymous User
             // Check if thread's channel allows anonymous posting
-            // Use ADMIN client to fetch config because RLS might block 'anon' from reading channels details safely
             const { data: thread } = await supabaseAdmin
                 .from("discussion_threads")
                 .select(`
@@ -129,12 +173,9 @@ export async function POST(request: Request) {
 
             // Fingerprinting
             const ua = request.headers.get("user-agent") || "unknown";
-            // IP extraction typically requires x-forwarded-for or similar in Next.js
-            // const ip = request.headers.get("x-forwarded-for") || "unknown_ip"; 
-            // Simple mock hash for demo (in production use crypto)
             const fingerprint = `anon-${Date.now()}-${Math.random()}`;
 
-            // Insert using ADMIN client (bypass RLS insert policy for 'anon' which might be restrictive)
+            // Insert using ADMIN client
             const { data, error } = await supabaseAdmin
                 .from("discussion_posts")
                 .insert({
@@ -151,11 +192,11 @@ export async function POST(request: Request) {
                 console.error("Error creating anon post:", error);
                 return NextResponse.json({ error: error.message }, { status: 500 });
             }
-            return NextResponse.json({ post: data as DiscussionPost });
+            createdPost = data as DiscussionPost;
 
         } else {
-            // User is logged in
-            // Use Standard Client (RLS enforced)
+            // Case B: Authenticated User
+            // Use Standard Client
             const { data, error } = await supabase
                 .from("discussion_posts")
                 .insert({
@@ -172,10 +213,54 @@ export async function POST(request: Request) {
                 if (error.code === '42501') return NextResponse.json({ error: "Forbidden: You cannot post here." }, { status: 403 });
                 return NextResponse.json({ error: error.message }, { status: 500 });
             }
-            return NextResponse.json({ post: data as DiscussionPost });
+            createdPost = data as DiscussionPost;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // 5. Handle Poll Creation
+        if (createdPost && poll) {
+            const { question, options, allow_multiple, expires_at } = poll;
+
+            if (question && Array.isArray(options) && options.length >= 2) {
+                // Use appropriate client
+                const client = user ? supabase : supabaseAdmin;
+                const creatorId = user ? user.id : null;
+
+                const { data: pollData, error: pollError } = await client
+                    .from('discussion_polls')
+                    .insert({
+                        post_id: (createdPost as any).id,
+                        question,
+                        allow_multiple_votes: allow_multiple || false,
+                        expires_at: expires_at || null,
+                        created_by: creatorId
+                    })
+                    .select()
+                    .single();
+
+                if (!pollError && pollData) {
+                    // Insert Options
+                    const optionsData = options.map((opt: string, idx: number) => ({
+                        poll_id: pollData.id,
+                        option_text: opt,
+                        position: idx
+                    }));
+
+                    await client.from('discussion_poll_options').insert(optionsData);
+
+                    // Attach poll to response
+                    (createdPost as any).poll = {
+                        ...pollData,
+                        options: optionsData.map((o: any) => ({ ...o, count: 0, isVoted: false })),
+                        total_votes: 0
+                    };
+                } else {
+                    console.error("Error creating poll:", pollError);
+                }
+            }
+        }
+
+        return NextResponse.json({ post: createdPost });
+
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }
