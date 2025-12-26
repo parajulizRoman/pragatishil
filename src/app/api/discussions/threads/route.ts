@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase/serverAdmin";
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -136,7 +137,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { channelId, title, content, isAnon, attachments } = body;
 
-    const { data: channel, error: cErr } = await supabase
+    // Use Admin Client to fetch Channel Config to bypass RLS issues for Anon User
+    const { data: channel, error: cErr } = await supabaseAdmin
         .from('discussion_channels')
         .select('*')
         .eq('id', channelId)
