@@ -10,9 +10,9 @@ import { flagContent, votePost, toggleThreadInteraction, toggleReaction } from "
 import Link from "next/link";
 import Image from "next/image";
 import { X, Shield, User, Crown, Paperclip, FileText, Image as ImageIcon, Loader2, MessageSquare, Heart, Bookmark, EyeOff, Flag, ArrowLeft, ArrowUp, ArrowDown, Trash2 } from "lucide-react";
-import MentionAutocomplete from "@/components/ui/MentionAutocomplete";
 import { Skeleton } from "@/components/ui/skeleton";
 import PostActions from "@/components/PostActions";
+import RichTextEditor from "@/components/RichTextEditor";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
@@ -582,21 +582,13 @@ export default function ThreadPage() {
                                         </div>
                                     ) : (
                                         <form onSubmit={handleReply}>
-                                            <MentionAutocomplete
-                                                minRows={3}
-                                                maxRows={10}
-                                                placeholder={!isAuthenticated ? t("आफ्नो बेनामी विचारहरू साझा गर्नुहोस्...", "Share your anonymous thoughts...") : t("यहाँ आफ्नो जवाफ टाइप गर्नुहोस्... (@ ले सदस्य उल्लेख गर्न)", "Type your reply here... (@ to mention members)")}
-                                                className="w-full text-base bg-transparent focus:outline-none resize-none mb-2 border-0 focus:ring-0"
-                                                value={replyContent}
-                                                onChange={setReplyContent}
-                                                onKeyDown={(e) => {
-                                                    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                                                        e.preventDefault();
-                                                        // @ts-ignore
-                                                        handleReply(e);
-                                                    }
-                                                }}
-                                            />
+                                            <div className="mb-4 border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-brand-blue/20 transition-all bg-slate-50">
+                                                <RichTextEditor
+                                                    onChange={setReplyContent}
+                                                    placeholder={!isAuthenticated ? t("आफ्नो बेनामी विचारहरू साझा गर्नुहोस्...", "Share your anonymous thoughts...") : t("यहाँ आफ्नो जवाफ टाइप गर्नुहोस्... (@ ले सदस्य उल्लेख गर्न)", "Type your reply here...")}
+                                                    minHeight="150px"
+                                                />
+                                            </div>
 
                                             {replyAttachments.length > 0 && (
                                                 <div className="flex gap-2 mb-3 flex-wrap">
@@ -617,7 +609,6 @@ export default function ThreadPage() {
                                                     </label>
                                                 </div>
                                                 <div className="flex items-center gap-3">
-                                                    <span className="text-xs text-muted-foreground hidden sm:inline">{t("Ctrl + Enter पठाउन", "Ctrl + Enter to send")}</span>
                                                     <Button type="submit" disabled={isSubmitting || !replyContent.trim()} className="bg-brand-blue hover:bg-blue-600 text-white">
                                                         {isSubmitting ? t("पठाउँदैछ...", "Sending...") : t("जवाफ पोस्ट", "Post Reply")}
                                                     </Button>
