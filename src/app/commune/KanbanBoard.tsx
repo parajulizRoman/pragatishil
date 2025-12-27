@@ -5,6 +5,7 @@ import { Plus, GripVertical, Calendar, User, Trash2, Edit2, X, Loader2 } from "l
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatBSDate } from "@/lib/bsDateFormat";
 
 interface ChannelTask {
     id: string;
@@ -275,7 +276,7 @@ export default function KanbanBoard({ channelId, canEdit, canDelete }: KanbanBoa
                                                     {task.due_date && (
                                                         <span className="flex items-center gap-0.5">
                                                             <Calendar className="w-3 h-3" />
-                                                            {new Date(task.due_date).toLocaleDateString('ne-NP')}
+                                                            {formatBSDate(task.due_date, 'short', language)}
                                                         </span>
                                                     )}
                                                     {task.assigned_user && (
