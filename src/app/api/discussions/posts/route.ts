@@ -132,7 +132,7 @@ export async function POST(request: Request) {
 
         // 2. Parse Body
         const body = await request.json();
-        const { threadId, content, isAnon, poll } = body;
+        const { threadId, content, isAnon, poll, attachments } = body;
 
         // 3. Validation
         if (!threadId || !content) {
@@ -258,6 +258,31 @@ export async function POST(request: Request) {
                 } else {
                     console.error("Error creating poll:", pollError);
                 }
+            }
+        }
+
+        // 6. Handle Attachments Linking
+        if (createdPost && attachments && Array.isArray(attachments) && attachments.length > 0) {
+            // Use the appropriate client
+            const client = user ? supabase : supabaseAdmin;
+
+            const attachmentRecords = attachments.map((att: { storagePath: string; fileName: string; mimeType?: string; sizeBytes?: number; type: string }) => ({
+                post_id: createdPost!.id,
+                storage_path: att.storagePath,
+                file_name: att.fileName,
+                mime_type: att.mimeType || null,
+                size_bytes: att.sizeBytes || null,
+                type: att.type,
+                created_by: user?.id || null
+            }));
+
+            const { error: attError } = await client
+                .from('discussion_post_attachments')
+                .insert(attachmentRecords);
+
+            if (attError) {
+                console.error("Error linking attachments:", attError);
+                // Don't fail the entire request, just log the error
             }
         }
 
