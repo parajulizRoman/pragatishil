@@ -60,7 +60,7 @@ CREATE POLICY "Council can view council_only events"
     ON party_events FOR SELECT
     USING (
         visibility = 'council_only' 
-        AND auth.uid() IN (SELECT id FROM profiles WHERE role IN ('admin', 'yantrik', 'incharge', 'moderator'))
+        AND auth.uid() IN (SELECT id FROM profiles WHERE role IN ('admin', 'yantrik', 'central_committee', 'board'))
     );
 
 -- Admins can view all events
@@ -70,11 +70,11 @@ CREATE POLICY "Admins can view all events"
         auth.uid() IN (SELECT id FROM profiles WHERE role IN ('admin', 'yantrik'))
     );
 
--- Admins and yantrik can create events
+-- Admins, yantrik, and central committee can create events
 CREATE POLICY "Admins can create events"
     ON party_events FOR INSERT
     WITH CHECK (
-        auth.uid() IN (SELECT id FROM profiles WHERE role IN ('admin', 'yantrik', 'incharge'))
+        auth.uid() IN (SELECT id FROM profiles WHERE role IN ('admin', 'yantrik', 'central_committee'))
     );
 
 -- Admins and event creators can update events
