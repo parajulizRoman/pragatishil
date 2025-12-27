@@ -104,7 +104,22 @@ export async function GET(request: Request) {
 
                     const reply_count = count ? Math.max(0, count - 1) : 0;
 
-                    return { ...t, user_vote, reply_count };
+                    // 3. Get Thumbnail (first image attachment from first post)
+                    let thumbnail_url: string | null = null;
+                    if (t.first_post_id) {
+                        const { data: attachments } = await supabase
+                            .from('discussion_post_attachments')
+                            .select('storage_path, type')
+                            .eq('post_id', t.first_post_id)
+                            .eq('type', 'image')
+                            .limit(1);
+
+                        if (attachments && attachments.length > 0) {
+                            thumbnail_url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/commune-uploads/${attachments[0].storage_path}`;
+                        }
+                    }
+
+                    return { ...t, user_vote, reply_count, thumbnail_url };
                 }));
                 return { data: threadsWithDetails, error: null };
             }

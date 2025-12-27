@@ -383,44 +383,42 @@ export default function ChannelPage() {
                     </div>
                 )}
 
-                {/* Edit/Delete Buttons for channel header */}
-                {channel.location_type && (
-                    <div className="mt-4 flex gap-2">
-                        {/* Edit: admin, incharge, or moderator */}
-                        {(canManageChannels(userRole)) && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setShowHeaderEditModal(true)}
-                                className="text-slate-600 border-slate-300 hover:bg-slate-50"
-                            >
-                                <Edit2 className="w-4 h-4 mr-1" />
-                                {t("हेडर सम्पादन", "Edit Header")}
-                            </Button>
-                        )}
-                        {/* Delete: party_admin only */}
-                        {['admin', 'yantrik'].includes(userRole) && (
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={async () => {
-                                    if (!confirm(t("के तपाईं यो च्यानल मेटाउन चाहनुहुन्छ?", "Are you sure you want to delete this channel?"))) return;
-                                    try {
-                                        const res = await fetch(`/api/discussions/channels?id=${channel.id}`, { method: 'DELETE' });
-                                        if (!res.ok) throw new Error('Failed to delete');
-                                        window.location.href = '/commune';
-                                    } catch {
-                                        alert('Failed to delete channel');
-                                    }
-                                }}
-                                className="text-red-600 border-red-200 hover:bg-red-50"
-                            >
-                                <Trash2 className="w-4 h-4 mr-1" />
-                                {t("च्यानल मेटाउनुहोस्", "Delete Channel")}
-                            </Button>
-                        )}
-                    </div>
-                )}
+                {/* Edit/Delete Buttons for channel header - available for all channels */}
+                <div className="mt-4 flex gap-2">
+                    {/* Edit: admin, incharge, or moderator */}
+                    {(canManageChannels(userRole)) && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowHeaderEditModal(true)}
+                            className="text-slate-600 border-slate-300 hover:bg-slate-50"
+                        >
+                            <Edit2 className="w-4 h-4 mr-1" />
+                            {t("हेडर सम्पादन", "Edit Header")}
+                        </Button>
+                    )}
+                    {/* Delete: party_admin only */}
+                    {['admin', 'yantrik'].includes(userRole) && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={async () => {
+                                if (!confirm(t("के तपाईं यो च्यानल मेटाउन चाहनुहुन्छ?", "Are you sure you want to delete this channel?"))) return;
+                                try {
+                                    const res = await fetch(`/api/discussions/channels?id=${channel.id}`, { method: 'DELETE' });
+                                    if (!res.ok) throw new Error('Failed to delete');
+                                    window.location.href = '/commune';
+                                } catch {
+                                    alert('Failed to delete channel');
+                                }
+                            }}
+                            className="text-red-600 border-red-200 hover:bg-red-50"
+                        >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            {t("च्यानल मेटाउनुहोस्", "Delete Channel")}
+                        </Button>
+                    )}
+                </div>
             </div>
 
             {/* Create Thread Form */}
@@ -589,6 +587,16 @@ export default function ChannelPage() {
                                                 <Badge variant="destructive" className="absolute top-0 right-0 rounded-none rounded-bl-md px-2 py-0.5 text-[10px]">Buried</Badge>
                                             )}
                                             <div className="flex justify-between items-start gap-4">
+                                                {/* Thumbnail Image */}
+                                                {(thread as any).thumbnail_url && (
+                                                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
+                                                        <img
+                                                            src={(thread as any).thumbnail_url}
+                                                            alt={thread.title}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                )}
                                                 <div className="flex-1">
                                                     <Typography variant="h4" className="text-lg font-bold text-brand-navy mb-1 group-hover:text-brand-blue transition-colors">
                                                         {thread.title}
