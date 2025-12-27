@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { X, Plus, Trash2 } from "lucide-react";
+import { X, Plus, Trash2, Upload, Image as ImageIcon } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { DiscussionChannel, UserRole } from "@/types";
 import { createBrowserClient } from "@supabase/ssr";
@@ -49,6 +49,11 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel, 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'details' | 'resources'>('details');
+
+    // Thumbnail & Icon State
+    const [thumbnailUrl, setThumbnailUrl] = useState("");
+    const [iconEmoji, setIconEmoji] = useState("💬");
+    const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
 
     // Resources State
     const [resources, setResources] = useState<{ title: string; type: string; url: string }[]>([]);
@@ -111,6 +116,8 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel, 
                 setReadmeContent(editChannel.readme_content || "");
                 setCategory(editChannel.category || "General");
                 setVisibility((editChannel.visibility as "public" | "logged_in" | "party_only") || "public");
+                setThumbnailUrl(editChannel.thumbnail_url || "");
+                setIconEmoji(editChannel.icon_emoji || "💬");
                 if (editChannel.resources) {
                     setResources(editChannel.resources.map(r => ({
                         title: r.title,
@@ -139,6 +146,8 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel, 
                 setVisibility("public");
                 setResources([]);
                 setImpactStats({});
+                setThumbnailUrl("");
+                setIconEmoji("💬");
             }
             setError(null);
             setActiveTab('details');
@@ -174,6 +183,55 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel, 
         setResources(newRes);
     };
 
+    // Thumbnail Upload Handler
+    const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert(t('कृपया छवि फाइल चयन गर्नुहोस्।', 'Please select an image file.'));
+            return;
+        }
+
+        // Validate file size (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+            alert(t('छवि २ MB भन्दा सानो हुनुपर्छ।', 'Image must be smaller than 2MB.'));
+            return;
+        }
+
+        setUploadingThumbnail(true);
+        try {
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+
+            // Upload to Supabase Storage
+            const fileName = `channel-thumbnails/${Date.now()}-${file.name}`;
+            const { data, error } = await supabase.storage
+                .from('commune-uploads')
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (error) throw error;
+
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('commune-uploads')
+                .getPublicUrl(data.path);
+
+            setThumbnailUrl(publicUrl);
+        } catch (err) {
+            console.error('Thumbnail upload error:', err);
+            alert(t('छवि अपलोड असफल भयो।', 'Failed to upload image.'));
+        } finally {
+            setUploadingThumbnail(false);
+        }
+    };
+
     if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -194,7 +252,9 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel, 
                 category,
                 readme_content: readmeContent || null,
                 impact_stats: impactStats, // Add Impact Stats
-                resources
+                resources,
+                thumbnail_url: thumbnailUrl || null,
+                icon_emoji: iconEmoji || '💬'
             };
 
             if (editChannel) {
@@ -326,6 +386,78 @@ export default function ChannelModal({ isOpen, onClose, onSuccess, editChannel, 
                                     onChange={e => setDescription(e.target.value)}
                                     placeholder={t('यो च्यानल केबारेमा हो?', 'What is this channel about?')}
                                 />
+                            </div>
+
+                            {/* Thumbnail & Icon Section */}
+                            <div className="space-y-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                                <label className="text-sm font-medium leading-none">{t('च्यानल आइकन र थम्बनेल', 'Channel Icon & Thumbnail')}</label>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    {/* Emoji Picker */}
+                                    <div className="space-y-2">
+                                        <label className="text-xs text-slate-600">{t('इमोजी आइकन', 'Emoji Icon')}</label>
+                                        <div className="flex gap-2">
+                                            <Input
+                                                value={iconEmoji}
+                                                onChange={e => setIconEmoji(e.target.value)}
+                                                placeholder="💬"
+                                                className="text-2xl text-center h-12 w-16"
+                                                maxLength={2}
+                                            />
+                                            <div className="flex-1 flex flex-wrap gap-1 p-2 bg-white rounded border border-slate-200">
+                                                {['💬', '🏛️', '🗺️', '📍', '🏘️', '🏠', '🏢', '💻', '📰', '👥', '👩', '🌐'].map(emoji => (
+                                                    <button
+                                                        key={emoji}
+                                                        type="button"
+                                                        onClick={() => setIconEmoji(emoji)}
+                                                        className="text-xl hover:bg-slate-100 rounded p-1 transition-colors"
+                                                    >
+                                                        {emoji}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Thumbnail Upload */}
+                                    <div className="space-y-2">
+                                        <label className="text-xs text-slate-600">{t('थम्बनेल छवि', 'Thumbnail Image')}</label>
+                                        {thumbnailUrl ? (
+                                            <div className="relative group">
+                                                <img
+                                                    src={thumbnailUrl}
+                                                    alt="Thumbnail"
+                                                    className="w-full h-24 object-cover rounded-lg border border-slate-200"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setThumbnailUrl('')}
+                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <label className="flex flex-col items-center justify-center h-24 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-brand-blue hover:bg-blue-50/50 transition-all">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    onChange={handleThumbnailUpload}
+                                                    className="hidden"
+                                                    disabled={uploadingThumbnail}
+                                                />
+                                                {uploadingThumbnail ? (
+                                                    <div className="text-xs text-slate-500">{t('अपलोड गर्दै...', 'Uploading...')}</div>
+                                                ) : (
+                                                    <>
+                                                        <ImageIcon className="w-6 h-6 text-slate-400 mb-1" />
+                                                        <span className="text-xs text-slate-500">{t('छवि अपलोड', 'Upload Image')}</span>
+                                                    </>
+                                                )}
+                                            </label>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-5">
