@@ -341,17 +341,30 @@ export default function ChannelPage() {
                 {/* Channel Header Banner - always shown with default fallback */}
                 <div className="mt-6 rounded-xl border border-slate-200 overflow-hidden bg-white shadow-sm">
                     {/* Banner Image */}
-                    <div className="relative h-48 md:h-64">
-                        <img
-                            src={channel.header_image_url || `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/gallery/party-flag.jpg`}
-                            alt={channel.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                                // Fallback to favicon if party flag not found
-                                (e.target as HTMLImageElement).src = '/favicon.png';
-                            }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    <div className={`relative h-48 md:h-64 ${!channel.header_image_url ? 'bg-gradient-to-br from-brand-red/10 via-white to-brand-blue/10' : ''}`}>
+                        {channel.header_image_url ? (
+                            /* Custom header - full cover */
+                            <img
+                                src={channel.header_image_url}
+                                alt={channel.name}
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            /* Default - centered logo with gradient background */
+                            <div className="flex items-center justify-center h-full bg-gradient-to-br from-brand-red/5 via-slate-50 to-brand-blue/5">
+                                <div className="text-center p-6">
+                                    <img
+                                        src="/favicon.png"
+                                        alt="Pragatishil Loktantrik Party"
+                                        className="w-24 h-24 md:w-32 md:h-32 mx-auto object-contain opacity-80"
+                                    />
+                                    <p className="mt-3 text-sm text-slate-500 font-medium">{t("प्रगतिशील लोकतान्त्रिक पार्टी", "Pragatishil Loktantrik Party")}</p>
+                                </div>
+                            </div>
+                        )}
+                        {channel.header_image_url && (
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                        )}
                     </div>
 
                     <div className="p-5">
