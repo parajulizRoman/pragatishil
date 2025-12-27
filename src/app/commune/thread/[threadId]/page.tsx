@@ -478,254 +478,231 @@ export default function ThreadPage() {
                         <Typography variant="muted">{t("अहिलेसम्म कुनै पोस्ट छैन। जवाफ दिने पहिलो हुनुहोस्!", "No posts yet. Be the first to reply!")}</Typography>
                     </div>
                 ) : (
-                    posts.map((post) => {
+                    posts.map((post, index) => {
                         const isMe = currentUserId === post.author_id;
                         if (post.buried_at) {
                             return <div key={post.id} className="p-4 bg-slate-50 text-slate-400 italic text-center rounded border text-sm">{t("डाउनभोट्सका कारण सामग्री गाडिएको छ।", "Content buried due to downvotes.")}</div>;
                         }
 
                         return (
-                            <div key={post.id} className={cn("flex gap-3 md:gap-4", isMe && "flex-row-reverse")}>
-                                {/* Vote Column */}
-                                <div className={cn("flex flex-col items-center pt-1 gap-0.5 min-w-[32px]", isMe && "hidden")}>
-                                    <Button variant="ghost" size="icon" className={cn("h-8 w-8 hover:bg-orange-50 hover:text-orange-600 rounded-full", post.user_vote === 1 && "text-orange-600 bg-orange-50")} onClick={() => handleVote(post.id, 1)}>
-                                        <ArrowUp size={18} />
-                                    </Button>
-                                    <span className={cn("text-xs font-bold", (post.upvotes - post.downvotes) > 0 ? "text-orange-600" : (post.upvotes - post.downvotes) < 0 ? "text-brand-blue" : "text-slate-500")}>
-                                        {post.upvotes - post.downvotes}
-                                    </span>
-                                    <Button variant="ghost" size="icon" className={cn("h-8 w-8 hover:bg-blue-50 hover:text-brand-blue rounded-full", post.user_vote === -1 && "text-brand-blue bg-blue-50")} onClick={() => handleVote(post.id, -1)}>
-                                        <ArrowDown size={18} />
-                                    </Button>
+                            <React.Fragment key={post.id}>
+                                <div className={cn("flex gap-3 md:gap-4", isMe && "flex-row-reverse", index > 0 && "mt-8 pl-0 md:pl-0 border-t border-slate-100/50 pt-8")}>
+                                    {/* Vote Column */}
+                                    <div className={cn("flex flex-col items-center pt-1 gap-0.5 min-w-[32px]", isMe && "hidden")}>
+                                        <Button variant="ghost" size="icon" className={cn("h-8 w-8 hover:bg-orange-50 hover:text-orange-600 rounded-full", post.user_vote === 1 && "text-orange-600 bg-orange-50")} onClick={() => handleVote(post.id, 1)}>
+                                            <ArrowUp size={18} />
+                                        </Button>
+                                        <span className={cn("text-xs font-bold", (post.upvotes - post.downvotes) > 0 ? "text-orange-600" : (post.upvotes - post.downvotes) < 0 ? "text-brand-blue" : "text-slate-500")}>
+                                            {post.upvotes - post.downvotes}
+                                        </span>
+                                        <Button variant="ghost" size="icon" className={cn("h-8 w-8 hover:bg-blue-50 hover:text-brand-blue rounded-full", post.user_vote === -1 && "text-brand-blue bg-blue-50")} onClick={() => handleVote(post.id, -1)}>
+                                            <ArrowDown size={18} />
+                                        </Button>
+                                    </div>
+
+                                    <Card className={cn(
+                                        "flex-1 transition-shadow hover:shadow-md border-transparent shadow-sm",
+                                        isMe ? "bg-blue-50/50 border-blue-100" : "bg-white border-slate-200"
+                                    )}>
+                                        <CardContent className="p-4 md:p-5">
+                                            {/* Post Header */}
+                                            <div className="flex items-center gap-3 mb-3">
+                                                {post.is_anon ? (
+                                                    <div className="flex items-center gap-2 text-slate-600">
+                                                        <UserAvatar size="w-8 h-8" />
+                                                        <div className="text-sm font-bold">{t("बेनामी", "Anonymous")}</div>
+                                                    </div>
+                                                ) : (
+                                                    <Link href={`/members/${post.author_id}`} className="flex items-center gap-2 group">
+                                                        {/* @ts-ignore */}
+                                                        <UserAvatar url={post.author?.avatar_url} name={post.author?.full_name} size="w-8 h-8" />
+                                                        <div>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="text-sm font-bold text-slate-800 group-hover:text-brand-blue transition-colors">
+                                                                    {post.author?.full_name || t("सदस्य", "Member")}
+                                                                </div>
+                                                                {post.author?.role && (
+                                                                    <Badge variant={getRoleBadgeVariant(post.author?.role) as any} className="text-[10px] px-1.5 py-0 h-4 md:h-5">
+                                                                        {getRoleLabel(post.author?.role, language)}
+                                                                    </Badge>
+                                                                )}
+                                                            </div>
+                                                            <div className="text-[10px] text-slate-400 font-medium">
+                                                                {/* @ts-ignore - district exists in DB but not in Profile type */}
+                                                                {post.author?.district ? `${post.author.district}, Nepal` : t('सदस्य', 'Member')}
+                                                            </div>
+                                                        </div>
+                                                    </Link>
+                                                )}
+                                                <div className="ml-auto text-xs text-slate-400">{new Date(post.created_at).toLocaleDateString()}</div>
+                                            </div>
+
+                                            {/* Content - with video embeds */}
+                                            <div className="text-slate-800 leading-relaxed whitespace-pre-wrap text-[15px] mb-4">
+                                                <RichTextWithVideos content={post.content} />
+                                            </div>
+
+                                            {/* Poll Display */}
+                                            {post.poll && (
+                                                <PollDisplay poll={post.poll} onVote={() => fetchData()} />
+                                            )}
+
+                                            {/* Attachments */}
+                                            {post.attachments && post.attachments.length > 0 && (
+                                                <div className="mt-4 grid gap-2 grid-cols-2 sm:grid-cols-3 max-w-xl">
+                                                    {post.attachments.map((att: any) => (
+                                                        att.type === 'image' ? (
+                                                            <div key={att.id} className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200 cursor-zoom-in hover:opacity-90 transition-opacity" onClick={() => window.open(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/commune-uploads/${att.storage_path}`, '_blank')}>
+                                                                <img
+                                                                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/commune-uploads/${att.storage_path}`}
+                                                                    alt={att.file_name}
+                                                                    className="object-cover w-full h-full"
+                                                                />
+                                                            </div>
+                                                        ) : (
+                                                            <a
+                                                                key={att.id}
+                                                                href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/commune-uploads/${att.storage_path}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="flex items-center gap-2 p-2 bg-white border border-slate-200 rounded-lg hover:border-brand-blue/50 group transition-all"
+                                                            >
+                                                                <div className="p-1.5 bg-blue-50 text-brand-blue rounded">
+                                                                    <FileText size={16} />
+                                                                </div>
+                                                                <div className="overflow-hidden">
+                                                                    <div className="truncate text-xs font-semibold text-slate-700 group-hover:text-brand-blue">{att.file_name}</div>
+                                                                    <div className="text-[10px] text-slate-400 uppercase">{att.type}</div>
+                                                                </div>
+                                                            </a>
+                                                        )
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* Footer Actions */}
+                                            <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100/50">
+                                                {isMe ? (
+                                                    <PostActions
+                                                        postId={post.id}
+                                                        postContent={post.content}
+                                                        isAuthor={isMe}
+                                                        onDelete={() => setPosts(prev => prev.filter(p => p.id !== post.id))}
+                                                        onUpdate={(c) => setPosts(prev => prev.map(p => p.id === post.id ? { ...p, content: c } : p))}
+                                                    />
+                                                ) : (
+                                                    <div /> // Spacer
+                                                )}
+
+                                                <Button variant="ghost" size="sm" className="h-6 w-6 text-slate-300 hover:text-destructive p-0" onClick={() => setFlagPostId(post.id)}>
+                                                    <Flag size={14} />
+                                                </Button>
+                                            </div>
+
+                                        </CardContent>
+                                    </Card>
                                 </div>
 
-                                <Card className={cn(
-                                    "flex-1 transition-shadow hover:shadow-md border-transparent shadow-sm",
-                                    isMe ? "bg-blue-50/50 border-blue-100" : "bg-white border-slate-200"
-                                )}>
-                                    <CardContent className="p-4 md:p-5">
-                                        {/* Post Header */}
-                                        <div className="flex items-center gap-3 mb-3">
-                                            {post.is_anon ? (
-                                                <div className="flex items-center gap-2 text-slate-600">
-                                                    <UserAvatar size="w-8 h-8" />
-                                                    <div className="text-sm font-bold">{t("बेनामी", "Anonymous")}</div>
-                                                </div>
-                                            ) : (
-                                                <Link href={`/members/${post.author_id}`} className="flex items-center gap-2 group">
-                                                    {/* @ts-ignore */}
-                                                    <UserAvatar url={post.author?.avatar_url} name={post.author?.full_name} size="w-8 h-8" />
-                                                    <div>
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="text-sm font-bold text-slate-800 group-hover:text-brand-blue transition-colors">
-                                                                {post.author?.full_name || t("सदस्य", "Member")}
-                                                            </div>
-                                                            {post.author?.role && (
-                                                                <Badge variant={getRoleBadgeVariant(post.author?.role) as any} className="text-[10px] px-1.5 py-0 h-4 md:h-5">
-                                                                    {getRoleLabel(post.author?.role, language)}
-                                                                </Badge>
-                                                            )}
-                                                        </div>
-                                                        <div className="text-[10px] text-slate-400 font-medium">
-                                                            {/* @ts-ignore - district exists in DB but not in Profile type */}
-                                                            {post.author?.district ? `${post.author.district}, Nepal` : t('सदस्य', 'Member')}
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            )}
-                                            <div className="ml-auto text-xs text-slate-400">{new Date(post.created_at).toLocaleDateString()}</div>
-                                        </div>
+                                {/* Reply Section - Embedded after first post */}
+                                {index === 0 && (
+                                    <div className="my-10 bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-2xl p-6 md:p-8 border border-slate-200/60 shadow-sm relative overflow-hidden group">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-blue/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
 
-                                        {/* Content - with video embeds */}
-                                        <div className="text-slate-800 leading-relaxed whitespace-pre-wrap text-[15px] mb-4">
-                                            <RichTextWithVideos content={post.content} />
-                                        </div>
+                                        <h3 className="text-xl font-bold text-brand-navy mb-6 flex items-center gap-2">
+                                            <MessageSquare className="text-brand-blue" />
+                                            {t("छलफलमा भाग लिनुहोस्", "Join the discussion")}
+                                        </h3>
 
-                                        {/* Poll Display */}
-                                        {post.poll && (
-                                            <PollDisplay poll={post.poll} onVote={() => fetchData()} />
-                                        )}
-
-                                        {/* Attachments */}
-                                        {post.attachments && post.attachments.length > 0 && (
-                                            <div className="mt-4 grid gap-2 grid-cols-2 sm:grid-cols-3 max-w-xl">
-                                                {post.attachments.map((att: any) => (
-                                                    att.type === 'image' ? (
-                                                        <div key={att.id} className="relative aspect-video bg-slate-100 rounded-lg overflow-hidden border border-slate-200 cursor-zoom-in hover:opacity-90 transition-opacity" onClick={() => window.open(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/commune-uploads/${att.storage_path}`, '_blank')}>
-                                                            <img
-                                                                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/commune-uploads/${att.storage_path}`}
-                                                                alt={att.file_name}
-                                                                className="object-cover w-full h-full"
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        <a
-                                                            key={att.id}
-                                                            href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/commune-uploads/${att.storage_path}`}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="flex items-center gap-2 p-2 bg-white border border-slate-200 rounded-lg hover:border-brand-blue/50 group transition-all"
-                                                        >
-                                                            <div className="p-1.5 bg-blue-50 text-brand-blue rounded">
-                                                                <FileText size={16} />
-                                                            </div>
-                                                            <div className="overflow-hidden">
-                                                                <div className="truncate text-xs font-semibold text-slate-700 group-hover:text-brand-blue">{att.file_name}</div>
-                                                                <div className="text-[10px] text-slate-400 uppercase">{att.type}</div>
-                                                            </div>
-                                                        </a>
-                                                    )
-                                                ))}
+                                        {!isAuthenticated && !channelConfig?.allow_anonymous_posts ? (
+                                            <div className="text-center py-8 bg-white/50 rounded-xl border border-dashed border-slate-200">
+                                                <Typography variant="p" className="mb-6 text-lg text-slate-600">{t("कृपया सहभागी हुन लग इन गर्नुहोस्।", "Please log in to participate.")}</Typography>
+                                                <Button onClick={async () => {
+                                                    const supabase = createBrowserClient(
+                                                        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                                                        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+                                                    );
+                                                    await supabase.auth.signInWithOAuth({
+                                                        provider: 'google',
+                                                        options: { redirectTo: `${window.location.origin}/auth/callback` },
+                                                    });
+                                                }} size="lg" className="bg-brand-blue text-white h-12 px-8 text-lg hover:bg-brand-navy shadow-lg shadow-blue-200">{t("Google मार्फत साइन इन", "Sign In with Google")}</Button>
                                             </div>
+                                        ) : (
+                                            <form onSubmit={handleReply} className="relative z-10">
+                                                <div className="mb-4 bg-white rounded-xl border border-slate-200 overflow-hidden focus-within:ring-4 focus-within:ring-brand-blue/10 focus-within:border-brand-blue/30 transition-all shadow-sm">
+                                                    <RichTextEditor
+                                                        onChange={setReplyContent}
+                                                        placeholder={!isAuthenticated ? t("आफ्नो बेनामी विचारहरू साझा गर्नुहोस्...", "Share your anonymous thoughts...") : t("यहाँ आफ्नो विचार लेख्नुहोस्... (@ ले सदस्य उल्लेख गर्न)", "Write your thoughts here...")}
+                                                        minHeight="200px"
+                                                    />
+                                                </div>
+
+                                                {replyAttachments.length > 0 && (
+                                                    <div className="flex gap-2 mb-4 flex-wrap">
+                                                        {replyAttachments.map((att, i) => (
+                                                            <div key={i} className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm shadow-sm">
+                                                                <Paperclip size={14} className="text-slate-400" />
+                                                                <span className="truncate max-w-[150px] font-medium text-slate-700">{att.meta.fileName}</span>
+                                                                <button type="button" onClick={() => removeAttachment(i)} className="text-slate-400 hover:text-red-500 ml-1"><X size={14} /></button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+                                                <div className="flex justify-between items-center pt-2">
+                                                    <div className="flex gap-2">
+                                                        <label className={cn("cursor-pointer p-3 hover:bg-white rounded-xl text-slate-500 hover:text-brand-blue transition-all border border-transparent hover:border-slate-200 hover:shadow-sm", isUploading && "opacity-50 pointer-events-none")}>
+                                                            <input type="file" multiple className="hidden" onChange={handleFileSelect} />
+                                                            {isUploading ? <Loader2 size={24} className="animate-spin" /> : <div className="flex items-center gap-2"><Paperclip size={24} /><span className="text-sm font-medium hidden sm:inline">{t("फाइल थप्नुहोस्", "Add File")}</span></div>}
+                                                        </label>
+                                                    </div>
+                                                    <div className="flex items-center gap-4">
+                                                        {isAnon && <Badge variant="outline" className="text-slate-500 border-slate-300 h-8 px-3">{t("बेनामी", "Anonymous Mode")}</Badge>}
+                                                        <Button type="submit" disabled={isSubmitting || !replyContent.trim()} size="lg" className="bg-brand-blue hover:bg-blue-600 text-white h-12 px-8 text-lg shadow-lg shadow-blue-200 hover:shadow-blue-300 transition-all rounded-xl">
+                                                            {isSubmitting ? <><Loader2 className="mr-2 animate-spin" /> {t("पठाउँदैछ...", "Sending...")}</> : <>{t("प्रतिक्रिया दिनुहोस्", "Post Comment")}</>}
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         )}
-
-                                        {/* Footer Actions */}
-                                        <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100/50">
-                                            {isMe ? (
-                                                <PostActions
-                                                    postId={post.id}
-                                                    postContent={post.content}
-                                                    isAuthor={isMe}
-                                                    onDelete={() => setPosts(prev => prev.filter(p => p.id !== post.id))}
-                                                    onUpdate={(c) => setPosts(prev => prev.map(p => p.id === post.id ? { ...p, content: c } : p))}
-                                                />
-                                            ) : (
-                                                <div /> // Spacer
-                                            )}
-
-                                            <Button variant="ghost" size="sm" className="h-6 w-6 text-slate-300 hover:text-destructive p-0" onClick={() => setFlagPostId(post.id)}>
-                                                <Flag size={14} />
-                                            </Button>
-                                        </div>
-
-                                    </CardContent>
-                                </Card>
-                            </div>
+                                    </div>
+                                )}
+                            </React.Fragment>
                         );
                     })
                 )}
                 <div ref={bottomRef} className="h-4" />
             </div>
 
-            {/* Reply Bar */}
-            <div className="fixed bottom-0 left-0 right-0 p-4 pointer-events-none z-20">
-                <div className="container max-w-4xl mx-auto pointer-events-auto">
-                    <AnimatePresence mode="wait">
-                        {!isReplyBoxOpen ? (
-                            <motion.div
-                                initial={{ y: 100 }}
-                                animate={{ y: 0 }}
-                                exit={{ y: 100 }}
-                            >
-                                <Button
-                                    size="lg"
-                                    className="w-full shadow-xl rounded-full h-14 bg-white hover:bg-slate-50 text-slate-500 justify-between border border-slate-200 px-6 group"
-                                    onClick={() => setIsReplyBoxOpen(true)}
-                                >
-                                    <span className="flex items-center gap-2">
-                                        <MessageSquare className="w-5 h-5 text-slate-400 group-hover:text-brand-blue" />
-                                        {isAuthenticated ? t("जवाफ लेख्नुहोस्...", "Write a reply...") : t("छलफलमा सामेल हुनुहोस्...", "Join the discussion...")}
-                                    </span>
-                                    <span className="bg-brand-blue text-white rounded-full p-1"><ArrowUp size={16} /></span>
-                                </Button>
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 50, scale: 0.95 }}
-                                className="bg-white rounded-xl shadow-2xl border border-slate-200 overflow-hidden mb-4"
-                            >
-                                <div className="flex justify-between items-center px-4 py-3 bg-slate-50 border-b border-slate-100">
-                                    <Typography variant="h4" className="text-sm font-bold text-slate-700">{t("थ्रेडमा जवाफ दिनुहोस्", "Reply to Thread")}</Typography>
-                                    <Button variant="ghost" size="sm" onClick={() => setIsReplyBoxOpen(false)} className="h-8 w-8 p-0"><X size={16} /></Button>
-                                </div>
-
-                                <div className="p-4">
-                                    {!isAuthenticated && !channelConfig?.allow_anonymous_posts ? (
-                                        <div className="text-center py-6">
-                                            <Typography variant="p" className="mb-4">{t("कृपया सहभागी हुन लग इन गर्नुहोस्।", "Please log in to participate.")}</Typography>
-                                            <Button onClick={async () => {
-                                                const supabase = createBrowserClient(
-                                                    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                                                    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-                                                );
-                                                await supabase.auth.signInWithOAuth({
-                                                    provider: 'google',
-                                                    options: { redirectTo: `${window.location.origin}/auth/callback` },
-                                                });
-                                            }} className="bg-brand-blue text-white">{t("Google मार्फत साइन इन", "Sign In with Google")}</Button>
-                                        </div>
-                                    ) : (
-                                        <form onSubmit={handleReply}>
-                                            <div className="mb-4 border border-slate-200 rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-brand-blue/20 transition-all bg-slate-50">
-                                                <RichTextEditor
-                                                    onChange={setReplyContent}
-                                                    placeholder={!isAuthenticated ? t("आफ्नो बेनामी विचारहरू साझा गर्नुहोस्...", "Share your anonymous thoughts...") : t("यहाँ आफ्नो जवाफ टाइप गर्नुहोस्... (@ ले सदस्य उल्लेख गर्न)", "Type your reply here...")}
-                                                    minHeight="150px"
-                                                />
-                                            </div>
-
-                                            {replyAttachments.length > 0 && (
-                                                <div className="flex gap-2 mb-3 flex-wrap">
-                                                    {replyAttachments.map((att, i) => (
-                                                        <div key={i} className="flex items-center gap-2 bg-slate-100 rounded px-2 py-1 text-xs">
-                                                            <span className="truncate max-w-[100px]">{att.meta.fileName}</span>
-                                                            <button type="button" onClick={() => removeAttachment(i)}><X size={12} /></button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-
-                                            <div className="flex justify-between items-center pt-2 border-t border-slate-100">
-                                                <div className="flex gap-2">
-                                                    <label className={cn("cursor-pointer p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-brand-blue transition-colors", isUploading && "opacity-50 pointer-events-none")}>
-                                                        <input type="file" multiple className="hidden" onChange={handleFileSelect} />
-                                                        {isUploading ? <Loader2 size={20} className="animate-spin" /> : <Paperclip size={20} />}
-                                                    </label>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <Button type="submit" disabled={isSubmitting || !replyContent.trim()} className="bg-brand-blue hover:bg-blue-600 text-white">
-                                                        {isSubmitting ? t("पठाउँदैछ...", "Sending...") : t("जवाफ पोस्ट", "Post Reply")}
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                        </form>
-                                    )}
-                                </div>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
-            </div>
-
             {/* Flag Modal */}
-            {flagPostId && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-                    <Card className="w-full max-w-sm">
-                        <CardHeader>
-                            <CardTitle>{t("पोस्ट रिपोर्ट", "Report Post")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleFlag} className="space-y-4">
-                                <select
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                    value={flagReason}
-                                    onChange={e => setFlagReason(e.target.value)}
-                                >
-                                    <option value="spam">{t("स्प्याम", "Spam")}</option>
-                                    <option value="inappropriate">{t("अनुचित", "Inappropriate")}</option>
-                                    <option value="other">{t("अन्य", "Other")}</option>
-                                </select>
-                                <div className="flex justify-end gap-2">
-                                    <Button type="button" variant="ghost" onClick={() => setFlagPostId(null)}>{t("रद्द गर्नुहोस्", "Cancel")}</Button>
-                                    <Button type="submit" variant="destructive">{t("रिपोर्ट", "Report")}</Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
+            {
+                flagPostId && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                        <Card className="w-full max-w-sm">
+                            <CardHeader>
+                                <CardTitle>{t("पोस्ट रिपोर्ट", "Report Post")}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <form onSubmit={handleFlag} className="space-y-4">
+                                    <select
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                        value={flagReason}
+                                        onChange={e => setFlagReason(e.target.value)}
+                                    >
+                                        <option value="spam">{t("स्प्याम", "Spam")}</option>
+                                        <option value="inappropriate">{t("अनुचित", "Inappropriate")}</option>
+                                        <option value="other">{t("अन्य", "Other")}</option>
+                                    </select>
+                                    <div className="flex justify-end gap-2">
+                                        <Button type="button" variant="ghost" onClick={() => setFlagPostId(null)}>{t("रद्द गर्नुहोस्", "Cancel")}</Button>
+                                        <Button type="submit" variant="destructive">{t("रिपोर्ट", "Report")}</Button>
+                                    </div>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )
+            }
         </div>
     );
 }
