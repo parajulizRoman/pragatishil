@@ -6,9 +6,12 @@ import { usePathname } from "next/navigation";
 import { DiscussionChannel, UserRole } from "@/types";
 import { createBrowserClient } from "@supabase/ssr";
 import ChannelModal from "./ChannelModal";
+import ChannelCard from "./ChannelCard";
 import { canManageChannels } from "@/lib/permissions";
 import { useLanguage } from "@/context/LanguageContext";
 import { Skeleton } from "@/components/ui/skeleton";
+import { LayoutGrid, List, Filter } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 function SidebarSkeleton() {
     return (
@@ -42,6 +45,11 @@ export default function CommuneLayout({
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingChannel, setEditingChannel] = useState<DiscussionChannel | null>(null);
     const [parentChannelForCreate, setParentChannelForCreate] = useState<DiscussionChannel | null>(null);
+
+    // View Mode State
+    const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+    // const [filterType, setFilterType] = useState<'all' | 'geographic' | 'department' | 'general'>('all');
+    // const [filterVisibility, setFilterVisibility] = useState<'all' | 'public' | 'members' | 'party_only'>('all');
 
     useEffect(() => {
         fetchData();
@@ -494,13 +502,62 @@ export default function CommuneLayout({
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
                         </div>
+
+                        {/* View Mode Toggle & Filters */}
+                        <div className="flex items-center justify-between gap-2 pt-2">
+                            {/* View Mode Toggle */}
+                            <div className="flex items-center gap-1 bg-slate-100 rounded-md p-0.5">
+                                <button
+                                    onClick={() => setViewMode('list')}
+                                    className={cn(
+                                        "p-1.5 rounded transition-all",
+                                        viewMode === 'list' ? "bg-white shadow-sm text-brand-blue" : "text-slate-400 hover:text-slate-600"
+                                    )}
+                                    title={t("सूची दृश्य", "List View")}
+                                >
+                                    <List className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('grid')}
+                                    className={cn(
+                                        "p-1.5 rounded transition-all",
+                                        viewMode === 'grid' ? "bg-white shadow-sm text-brand-blue" : "text-slate-400 hover:text-slate-600"
+                                    )}
+                                    title={t("ग्रिड दृश्य", "Grid View")}
+                                >
+                                    <LayoutGrid className="w-3.5 h-3.5" />
+                                </button>
+                            </div>
+
+                            {/* Filter Button */}
+                            <button
+                                className="flex items-center gap-1 text-xs text-slate-500 hover:text-brand-blue transition-colors"
+                                title={t("फिल्टर", "Filter")}
+                            >
+                                <Filter className="w-3 h-3" />
+                            </button>
+                        </div>
                     </div>
 
                     <div className="space-y-2">
                         {loading ? (
                             <SidebarSkeleton />
+                        ) : viewMode === 'grid' ? (
+                            /* Grid View - Show all channels as cards */
+                            <div className="grid grid-cols-1 gap-2 p-2">
+                                {filteredChannels.map(channel => (
+                                    <ChannelCard
+                                        key={channel.id}
+                                        channel={channel}
+                                        isActive={pathname.includes(channel.slug || channel.id)}
+                                        showStats={false}
+                                        language={language}
+                                    />
+                                ))}
+                            </div>
                         ) : (
                             <>
+                                {/* List View - Original categorized layout */}
                                 {/* Council (Geographic) Channels First */}
                                 {renderCouncilCategory()}
 

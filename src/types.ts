@@ -190,6 +190,14 @@ export interface DiscussionChannel {
     header_image_url?: string | null;
     political_intro?: string | null;
 
+    // Thumbnail and icon
+    thumbnail_url?: string | null;
+    icon_emoji?: string | null;
+
+    // Stats (optional, populated by queries)
+    thread_count?: number;
+    member_count?: number;
+
     created_at: string;
 }
 
