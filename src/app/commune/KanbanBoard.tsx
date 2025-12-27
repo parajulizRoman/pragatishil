@@ -49,6 +49,10 @@ export default function KanbanBoard({ channelId, canEdit, canDelete }: KanbanBoa
     const [editingTask, setEditingTask] = useState<ChannelTask | null>(null);
     const [addToColumn, setAddToColumn] = useState<string>('todo');
 
+    const [sortBy, setSortBy] = useState<'position' | 'date_asc' | 'date_desc' | 'priority'>('position');
+    const [filterPriority, setFilterPriority] = useState<string>('all');
+    const [filterAssignee, setFilterAssignee] = useState<'all' | 'me' | 'unassigned'>('all');
+
     useEffect(() => {
         fetchTasks();
     }, [channelId]);
@@ -80,6 +84,12 @@ export default function KanbanBoard({ channelId, canEdit, canDelete }: KanbanBoa
     const handleDrop = async (e: React.DragEvent, newStatus: string) => {
         e.preventDefault();
         if (!draggedTask || !canEdit) return;
+
+        // Disable drag-drop if sorting/filtering is active (to prevent position confusion)
+        if (sortBy !== 'position' || filterPriority !== 'all' || filterAssignee !== 'all') {
+            alert(t('फिल्टर वा क्रमबद्ध सक्रिय हुँदा, तान्ने र खसाल्ने अक्षम हुन्छ।', 'Drag and drop disabled while filtering or custom sorting.'));
+            return;
+        }
 
         if (draggedTask.status === newStatus) {
             setDraggedTask(null);
@@ -124,8 +134,35 @@ export default function KanbanBoard({ channelId, canEdit, canDelete }: KanbanBoa
         }
     };
 
-    const getTasksByColumn = (status: string) =>
-        tasks.filter(t => t.status === status).sort((a, b) => a.position - b.position);
+    const getTasksByColumn = (status: string) => {
+        let filtered = tasks.filter(t => t.status === status);
+
+        // Filter: Priority
+        if (filterPriority !== 'all') {
+            filtered = filtered.filter(t => t.priority === filterPriority);
+        }
+
+        // Filter: Assignee (Mock implementation - assuming current user ID available globally or handled loosely)
+        // For 'me', we would need currentUserId. Since this component doesn't have it explicitly passed
+        // from props in this snippet, we will skip implementation of 'me' filter logic or assume simple check if id matches.
+        // Actually, we can check `assigned_to` null for 'unassigned'.
+        if (filterAssignee === 'unassigned') {
+            filtered = filtered.filter(t => !t.assigned_to);
+        }
+        // 'me' filter omitted due to lack of userId in props, can be added later
+
+        // Sort
+        return filtered.sort((a, b) => {
+            if (sortBy === 'position') return a.position - b.position;
+            if (sortBy === 'date_desc') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+            if (sortBy === 'date_asc') return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+            if (sortBy === 'priority') {
+                const pVal = { urgent: 4, high: 3, medium: 2, low: 1 };
+                return (pVal[b.priority] || 0) - (pVal[a.priority] || 0);
+            }
+            return 0;
+        });
+    };
 
     if (loading) {
         return (
@@ -137,6 +174,48 @@ export default function KanbanBoard({ channelId, canEdit, canDelete }: KanbanBoa
 
     return (
         <div className="space-y-4">
+            {/* Toolbar */}
+            <div className="flex flex-wrap items-center justify-between gap-4 bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-slate-700">{t("फिल्टर:", "Filter:")}</span>
+                    <select
+                        value={filterPriority}
+                        onChange={(e) => setFilterPriority(e.target.value)}
+                        className="text-sm border border-slate-300 rounded px-2 py-1 bg-white focus:ring-2 focus:ring-brand-blue/20 outline-none"
+                    >
+                        <option value="all">{t("सबै प्राथमिकता", "All Priorities")}</option>
+                        <option value="urgent">🔴 {t("अत्यावश्यक", "Urgent")}</option>
+                        <option value="high">🟠 {t("उच्च", "High")}</option>
+                        <option value="medium">🔵 {t("मध्यम", "Medium")}</option>
+                        <option value="low">⚪ {t("कम", "Low")}</option>
+                    </select>
+
+                    <select
+                        value={filterAssignee}
+                        onChange={(e) => setFilterAssignee(e.target.value as 'all' | 'me' | 'unassigned')}
+                        className="text-sm border border-slate-300 rounded px-2 py-1 bg-white focus:ring-2 focus:ring-brand-blue/20 outline-none"
+                    >
+                        <option value="all">{t("सबै सदस्य", "All Members")}</option>
+                        <option value="unassigned">{t("जिम्मेवारी नतोकिएको", "Unassigned")}</option>
+                        {/* <option value="me">My Tasks</option> */}
+                    </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-slate-700">{t("क्रमबद्ध:", "Sort by:")}</span>
+                    <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as 'position' | 'date_asc' | 'date_desc' | 'priority')}
+                        className="text-sm border border-slate-300 rounded px-2 py-1 bg-white focus:ring-2 focus:ring-brand-blue/20 outline-none"
+                    >
+                        <option value="position">{t("स्थिति (पूर्वनिर्धारित)", "Position (Default)")}</option>
+                        <option value="priority">{t("प्राथमिकता (उच्च-कम)", "Priority (High-Low)")}</option>
+                        <option value="date_desc">{t("नयाँ पहिले", "Newest First")}</option>
+                        <option value="date_asc">{t("पुरानो पहिले", "Oldest First")}</option>
+                    </select>
+                </div>
+            </div>
+
             {/* Kanban Columns */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {COLUMNS.map(column => (

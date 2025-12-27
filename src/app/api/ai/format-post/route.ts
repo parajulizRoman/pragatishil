@@ -1,29 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
 
 // POST /api/ai/format-post
 export async function POST(request: NextRequest) {
     try {
-        const cookieStore = cookies();
-        const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            {
-                cookies: {
-                    get(name: string) {
-                        return cookieStore.get(name)?.value;
-                    },
-                },
-            }
-        );
-
-        // Check auth (Optional: Allow anon for now to support public channels)
-        const { data: { user } } = await supabase.auth.getUser();
-        // if (!user) {
-        //     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        // }
 
         const body = await request.json();
         const { content } = body;

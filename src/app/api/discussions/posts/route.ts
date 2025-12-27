@@ -225,10 +225,11 @@ export async function POST(request: Request) {
                 const client = user ? supabase : supabaseAdmin;
                 const creatorId = user ? user.id : null;
 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const { data: pollData, error: pollError } = await client
                     .from('discussion_polls')
                     .insert({
-                        post_id: (createdPost as any).id,
+                        post_id: (createdPost as { id: string }).id,
                         question,
                         allow_multiple_votes: allow_multiple || false,
                         expires_at: expires_at || null,
@@ -248,9 +249,10 @@ export async function POST(request: Request) {
                     await client.from('discussion_poll_options').insert(optionsData);
 
                     // Attach poll to response
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (createdPost as any).poll = {
                         ...pollData,
-                        options: optionsData.map((o: any) => ({ ...o, count: 0, isVoted: false })),
+                        options: optionsData.map((o) => ({ ...o, count: 0, isVoted: false })),
                         total_votes: 0
                     };
                 } else {
@@ -261,6 +263,7 @@ export async function POST(request: Request) {
 
         return NextResponse.json({ post: createdPost });
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
         return NextResponse.json({ error: err.message }, { status: 500 });
     }

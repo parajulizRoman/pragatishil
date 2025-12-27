@@ -9,7 +9,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { flagContent, votePost, toggleThreadInteraction, toggleReaction } from "@/app/commune/actions";
 import Link from "next/link";
 import Image from "next/image";
-import { X, Shield, User, Crown, Paperclip, FileText, Image as ImageIcon, Loader2, MessageSquare, Heart, Bookmark, EyeOff, Flag, ArrowLeft, ArrowUp, ArrowDown, Trash2 } from "lucide-react";
+import { X, Shield, User, Crown, Paperclip, FileText, Image as ImageIcon, Loader2, MessageSquare, Heart, Bookmark, EyeOff, Flag, ArrowLeft, ArrowUp, ArrowDown, Trash2, Edit2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import PostActions from "@/components/PostActions";
 import RichTextEditor from "@/components/RichTextEditor";
@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import { RichTextWithVideos } from "@/components/ui/VideoEmbed";
 import { getRoleLabel, getRoleBadgeVariant } from "@/lib/roleDisplay";
+import PollDisplay from "@/components/PollDisplay";
 
 // Helpers
 const PLACEHOLDERS = [
@@ -86,6 +87,32 @@ export default function ThreadPage() {
     const [isFlagging, setIsFlagging] = useState(false);
 
     const bottomRef = useRef<HTMLDivElement>(null);
+
+    // Title Editing
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [editTitleValue, setEditTitleValue] = useState("");
+    const [isSavingTitle, setIsSavingTitle] = useState(false);
+
+    const handleSaveTitleSave = async () => {
+        if (!editTitleValue.trim() || !thread) return;
+        setIsSavingTitle(true);
+        try {
+            const res = await fetch(`/api/discussions/threads?id=${thread.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: editTitleValue })
+            });
+
+            if (!res.ok) throw new Error((await res.json()).error || "Failed to update");
+
+            setThread(prev => prev ? { ...prev, title: editTitleValue } : null);
+            setIsEditingTitle(false);
+        } catch (e: any) {
+            alert(e.message);
+        } finally {
+            setIsSavingTitle(false);
+        }
+    };
 
     const fetchData = React.useCallback(async () => {
         setLoading(true);
@@ -346,7 +373,51 @@ export default function ThreadPage() {
 
                 <div className="space-y-4">
                     <Badge variant="secondary" className="bg-slate-100 text-slate-600">{thread.channel?.name}</Badge>
-                    <Typography variant="h1" className="text-3xl md:text-4xl leading-tight text-brand-navy">{thread.title}</Typography>
+
+                    {/* Header Image from First Post */}
+                    {posts.length > 0 && posts[0].attachments && posts[0].attachments.some(a => a.type === 'image') && (
+                        <div className="relative w-full h-64 md:h-80 rounded-xl overflow-hidden mb-6 border border-slate-200">
+                            <img
+                                src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/commune-uploads/${posts[0].attachments.find(a => a.type === 'image')?.storage_path}`}
+                                alt="Thread Header"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    )}
+
+                    {isEditingTitle ? (
+                        <div className="flex flex-col gap-2">
+                            <input
+                                type="text"
+                                value={editTitleValue}
+                                onChange={(e) => setEditTitleValue(e.target.value)}
+                                className="text-3xl md:text-4xl font-bold text-brand-navy border-b-2 border-brand-blue focus:outline-none bg-transparent w-full"
+                                autoFocus
+                            />
+                            <div className="flex gap-2 mt-1">
+                                <Button size="sm" onClick={handleSaveTitleSave} disabled={isSavingTitle} className="bg-brand-blue text-white">
+                                    {isSavingTitle ? <Loader2 className="w-4 h-4 animate-spin" /> : t("सेभ गर्नुहोस्", "Save")}
+                                </Button>
+                                <Button size="sm" variant="ghost" onClick={() => { setIsEditingTitle(false); setEditTitleValue(thread.title); }}>
+                                    {t("रद्द", "Cancel")}
+                                </Button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="group flex items-start justify-between gap-4">
+                            <Typography variant="h1" className="text-3xl md:text-4xl leading-tight text-brand-navy">{thread.title}</Typography>
+                            {/* Edit Title Button */}
+                            {(currentUserId === thread.created_by || ['admin', 'yantrik', 'admin_party'].includes(thread.author?.role || '')) && (
+                                <button
+                                    onClick={() => { setIsEditingTitle(true); setEditTitleValue(thread.title); }}
+                                    className="opacity-0 group-hover:opacity-100 transition-opacity p-2 text-slate-400 hover:text-brand-blue"
+                                    title={t("शीर्षक सम्पादन", "Edit Title")}
+                                >
+                                    <Edit2 size={18} />
+                                </button>
+                            )}
+                        </div>
+                    )}
 
                     <div className="flex items-center gap-3 py-2 border-b border-sky-100/50">
                         <span className="text-sm text-muted-foreground">{t("मूल छलफल सुरु गर्ने", "Original discussion started by")}</span>
@@ -469,6 +540,11 @@ export default function ThreadPage() {
                                         <div className="text-slate-800 leading-relaxed whitespace-pre-wrap text-[15px] mb-4">
                                             <RichTextWithVideos content={post.content} />
                                         </div>
+
+                                        {/* Poll Display */}
+                                        {post.poll && (
+                                            <PollDisplay poll={post.poll} onVote={() => fetchData()} />
+                                        )}
 
                                         {/* Attachments */}
                                         {post.attachments && post.attachments.length > 0 && (

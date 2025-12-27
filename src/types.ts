@@ -214,6 +214,7 @@ export interface DiscussionThread {
     channel?: DiscussionChannel;
     first_post_content?: string;
     user_vote?: number; // 0, 1, -1 for current user on first post
+    reply_count?: number;
 }
 
 export interface Reaction {
@@ -246,6 +247,7 @@ export interface DiscussionPost {
     downvotes: number;
     user_vote: number; // 0, 1, or -1 (if current user voted)
     attachments?: DiscussionAttachment[];
+    poll?: DiscussionPoll;
 }
 
 export interface DiscussionAttachment {
@@ -386,4 +388,32 @@ export interface MediaItem {
     updated_by: string | null;
     album_id: number | null;
     uploaded_by: string | null;
+}
+
+export interface DiscussionPoll {
+    id: string;
+    post_id: string;
+    question: string;
+    allow_multiple_votes: boolean;
+    expires_at: string | null;
+    created_at: string;
+    options: PollOption[];
+    user_votes?: string[]; // Option IDs user voted for
+    total_votes?: number;
+}
+
+export interface PollOption {
+    id: string;
+    poll_id: string;
+    option_text: string;
+    position: number;
+    vote_count?: number;
+}
+
+export interface PollVote {
+    id: string;
+    poll_id: string;
+    option_id: string;
+    user_id: string;
+    created_at: string;
 }

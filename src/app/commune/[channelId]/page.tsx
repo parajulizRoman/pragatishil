@@ -19,6 +19,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import ChannelMembersModal from "../ChannelMembersModal";
 import ChannelHeaderEditModal from "../ChannelHeaderEditModal";
 import KanbanBoard from "../KanbanBoard";
+import PollCreationForm from "@/components/PollCreationForm";
 import { canManageChannels } from "@/lib/permissions";
 
 export default function ChannelPage() {
@@ -38,6 +39,10 @@ export default function ChannelPage() {
     const [richContentJson, setRichContentJson] = useState<string>(""); // Lexical JSON
     const [isNewThreadAnon, setIsNewThreadAnon] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
+
+    // Poll State
+    const [pollData, setPollData] = useState<any>(null); // Type 'any' or create imported interface
+
 
     // Attachments State
     const [attachments, setAttachments] = useState<{ file: File, meta: any }[]>([]);
@@ -220,7 +225,8 @@ export default function ChannelPage() {
                 content: richContentJson || newBody, // Use rich content if available
                 content_type: richContentJson ? 'rich' : 'plain',
                 isAnon: isNewThreadAnon,
-                attachments: attachments.map(a => a.meta)
+                attachments: attachments.map(a => a.meta),
+                poll: pollData
             };
 
             const res = await fetch("/api/discussions/threads", {
@@ -237,7 +243,11 @@ export default function ChannelPage() {
             setNewTitle("");
             setNewBody("");
             setRichContentJson("");
+            setNewTitle("");
+            setNewBody("");
+            setRichContentJson("");
             setAttachments([]);
+            setPollData(null); // Reset Poll
             setShowForm(false);
             fetchData(); // Refresh list
         } catch (err: any) {
@@ -473,6 +483,10 @@ export default function ChannelPage() {
                                 </div>
                             </div>
 
+                            <div className="mt-2">
+                                <PollCreationForm onChange={setPollData} />
+                            </div>
+
                             {/* Actions Row */}
                             <div className="flex justify-between items-center pt-2">
                                 {/* Anon Toggle for Allowed Channels */}
@@ -512,7 +526,8 @@ export default function ChannelPage() {
                         </form>
                     </CardContent>
                 </Card>
-            )}
+            )
+            }
 
             {/* Tabs Navigation */}
             <div className="flex border-b border-slate-200 mb-8">
@@ -543,254 +558,260 @@ export default function ChannelPage() {
                 >
                     {t("प्रभाव र तथ्याङ्क", "Impact & Stats")}
                 </button>
-                {/* Tasks Tab - only for geographic/department channels */}
-                {channel.location_type && (
-                    <button
-                        onClick={() => setActiveTab('tasks')}
-                        className={cn(
-                            "px-6 py-3 text-sm font-medium border-b-2 transition-colors",
-                            activeTab === 'tasks' ? "border-brand-blue text-brand-blue" : "border-transparent text-muted-foreground hover:text-slate-800"
-                        )}
-                    >
-                        {t("कार्यहरू", "Tasks")}
-                    </button>
-                )}
+                {/* Tasks Tab - for all channels */}
+                <button
+                    onClick={() => setActiveTab('tasks')}
+                    className={cn(
+                        "px-6 py-3 text-sm font-medium border-b-2 transition-colors",
+                        activeTab === 'tasks' ? "border-brand-blue text-brand-blue" : "border-transparent text-muted-foreground hover:text-slate-800"
+                    )}
+                >
+                    {t("कार्यहरू", "Tasks")}
+                </button>
             </div>
 
             {/* TAB CONTENT */}
-            {activeTab === 'discussions' && (
-                <div className="space-y-4">
-                    {threads.length === 0 ? (
-                        <Card className="text-center p-12 bg-slate-50/50 border-dashed">
+            {
+                activeTab === 'discussions' && (
+                    <div className="space-y-4">
+                        {threads.length === 0 ? (
+                            <Card className="text-center p-12 bg-slate-50/50 border-dashed">
+                                <CardContent>
+                                    <Typography variant="muted">{t("अहिलेसम्म कुनै थ्रेड छैन। कुराकानी सुरु गर्ने पहिलो हुनुहोस्!", "No threads yet. Be the first to start a conversation!")}</Typography>
+                                </CardContent>
+                            </Card>
+                        ) : (
+                            threads.map(thread => (
+                                <Link key={thread.id} href={`/commune/thread/${thread.id}`} className="block group">
+                                    <Card className="hover:shadow-md transition-all hover:border-brand-blue/30 relative overflow-hidden group-hover:-translate-y-0.5 duration-200">
+                                        <CardContent className="p-5">
+                                            {thread.buried_at && (
+                                                <Badge variant="destructive" className="absolute top-0 right-0 rounded-none rounded-bl-md px-2 py-0.5 text-[10px]">Buried</Badge>
+                                            )}
+                                            <div className="flex justify-between items-start gap-4">
+                                                <div className="flex-1">
+                                                    <Typography variant="h4" className="text-lg font-bold text-brand-navy mb-1 group-hover:text-brand-blue transition-colors">
+                                                        {thread.title}
+                                                    </Typography>
+                                                    {thread.first_post_content && (
+                                                        <Typography variant="p" className="text-slate-600 text-sm line-clamp-2 mb-2 leading-relaxed">
+                                                            {thread.first_post_content}
+                                                        </Typography>
+                                                    )}
+                                                    <div className="flex items-center text-xs text-muted-foreground gap-3 mt-3">
+                                                        <span>{new Date(thread.created_at!).toLocaleDateString()}</span>
+                                                        <span>•</span>
+                                                        {thread.is_anonymous ? <span className="italic">{t("बेनामी", "Anonymous")}</span> : <span className="font-medium text-slate-700">{t("सदस्य", "Member")}</span>}
+                                                    </div>
+                                                </div>
+
+                                                {/* Stats (Votes/Comments) */}
+                                                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 text-slate-500 text-sm ml-2">
+                                                    <div className="flex items-center gap-1 bg-slate-50 rounded-lg border border-slate-200 p-0.5" onClick={(e) => e.preventDefault()}>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={(e) => { e.preventDefault(); handleVote(thread.id, thread.first_post_id!, 1); }}
+                                                            className={cn("h-7 w-7 rounded", thread.user_vote === 1 ? 'text-orange-600 bg-orange-50' : 'text-slate-400')}
+                                                            title="Upvote"
+                                                        >
+                                                            <ThumbsUp size={14} className={thread.user_vote === 1 ? "fill-current" : ""} />
+                                                        </Button>
+                                                        <span className={cn(
+                                                            "text-xs font-bold min-w-[1.5em] text-center",
+                                                            (thread.upvotes || 0) - (thread.downvotes || 0) > 0 ? "text-orange-600" :
+                                                                (thread.upvotes || 0) - (thread.downvotes || 0) < 0 ? "text-brand-blue" : "text-slate-600"
+                                                        )}>
+                                                            {(thread.upvotes || 0) - (thread.downvotes || 0)}
+                                                        </span>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={(e) => { e.preventDefault(); handleVote(thread.id, thread.first_post_id!, -1); }}
+                                                            className={cn("h-7 w-7 rounded", thread.user_vote === -1 ? 'text-brand-blue bg-blue-50' : 'text-slate-400')}
+                                                            title="Downvote"
+                                                        >
+                                                            <ThumbsDown size={14} className={thread.user_vote === -1 ? "fill-current" : ""} />
+                                                        </Button>
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 rounded-md border border-slate-100" title="Comments">
+                                                        <MessageSquare size={14} className="text-slate-400" />
+                                                        <span className="font-medium text-slate-700">{thread.reply_count || 0}</span>
+                                                    </div>
+                                                    {/* Flag Button (Prevent Link Click) */}
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={(e) => { e.preventDefault(); setFlagThreadId(thread.id); }}
+                                                        className="h-8 w-8 text-slate-300 hover:text-destructive transition-colors hidden group-hover:flex"
+                                                        title="Report Thread"
+                                                    >
+                                                        <Flag size={14} />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            ))
+                        )}
+                    </div>
+                )
+            }
+
+            {
+                activeTab === 'resources' && (
+                    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
+                        {/* Read Me / Guidelines */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-lg flex items-center gap-2">
+                                    <FileText className="w-5 h-5 text-brand-blue" />
+                                    {t("मुख्य कागजातहरू र ReadMe", "Key Documents & ReadMe")}
+                                </CardTitle>
+                            </CardHeader>
                             <CardContent>
-                                <Typography variant="muted">{t("अहिलेसम्म कुनै थ्रेड छैन। कुराकानी सुरु गर्ने पहिलो हुनुहोस्!", "No threads yet. Be the first to start a conversation!")}</Typography>
+                                {channel.readme_content ? (
+                                    <div className="prose prose-sm text-slate-600 whitespace-pre-wrap max-w-none">
+                                        {channel.readme_content}
+                                    </div>
+                                ) : (
+                                    <Typography variant="muted" className="italic">{t("अहिलेसम्म कुनै दिशानिर्देश वा readme सामग्री थपिएको छैन।", "No specific guidelines or readme content added yet.")}</Typography>
+                                )}
                             </CardContent>
                         </Card>
-                    ) : (
-                        threads.map(thread => (
-                            <Link key={thread.id} href={`/commune/thread/${thread.id}`} className="block group">
-                                <Card className="hover:shadow-md transition-all hover:border-brand-blue/30 relative overflow-hidden group-hover:-translate-y-0.5 duration-200">
-                                    <CardContent className="p-5">
-                                        {thread.buried_at && (
-                                            <Badge variant="destructive" className="absolute top-0 right-0 rounded-none rounded-bl-md px-2 py-0.5 text-[10px]">Buried</Badge>
-                                        )}
-                                        <div className="flex justify-between items-start gap-4">
-                                            <div className="flex-1">
-                                                <Typography variant="h4" className="text-lg font-bold text-brand-navy mb-1 group-hover:text-brand-blue transition-colors">
-                                                    {thread.title}
-                                                </Typography>
-                                                {thread.first_post_content && (
-                                                    <Typography variant="p" className="text-slate-600 text-sm line-clamp-2 mb-2 leading-relaxed">
-                                                        {thread.first_post_content}
-                                                    </Typography>
-                                                )}
-                                                <div className="flex items-center text-xs text-muted-foreground gap-3 mt-3">
-                                                    <span>{new Date(thread.created_at!).toLocaleDateString()}</span>
-                                                    <span>•</span>
-                                                    {thread.is_anonymous ? <span className="italic">{t("बेनामी", "Anonymous")}</span> : <span className="font-medium text-slate-700">{t("सदस्य", "Member")}</span>}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* Documents & Links Column */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                                    <WrapperLinkIcon />
+                                    {t("कागजातहरू र लिङ्कहरू", "Documents & Links")}
+                                </h3>
+
+                                {/* Legacy Doc Link */}
+                                {channel.docs_url && (
+                                    <a href={channel.docs_url} target="_blank" rel="noopener noreferrer" className="block">
+                                        <Card className="hover:shadow-md transition-all group border-blue-100 bg-blue-50/50">
+                                            <CardContent className="p-4 flex items-center gap-3">
+                                                <div className="bg-blue-100 p-2 rounded-full text-brand-blue">
+                                                    <FileText size={18} />
                                                 </div>
-                                            </div>
-
-                                            {/* Stats (Votes/Comments) */}
-                                            <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 text-slate-500 text-sm ml-2">
-                                                <div className="flex items-center gap-1 bg-slate-50 rounded-lg border border-slate-200 p-0.5" onClick={(e) => e.preventDefault()}>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={(e) => { e.preventDefault(); handleVote(thread.id, thread.first_post_id!, 1); }}
-                                                        className={cn("h-7 w-7 rounded", thread.user_vote === 1 ? 'text-orange-600 bg-orange-50' : 'text-slate-400')}
-                                                        title="Upvote"
-                                                    >
-                                                        <ThumbsUp size={14} className={thread.user_vote === 1 ? "fill-current" : ""} />
-                                                    </Button>
-                                                    <span className={cn(
-                                                        "text-xs font-bold min-w-[1.5em] text-center",
-                                                        (thread.upvotes || 0) - (thread.downvotes || 0) > 0 ? "text-orange-600" :
-                                                            (thread.upvotes || 0) - (thread.downvotes || 0) < 0 ? "text-brand-blue" : "text-slate-600"
-                                                    )}>
-                                                        {(thread.upvotes || 0) - (thread.downvotes || 0)}
-                                                    </span>
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={(e) => { e.preventDefault(); handleVote(thread.id, thread.first_post_id!, -1); }}
-                                                        className={cn("h-7 w-7 rounded", thread.user_vote === -1 ? 'text-brand-blue bg-blue-50' : 'text-slate-400')}
-                                                        title="Downvote"
-                                                    >
-                                                        <ThumbsDown size={14} className={thread.user_vote === -1 ? "fill-current" : ""} />
-                                                    </Button>
+                                                <div>
+                                                    <div className="font-semibold text-brand-blue">{t("मुख्य ड्राइभ फोल्डर (Legacy)", "Main Drive Folder (Legacy)")}</div>
+                                                    <div className="text-xs text-slate-500">{t("बाह्य लिङ्क", "External Link")}</div>
                                                 </div>
-                                                <div className="flex items-center gap-1.5 px-2 py-1 bg-slate-50 rounded-md border border-slate-100" title="Comments">
-                                                    <MessageSquare size={14} className="text-slate-400" />
-                                                    <span className="font-medium text-slate-700">{(thread.total_posts || 1) - 1}</span>
+                                            </CardContent>
+                                        </Card>
+                                    </a>
+                                )}
+
+                                {/* Dynamic Resources (docs, links) */}
+                                {channel.resources?.filter(r => ['doc', 'link'].includes(r.type)).map(res => (
+                                    <a key={res.id} href={res.url} target="_blank" rel="noopener noreferrer" className="block">
+                                        <Card className="hover:shadow-sm hover:border-brand-blue/50 transition-all">
+                                            <CardContent className="p-4">
+                                                <div className="font-semibold text-slate-800 flex items-center gap-2">
+                                                    {res.type === 'doc' ? '📄' : '🔗'} {res.title}
                                                 </div>
-                                                {/* Flag Button (Prevent Link Click) */}
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={(e) => { e.preventDefault(); setFlagThreadId(thread.id); }}
-                                                    className="h-8 w-8 text-slate-300 hover:text-destructive transition-colors hidden group-hover:flex"
-                                                    title="Report Thread"
-                                                >
-                                                    <Flag size={14} />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        ))
-                    )}
-                </div>
-            )}
+                                                {res.description && <div className="text-xs text-muted-foreground mt-1">{res.description}</div>}
+                                            </CardContent>
+                                        </Card>
+                                    </a>
+                                ))}
 
-            {activeTab === 'resources' && (
-                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2">
-                    {/* Read Me / Guidelines */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="text-lg flex items-center gap-2">
-                                <FileText className="w-5 h-5 text-brand-blue" />
-                                {t("मुख्य कागजातहरू र ReadMe", "Key Documents & ReadMe")}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {channel.readme_content ? (
-                                <div className="prose prose-sm text-slate-600 whitespace-pre-wrap max-w-none">
-                                    {channel.readme_content}
-                                </div>
-                            ) : (
-                                <Typography variant="muted" className="italic">{t("अहिलेसम्म कुनै दिशानिर्देश वा readme सामग्री थपिएको छैन।", "No specific guidelines or readme content added yet.")}</Typography>
-                            )}
-                        </CardContent>
-                    </Card>
+                                {(!channel.docs_url && (!channel.resources || !channel.resources.some(r => ['doc', 'link'].includes(r.type)))) && (
+                                    <Typography variant="muted" className="italic text-sm">{t("कुनै कागजातहरू फेला परेनन्।", "No documents found.")}</Typography>
+                                )}
+                            </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Documents & Links Column */}
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
-                                <WrapperLinkIcon />
-                                {t("कागजातहरू र लिङ्कहरू", "Documents & Links")}
-                            </h3>
+                            {/* Videos Column */}
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+                                    <WrapperVideoIcon />
+                                    {t("विशेष भिडियोहरू", "Featured Videos")}
+                                </h3>
 
-                            {/* Legacy Doc Link */}
-                            {channel.docs_url && (
-                                <a href={channel.docs_url} target="_blank" rel="noopener noreferrer" className="block">
-                                    <Card className="hover:shadow-md transition-all group border-blue-100 bg-blue-50/50">
-                                        <CardContent className="p-4 flex items-center gap-3">
-                                            <div className="bg-blue-100 p-2 rounded-full text-brand-blue">
-                                                <FileText size={18} />
-                                            </div>
-                                            <div>
-                                                <div className="font-semibold text-brand-blue">{t("मुख्य ड्राइभ फोल्डर (Legacy)", "Main Drive Folder (Legacy)")}</div>
-                                                <div className="text-xs text-slate-500">{t("बाह्य लिङ्क", "External Link")}</div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </a>
-                            )}
+                                {/* Legacy Video Link */}
+                                {channel.video_playlist_url && (
+                                    <a href={channel.video_playlist_url} target="_blank" rel="noopener noreferrer" className="block">
+                                        <Card className="hover:shadow-md transition-all group border-red-100 bg-red-50/50">
+                                            <CardContent className="p-4 flex items-center gap-3">
+                                                <div className="bg-red-100 p-2 rounded-full text-red-600">
+                                                    <WrapperVideoIcon size={18} />
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold text-red-700">{t("आधिकारिक प्लेलिस्ट (Legacy)", "Official Playlist (Legacy)")}</div>
+                                                    <div className="text-xs text-red-500">{t("YouTube प्लेलिस्ट", "YouTube Playlist")}</div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    </a>
+                                )}
 
-                            {/* Dynamic Resources (docs, links) */}
-                            {channel.resources?.filter(r => ['doc', 'link'].includes(r.type)).map(res => (
-                                <a key={res.id} href={res.url} target="_blank" rel="noopener noreferrer" className="block">
-                                    <Card className="hover:shadow-sm hover:border-brand-blue/50 transition-all">
-                                        <CardContent className="p-4">
-                                            <div className="font-semibold text-slate-800 flex items-center gap-2">
-                                                {res.type === 'doc' ? '📄' : '🔗'} {res.title}
-                                            </div>
-                                            {res.description && <div className="text-xs text-muted-foreground mt-1">{res.description}</div>}
-                                        </CardContent>
-                                    </Card>
-                                </a>
-                            ))}
+                                {/* Dynamic Resources (video) */}
+                                {channel.resources?.filter(r => r.type === 'video').map(res => (
+                                    <a key={res.id} href={res.url} target="_blank" rel="noopener noreferrer" className="block">
+                                        <Card className="hover:shadow-sm hover:border-red-300 transition-all">
+                                            <CardContent className="p-4">
+                                                <div className="font-semibold text-slate-800 flex items-center gap-2">
+                                                    📺 {res.title}
+                                                </div>
+                                                {res.description && <div className="text-xs text-muted-foreground mt-1">{res.description}</div>}
+                                            </CardContent>
+                                        </Card>
+                                    </a>
+                                ))}
 
-                            {(!channel.docs_url && (!channel.resources || !channel.resources.some(r => ['doc', 'link'].includes(r.type)))) && (
-                                <Typography variant="muted" className="italic text-sm">{t("कुनै कागजातहरू फेला परेनन्।", "No documents found.")}</Typography>
-                            )}
-                        </div>
-
-                        {/* Videos Column */}
-                        <div className="space-y-4">
-                            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
-                                <WrapperVideoIcon />
-                                {t("विशेष भिडियोहरू", "Featured Videos")}
-                            </h3>
-
-                            {/* Legacy Video Link */}
-                            {channel.video_playlist_url && (
-                                <a href={channel.video_playlist_url} target="_blank" rel="noopener noreferrer" className="block">
-                                    <Card className="hover:shadow-md transition-all group border-red-100 bg-red-50/50">
-                                        <CardContent className="p-4 flex items-center gap-3">
-                                            <div className="bg-red-100 p-2 rounded-full text-red-600">
-                                                <WrapperVideoIcon size={18} />
-                                            </div>
-                                            <div>
-                                                <div className="font-semibold text-red-700">{t("आधिकारिक प्लेलिस्ट (Legacy)", "Official Playlist (Legacy)")}</div>
-                                                <div className="text-xs text-red-500">{t("YouTube प्लेलिस्ट", "YouTube Playlist")}</div>
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </a>
-                            )}
-
-                            {/* Dynamic Resources (video) */}
-                            {channel.resources?.filter(r => r.type === 'video').map(res => (
-                                <a key={res.id} href={res.url} target="_blank" rel="noopener noreferrer" className="block">
-                                    <Card className="hover:shadow-sm hover:border-red-300 transition-all">
-                                        <CardContent className="p-4">
-                                            <div className="font-semibold text-slate-800 flex items-center gap-2">
-                                                📺 {res.title}
-                                            </div>
-                                            {res.description && <div className="text-xs text-muted-foreground mt-1">{res.description}</div>}
-                                        </CardContent>
-                                    </Card>
-                                </a>
-                            ))}
-
-                            {(!channel.video_playlist_url && (!channel.resources || !channel.resources.some(r => r.type === 'video'))) && (
-                                <Typography variant="muted" className="italic text-sm">{t("कुनै भिडियोहरू फेला परेनन्।", "No videos found.")}</Typography>
-                            )}
+                                {(!channel.video_playlist_url && (!channel.resources || !channel.resources.some(r => r.type === 'video'))) && (
+                                    <Typography variant="muted" className="italic text-sm">{t("कुनै भिडियोहरू फेला परेनन्।", "No videos found.")}</Typography>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Tasks Tab - Kanban Board */}
-            {activeTab === 'tasks' && channel.location_type && (
-                <KanbanBoard
-                    channelId={channel.id}
-                    canEdit={canManageChannels(userRole)}
-                    canDelete={['admin', 'yantrik'].includes(userRole)}
-                />
-            )}
+            {
+                activeTab === 'tasks' && (
+                    <KanbanBoard
+                        channelId={channel.id}
+                        canEdit={canManageChannels(userRole)}
+                        canDelete={['admin', 'yantrik'].includes(userRole)}
+                    />
+                )
+            }
 
             {/* Flag Modal */}
-            {flagThreadId && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-                    <Card className="w-full max-w-sm">
-                        <CardHeader>
-                            <CardTitle>{t("थ्रेड रिपोर्ट", "Report Thread")}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleFlag} className="space-y-4">
-                                <select
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                    value={flagReason}
-                                    onChange={e => setFlagReason(e.target.value)}
-                                >
-                                    <option value="spam">{t("स्प्याम", "Spam")}</option>
-                                    <option value="inappropriate">{t("अनुचित", "Inappropriate")}</option>
-                                    <option value="other">{t("अन्य", "Other")}</option>
-                                </select>
-                                <div className="flex justify-end gap-2">
-                                    <Button type="button" variant="ghost" onClick={() => setFlagThreadId(null)}>{t("रद्द गर्नुहोस्", "Cancel")}</Button>
-                                    <Button type="submit" variant="destructive">{t("रिपोर्ट", "Report")}</Button>
-                                </div>
-                            </form>
-                        </CardContent>
-                    </Card>
-                </div>
-            )}
+            {
+                flagThreadId && (
+                    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                        <Card className="w-full max-w-sm">
+                            <CardHeader>
+                                <CardTitle>{t("थ्रेड रिपोर्ट", "Report Thread")}</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <form onSubmit={handleFlag} className="space-y-4">
+                                    <select
+                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                        value={flagReason}
+                                        onChange={e => setFlagReason(e.target.value)}
+                                    >
+                                        <option value="spam">{t("स्प्याम", "Spam")}</option>
+                                        <option value="inappropriate">{t("अनुचित", "Inappropriate")}</option>
+                                        <option value="other">{t("अन्य", "Other")}</option>
+                                    </select>
+                                    <div className="flex justify-end gap-2">
+                                        <Button type="button" variant="ghost" onClick={() => setFlagThreadId(null)}>{t("रद्द गर्नुहोस्", "Cancel")}</Button>
+                                        <Button type="submit" variant="destructive">{t("रिपोर्ट", "Report")}</Button>
+                                    </div>
+                                </form>
+                            </CardContent>
+                        </Card>
+                    </div>
+                )
+            }
 
             {/* Channel Members Modal */}
             <ChannelMembersModal
@@ -801,15 +822,17 @@ export default function ChannelPage() {
             />
 
             {/* Channel Header Edit Modal */}
-            {channel && (
-                <ChannelHeaderEditModal
-                    isOpen={showHeaderEditModal}
-                    onClose={() => setShowHeaderEditModal(false)}
-                    onSuccess={fetchData}
-                    channel={channel}
-                />
-            )}
-        </div>
+            {
+                channel && (
+                    <ChannelHeaderEditModal
+                        isOpen={showHeaderEditModal}
+                        onClose={() => setShowHeaderEditModal(false)}
+                        onSuccess={fetchData}
+                        channel={channel}
+                    />
+                )
+            }
+        </div >
     );
 }
 

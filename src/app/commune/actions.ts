@@ -62,6 +62,11 @@ export async function votePost(postId: string, voteType: number) {
         throw new Error("You must be logged in to vote.");
     }
 
+    if (!postId || postId === "undefined" || postId.length < 10) {
+        console.error("[votePost] Invalid postId received:", postId);
+        throw new Error("Invalid post ID.");
+    }
+
     if (![1, -1].includes(voteType)) {
         throw new Error("Invalid vote type.");
     }

@@ -135,7 +135,7 @@ export async function POST(request: Request) {
 
     // 1. Auth & Channel Check
     const body = await request.json();
-    const { channelId, title, content, isAnon, attachments } = body;
+    const { channelId, title, content, isAnon } = body;
 
     // Use Admin Client to fetch Channel Config to bypass RLS issues for Anon User
     const { data: channel, error: cErr } = await supabaseAdmin
@@ -205,6 +205,44 @@ export async function POST(request: Request) {
             .from('discussion_threads')
             .update({ first_post_id: post.id })
             .eq('id', thread.id);
+
+        // 3. Create Poll (Optional)
+        const { poll } = body;
+        if (poll) {
+            const { question, options, allow_multiple, expires_at } = poll;
+
+            if (question && Array.isArray(options) && options.length >= 2) {
+                // Use same client as post creation (user context)
+                const { data: pollData, error: pollError } = await supabase
+                    .from('discussion_polls')
+                    .insert({
+                        post_id: post.id,
+                        question,
+                        allow_multiple_votes: allow_multiple || false,
+                        expires_at: expires_at || null,
+                        created_by: user?.id || null
+                    })
+                    .select()
+                    .single();
+
+                if (pollError) {
+                    console.error('[Poll Create] Error:', pollError);
+                } else if (pollData) {
+                    // Insert Options
+                    const optionsData = options.map((opt: string, idx: number) => ({
+                        poll_id: pollData.id,
+                        option_text: opt,
+                        position: idx
+                    }));
+
+                    const { error: optError } = await supabase
+                        .from('discussion_poll_options')
+                        .insert(optionsData);
+
+                    if (optError) console.error('[Poll Options Create] Error:', optError);
+                }
+            }
+        }
 
         return NextResponse.json({ success: true, threadId: thread.id });
 

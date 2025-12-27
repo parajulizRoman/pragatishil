@@ -45,6 +45,9 @@ export default function CommunityPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [userRole, setUserRole] = useState<UserRole | null>(null);
 
+    // Search Logic
+    const [searchQuery, setSearchQuery] = useState("");
+
     useEffect(() => {
         const init = async () => {
             // 1. Fetch User Role
@@ -119,11 +122,16 @@ export default function CommunityPage() {
     // Use Capability Helpers
     const canEditChannels = canManageChannels(userRole);
 
+    const filteredChannels = channels.filter(c =>
+        (c.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (c.name_ne || '').toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     // Grouping Logic
     const grouped = {
-        public: channels.filter(c => c.visibility === 'public'),
-        members: channels.filter(c => ['members', 'logged_in', 'party_only'].includes(c.visibility)),
-        leadership: channels.filter(c => ['central_committee', 'board_only', 'leadership', 'internal'].includes(c.visibility)),
+        public: filteredChannels.filter(c => c.visibility === 'public'),
+        members: filteredChannels.filter(c => ['members', 'logged_in', 'party_only'].includes(c.visibility)),
+        leadership: filteredChannels.filter(c => ['central_committee', 'board_only', 'leadership', 'internal'].includes(c.visibility)),
     };
 
     // Visibility labels
@@ -201,9 +209,25 @@ export default function CommunityPage() {
 
     return (
         <div className="container mx-auto px-4 py-16 max-w-6xl min-h-[80vh]">
-            <div className="mb-16 text-center">
+            <div className="mb-12 text-center">
                 <Typography variant="h1" className="mb-3 text-brand-navy">{t("समुदाय छलफल", "Community Discussions")}</Typography>
-                <Typography variant="lead">{t("छलफलमा सहभागी हुनुहोस्। तलको च्यानल छान्नुहोस्।", "Join the conversation. Select a channel below.")}</Typography>
+                <Typography variant="lead" className="mb-8">{t("छलफलमा सहभागी हुनुहोस्। तलको च्यानल छान्नुहोस्।", "Join the conversation. Select a channel below.")}</Typography>
+
+                {/* Search Input */}
+                <div className="max-w-md mx-auto relative group">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="h-5 w-5 text-slate-400 group-focus-within:text-brand-blue transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input
+                        type="text"
+                        className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-full leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue/20 focus:border-brand-blue transition-all shadow-sm"
+                        placeholder={t("च्यानल खोज्नुहोस्...", "Search channels...")}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
             </div>
 
             {channels.length === 0 ? (
@@ -214,46 +238,55 @@ export default function CommunityPage() {
                 </Card>
             ) : (
                 <div className="space-y-16">
-                    {/* Public Section */}
-                    {grouped.public.length > 0 && (
-                        <section>
-                            <div className="flex items-center gap-4 mb-8">
-                                <div className="h-px bg-slate-200 flex-grow"></div>
-                                <Typography variant="h2" className="text-2xl text-brand-blue border-none !pb-0">{t("खुला सार्वजनिक मञ्च", "Open Public Forum")}</Typography>
-                                <div className="h-px bg-slate-200 flex-grow"></div>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {grouped.public.map(renderChannelCard)}
-                            </div>
-                        </section>
-                    )}
+                    {filteredChannels.length === 0 ? (
+                        <div className="text-center py-12">
+                            <Typography variant="muted" className="text-lg italic">{t("कुनै च्यानल भेटिएन।", "No channels found matching your search.")}</Typography>
+                            <Button variant="link" onClick={() => setSearchQuery("")} className="mt-2 text-brand-blue">{t("सबै च्यानल हेर्नुहोस्", "View all channels")}</Button>
+                        </div>
+                    ) : (
+                        <>
+                            {/* Public Section */}
+                            {grouped.public.length > 0 && (
+                                <section>
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="h-px bg-slate-200 flex-grow"></div>
+                                        <Typography variant="h2" className="text-2xl text-brand-blue border-none !pb-0">{t("खुला सार्वजनिक मञ्च", "Open Public Forum")}</Typography>
+                                        <div className="h-px bg-slate-200 flex-grow"></div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {grouped.public.map(renderChannelCard)}
+                                    </div>
+                                </section>
+                            )}
 
-                    {/* Members Section */}
-                    {grouped.members.length > 0 && (
-                        <section>
-                            <div className="flex items-center gap-4 mb-8">
-                                <div className="h-px bg-slate-200 flex-grow"></div>
-                                <Typography variant="h2" className="text-2xl text-brand-red border-none !pb-0">{t("सदस्य क्षेत्र", "Members Area")}</Typography>
-                                <div className="h-px bg-slate-200 flex-grow"></div>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {grouped.members.map(renderChannelCard)}
-                            </div>
-                        </section>
-                    )}
+                            {/* Members Section */}
+                            {grouped.members.length > 0 && (
+                                <section>
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="h-px bg-slate-200 flex-grow"></div>
+                                        <Typography variant="h2" className="text-2xl text-brand-red border-none !pb-0">{t("सदस्य क्षेत्र", "Members Area")}</Typography>
+                                        <div className="h-px bg-slate-200 flex-grow"></div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {grouped.members.map(renderChannelCard)}
+                                    </div>
+                                </section>
+                            )}
 
-                    {/* Leadership Section */}
-                    {grouped.leadership.length > 0 && (
-                        <section>
-                            <div className="flex items-center gap-4 mb-8">
-                                <div className="h-px bg-slate-200 flex-grow"></div>
-                                <Typography variant="h2" className="text-2xl text-brand-navy border-none !pb-0">{t("नेतृत्व वृत्त", "Leadership Circle")}</Typography>
-                                <div className="h-px bg-slate-200 flex-grow"></div>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {grouped.leadership.map(renderChannelCard)}
-                            </div>
-                        </section>
+                            {/* Leadership Section */}
+                            {grouped.leadership.length > 0 && (
+                                <section>
+                                    <div className="flex items-center gap-4 mb-8">
+                                        <div className="h-px bg-slate-200 flex-grow"></div>
+                                        <Typography variant="h2" className="text-2xl text-brand-navy border-none !pb-0">{t("नेतृत्व वृत्त", "Leadership Circle")}</Typography>
+                                        <div className="h-px bg-slate-200 flex-grow"></div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {grouped.leadership.map(renderChannelCard)}
+                                    </div>
+                                </section>
+                            )}
+                        </>
                     )}
                 </div>
             )}
