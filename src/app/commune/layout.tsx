@@ -103,12 +103,17 @@ export default function CommuneLayout({
     // Use Capability Helper
     const canEditChannels = canManageChannels(userRole);
 
-    // Filter Channels based on Search
+    // Filter Channels based on Search (supports English name, Nepali name, slug, and description)
     const [searchQuery, setSearchQuery] = useState("");
-    const filteredChannels = channels.filter(c =>
-        (c.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (c.name_ne || '').toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredChannels = channels.filter(c => {
+        const query = searchQuery.toLowerCase();
+        return (
+            (c.name || '').toLowerCase().includes(query) ||
+            (c.name_ne || '').toLowerCase().includes(query) ||
+            (c.slug || '').toLowerCase().includes(query) ||
+            (c.description || '').toLowerCase().includes(query)
+        );
+    });
 
     // Separate geographic (Council) channels from regular channels
     const geoChannels = filteredChannels.filter(c => c.location_type);

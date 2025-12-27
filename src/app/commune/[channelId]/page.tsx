@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import { DiscussionThread, DiscussionChannel } from "@/types";
 import { createBrowserClient } from "@supabase/ssr";
 import { flagContent, votePost } from "@/app/commune/actions";
-import { Paperclip, X, FileText, Image as ImageIcon, Loader2, ArrowLeft, MessageSquare, ThumbsUp, ThumbsDown, Flag, Users, Edit2, Trash2 } from "lucide-react";
+import { Paperclip, X, FileText, Image as ImageIcon, Loader2, ArrowLeft, MessageSquare, ThumbsUp, ThumbsDown, Flag, Users, Edit2, Trash2, Settings } from "lucide-react";
 import RichTextEditor from "@/components/RichTextEditor";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
 import ChannelMembersModal from "../ChannelMembersModal";
 import ChannelHeaderEditModal from "../ChannelHeaderEditModal";
+import ChannelModal from "../ChannelModal";
 import KanbanBoard from "../KanbanBoard";
 import PollCreationForm from "@/components/PollCreationForm";
 import { canManageChannels } from "@/lib/permissions";
@@ -65,6 +66,9 @@ export default function ChannelPage() {
 
     // Header edit modal
     const [showHeaderEditModal, setShowHeaderEditModal] = useState(false);
+
+    // Channel edit modal
+    const [showChannelEditModal, setShowChannelEditModal] = useState(false);
 
     useEffect(() => {
         const supabase = createBrowserClient(
@@ -397,8 +401,8 @@ export default function ChannelPage() {
                 </div>
 
                 {/* Edit/Delete Buttons for channel header - available for all channels */}
-                <div className="mt-4 flex gap-2">
-                    {/* Edit: admin, incharge, or moderator */}
+                <div className="mt-4 flex gap-2 flex-wrap">
+                    {/* Edit Header: admin, incharge, or moderator */}
                     {(canManageChannels(userRole)) && (
                         <Button
                             variant="outline"
@@ -408,6 +412,18 @@ export default function ChannelPage() {
                         >
                             <Edit2 className="w-4 h-4 mr-1" />
                             {t("हेडर सम्पादन", "Edit Header")}
+                        </Button>
+                    )}
+                    {/* Edit Channel: admin, yantrik, incharge */}
+                    {(canManageChannels(userRole)) && (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowChannelEditModal(true)}
+                            className="text-slate-600 border-slate-300 hover:bg-slate-50"
+                        >
+                            <Settings className="w-4 h-4 mr-1" />
+                            {t("च्यानल सम्पादन", "Edit Channel")}
                         </Button>
                     )}
                     {/* Delete: party_admin only */}
@@ -850,6 +866,18 @@ export default function ChannelPage() {
                         onClose={() => setShowHeaderEditModal(false)}
                         onSuccess={fetchData}
                         channel={channel}
+                    />
+                )
+            }
+
+            {/* Channel Edit Modal */}
+            {
+                channel && (
+                    <ChannelModal
+                        isOpen={showChannelEditModal}
+                        onClose={() => setShowChannelEditModal(false)}
+                        onSuccess={fetchData}
+                        editChannel={channel}
                     />
                 )
             }
