@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { toNepaliNumerals } from '@/lib/bsDateFormat';
 import { cn } from '@/lib/utils';
 import NepaliDate from 'nepali-date-converter';
+import { getMoonCycle, isSpecialLunarDay } from '@/lib/moonCycle';
 
 export interface CalendarEvent {
     id: string;
@@ -17,6 +18,17 @@ export interface CalendarEvent {
     event_type: string;
     is_live: boolean;
     status: string;
+}
+
+interface Festival {
+    id: string;
+    name_en: string;
+    name_ne: string;
+    bs_month: number;
+    bs_day: number;
+    image_url?: string;
+    category: string;
+    is_public_holiday: boolean;
 }
 
 interface CalendarProps {
@@ -29,6 +41,7 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
     const { t, language } = useLanguage();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [viewMode, setViewMode] = useState<'month' | 'week' | 'day'>('month');
+    const [festivals, setFestivals] = useState<Festival[]>([]);
 
     // Get current BS date
     //     const currentBS = getCurrentBSDate();
@@ -50,6 +63,27 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
     const weekDays = language === 'ne'
         ? ['आइत', 'सोम', 'मंगल', 'बुध', 'बिहि', 'शुक्र', 'शनि']
         : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    // Fetch festivals on mount and when month changes
+    useEffect(() => {
+        const fetchFestivals = async () => {
+            try {
+                const res = await fetch(`/api/festivals?month=${currentBSMonth}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setFestivals(data.festivals || []);
+                }
+            } catch (error) {
+                console.error('Failed to fetch festivals:', error);
+            }
+        };
+        fetchFestivals();
+    }, [currentBSMonth]);
+
+    // Helper: Get festival for a specific BS date
+    const getFestivalForDate = (bsDay: number): Festival | null => {
+        return festivals.find(f => f.bs_month === currentBSMonth && f.bs_day === bsDay) || null;
+    };
 
     // Navigate months
     const goToPreviousMonth = () => {
@@ -218,33 +252,59 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
                                 const isCurrentDay = isToday(date);
                                 const bsDay = date ? new NepaliDate(date).getDate() : null;
 
+                                // Get moon cycle and festival for this day
+                                const moonCycle = date ? getMoonCycle(new NepaliDate(date)) : null;
+                                const lunarDay = date ? isSpecialLunarDay(date) : { isSpecial: false };
+                                const festival = bsDay ? getFestivalForDate(bsDay) : null;
+
                                 return (
                                     <button
                                         key={index}
                                         onClick={() => date && onDateClick?.(date)}
                                         disabled={!date}
                                         className={cn(
-                                            "min-h-[80px] p-2 rounded-lg border transition-all",
+                                            "min-h-[100px] p-2 rounded-lg border transition-all relative",
                                             !date && "bg-slate-50 cursor-not-allowed",
                                             date && "hover:border-brand-blue hover:shadow-sm cursor-pointer",
-                                            isCurrentDay && "border-brand-blue bg-blue-50 ring-2 ring-brand-blue/20"
+                                            isCurrentDay && "border-brand-blue bg-blue-50 ring-2 ring-brand-blue/20",
+                                            festival?.is_public_holiday && "bg-red-50/30"
                                         )}
                                     >
                                         {date && (
                                             <div className="flex flex-col h-full">
                                                 {/* BS Date - Large and prominent */}
                                                 <div className="flex flex-col items-center mb-1">
-                                                    <span className={cn(
-                                                        "text-3xl font-bold leading-none",
-                                                        isCurrentDay ? "text-brand-blue" : "text-slate-800"
-                                                    )}>
-                                                        {language === 'ne' ? toNepaliNumerals(bsDay!) : bsDay}
-                                                    </span>
+                                                    <div className="flex items-center gap-1">
+                                                        {/* Moon phase emoji */}
+                                                        {lunarDay.isSpecial && (
+                                                            <span className="text-sm" title={language === 'ne' ? lunarDay.name_ne : lunarDay.name_en}>
+                                                                {moonCycle?.emoji}
+                                                            </span>
+                                                        )}
+                                                        <span className={cn(
+                                                            "text-3xl font-bold leading-none",
+                                                            isCurrentDay ? "text-brand-blue" : "text-slate-800"
+                                                        )}>
+                                                            {language === 'ne' ? toNepaliNumerals(bsDay!) : bsDay}
+                                                        </span>
+                                                    </div>
                                                     {/* AD Date - Small below */}
                                                     <span className="text-[10px] text-slate-400 mt-0.5">
                                                         {date.getDate()}
                                                     </span>
                                                 </div>
+
+                                                {/* Festival name if exists */}
+                                                {festival && (
+                                                    <div className={cn(
+                                                        "text-[9px] font-medium px-1 py-0.5 rounded mb-1 truncate",
+                                                        festival.is_public_holiday
+                                                            ? "bg-red-100 text-red-700"
+                                                            : "bg-amber-100 text-amber-700"
+                                                    )}>
+                                                        {language === 'ne' ? festival.name_ne : festival.name_en}
+                                                    </div>
+                                                )}
 
                                                 {/* Event indicators */}
                                                 <div className="flex-1 space-y-1">
