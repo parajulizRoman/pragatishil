@@ -31,7 +31,7 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
     const [viewMode, setViewMode] = useState<'month' | 'week' | 'day'>('month');
 
     // Get current BS date
-//     const currentBS = getCurrentBSDate();
+    //     const currentBS = getCurrentBSDate();
     const bsDate = new NepaliDate(currentDate);
     const currentBSYear = bsDate.getYear();
     const currentBSMonth = bsDate.getMonth(); // 0-indexed
@@ -232,12 +232,19 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
                                     >
                                         {date && (
                                             <div className="flex flex-col h-full">
-                                                <span className={cn(
-                                                    "text-sm font-medium mb-1",
-                                                    isCurrentDay ? "text-brand-blue" : "text-slate-700"
-                                                )}>
-                                                    {language === 'ne' ? toNepaliNumerals(bsDay!) : bsDay}
-                                                </span>
+                                                {/* BS Date - Large and prominent */}
+                                                <div className="flex flex-col items-center mb-1">
+                                                    <span className={cn(
+                                                        "text-3xl font-bold leading-none",
+                                                        isCurrentDay ? "text-brand-blue" : "text-slate-800"
+                                                    )}>
+                                                        {language === 'ne' ? toNepaliNumerals(bsDay!) : bsDay}
+                                                    </span>
+                                                    {/* AD Date - Small below */}
+                                                    <span className="text-[10px] text-slate-400 mt-0.5">
+                                                        {date.getDate()}
+                                                    </span>
+                                                </div>
 
                                                 {/* Event indicators */}
                                                 <div className="flex-1 space-y-1">
