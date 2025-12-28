@@ -101,7 +101,7 @@ export default function EventsPage() {
         return { label: language === 'ne' ? config.ne : config.en, color: config.color };
     };
 
-    // const pastEvents = events.filter(e => new Date(e.start_datetime) < new Date());
+    const upcomingEvents = events.filter(e => new Date(e.start_datetime) >= new Date());
     const pastEvents = events.filter(e => new Date(e.start_datetime) < new Date());
 
     return (
