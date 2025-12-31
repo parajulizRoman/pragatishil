@@ -1,19 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X, Plus, Trash2, Users, Search, UserPlus } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { X, Plus, Trash2, Users, Search, UserPlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Typography } from "@/components/ui/typography";
 import { Skeleton } from "@/components/ui/skeleton";
-// Badge component available if needed
+import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/context/LanguageContext";
 import {
     getChannelMembers,
     removeChannelMember,
     updateChannelMemberRole,
     bulkAddChannelMembers,
-    ChannelMember
+    addChannelMember,
+    searchUsers,
+    ChannelMember,
+    SearchedUser
 } from "@/actions/channelMembers";
 
 interface ChannelMembersModalProps {
@@ -21,6 +24,16 @@ interface ChannelMembersModalProps {
     onClose: () => void;
     channelId: string;
     channelName: string;
+}
+
+// Debounce helper
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function debounce<T extends (...args: any[]) => void>(fn: T, delay: number): T {
+    let timeoutId: NodeJS.Timeout;
+    return ((...args: Parameters<T>) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => fn(...args), delay);
+    }) as T;
 }
 
 // Role badge colors
@@ -43,7 +56,11 @@ export default function ChannelMembersModal({
     const [searchTerm, setSearchTerm] = useState("");
     const [activeTab, setActiveTab] = useState<'members' | 'add'>('members');
 
-    // Individual add member feature - TODO: implement user search
+    // Individual user search state
+    const [userSearchQuery, setUserSearchQuery] = useState("");
+    const [userSearchResults, setUserSearchResults] = useState<SearchedUser[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [addingUserId, setAddingUserId] = useState<string | null>(null);
 
     // Bulk add state
     const [bulkFilter, setBulkFilter] = useState({
@@ -88,7 +105,37 @@ export default function ChannelMembersModal({
         }
     };
 
-    // TODO: Add individual member search/add feature
+    // Debounced user search
+    const debouncedSearch = useCallback(
+        debounce(async (query: string) => {
+            if (query.length < 2) {
+                setUserSearchResults([]);
+                return;
+            }
+            setIsSearching(true);
+            const results = await searchUsers(query, channelId);
+            setUserSearchResults(results);
+            setIsSearching(false);
+        }, 300),
+        [channelId]
+    );
+
+    useEffect(() => {
+        debouncedSearch(userSearchQuery);
+    }, [userSearchQuery, debouncedSearch]);
+
+    const handleAddIndividualUser = async (userId: string) => {
+        setAddingUserId(userId);
+        const result = await addChannelMember(channelId, userId, 'member');
+        if (result.success) {
+            // Remove from search results and reload members
+            setUserSearchResults(prev => prev.filter(u => u.id !== userId));
+            loadMembers();
+        } else {
+            alert(result.error);
+        }
+        setAddingUserId(null);
+    };
 
     const handleBulkAdd = async () => {
         if (!bulkFilter.role && !bulkFilter.state && !bulkFilter.district && !bulkFilter.department) {
@@ -243,6 +290,93 @@ export default function ChannelMembersModal({
                         </div>
                     ) : (
                         <div className="space-y-6">
+                            {/* Individual User Search */}
+                            <div className="p-4 bg-blue-50 rounded-lg space-y-4 border border-blue-100">
+                                <Typography variant="h4" className="text-base font-semibold text-brand-blue">
+                                    {t("व्यक्तिगत सदस्य खोज्नुहोस्", "Search Individual Member")}
+                                </Typography>
+                                <Typography variant="muted" className="text-sm">
+                                    {t("नाम अनुसार खोज्नुहोस् र थप्नुहोस्",
+                                        "Search by name and add individual users")}
+                                </Typography>
+
+                                {/* Search Input */}
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <Input
+                                        placeholder={t("नाम टाइप गर्नुहोस्...", "Type name to search...")}
+                                        value={userSearchQuery}
+                                        onChange={(e) => setUserSearchQuery(e.target.value)}
+                                        className="pl-10"
+                                    />
+                                    {isSearching && (
+                                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-brand-blue" size={18} />
+                                    )}
+                                </div>
+
+                                {/* Search Results */}
+                                {userSearchResults.length > 0 && (
+                                    <div className="max-h-48 overflow-y-auto space-y-2">
+                                        {userSearchResults.map(user => (
+                                            <div
+                                                key={user.id}
+                                                className="flex items-center gap-3 p-2 rounded-lg border bg-white hover:bg-slate-50 transition"
+                                            >
+                                                {/* Avatar */}
+                                                <div className="w-8 h-8 rounded-full bg-brand-blue/10 flex items-center justify-center text-brand-blue text-sm font-medium overflow-hidden">
+                                                    {user.avatar_url ? (
+                                                        <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        user.full_name?.[0] || '?'
+                                                    )}
+                                                </div>
+
+                                                {/* Info */}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="font-medium text-sm text-slate-800 truncate">
+                                                        {user.full_name}
+                                                    </div>
+                                                    <Badge className="text-[10px] px-1.5 py-0 bg-slate-100 text-slate-600">
+                                                        {user.role}
+                                                    </Badge>
+                                                </div>
+
+                                                {/* Add Button */}
+                                                <Button
+                                                    size="sm"
+                                                    onClick={() => handleAddIndividualUser(user.id)}
+                                                    disabled={addingUserId === user.id}
+                                                    className="h-7 px-3 bg-brand-blue hover:bg-brand-blue/90"
+                                                >
+                                                    {addingUserId === user.id ? (
+                                                        <Loader2 size={14} className="animate-spin" />
+                                                    ) : (
+                                                        <>
+                                                            <Plus size={14} className="mr-1" />
+                                                            {t("थप्नुहोस्", "Add")}
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Empty State */}
+                                {userSearchQuery.length >= 2 && !isSearching && userSearchResults.length === 0 && (
+                                    <Typography variant="muted" className="text-center text-sm py-2">
+                                        {t("कुनै प्रयोगकर्ता फेला परेन", "No users found")}
+                                    </Typography>
+                                )}
+                            </div>
+
+                            {/* Divider */}
+                            <div className="flex items-center gap-3">
+                                <div className="flex-1 h-px bg-slate-200"></div>
+                                <span className="text-xs text-slate-400 uppercase">{t("वा", "or")}</span>
+                                <div className="flex-1 h-px bg-slate-200"></div>
+                            </div>
+
                             {/* Bulk Add by Filter */}
                             <div className="p-4 bg-slate-50 rounded-lg space-y-4">
                                 <Typography variant="h4" className="text-base font-semibold">

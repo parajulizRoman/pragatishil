@@ -237,3 +237,58 @@ export async function isChannelMember(channelId: string): Promise<{ isMember: bo
     if (!data) return { isMember: false };
     return { isMember: true, role: data.role };
 }
+
+export interface SearchedUser {
+    id: string;
+    full_name: string;
+    avatar_url: string | null;
+    role: string;
+}
+
+/**
+ * Search users by name or email for adding to channels
+ * Excludes users already in the channel
+ */
+export async function searchUsers(
+    query: string,
+    channelId: string,
+    limit: number = 10
+): Promise<SearchedUser[]> {
+    if (!query || query.length < 2) return [];
+
+    const supabase = await createClient();
+
+    // Get current channel members to exclude them
+    const { data: existingMembers } = await supabase
+        .from("channel_members")
+        .select("user_id")
+        .eq("channel_id", channelId);
+
+    const existingUserIds = (existingMembers || []).map(m => m.user_id);
+
+    // Search users by name (case-insensitive ILIKE)
+    let searchQuery = supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url, role")
+        .ilike("full_name", `%${query}%`)
+        .limit(limit);
+
+    // Exclude already-added members
+    if (existingUserIds.length > 0) {
+        searchQuery = searchQuery.not("id", "in", `(${existingUserIds.join(",")})`);
+    }
+
+    const { data, error } = await searchQuery;
+
+    if (error) {
+        console.error("Error searching users:", error);
+        return [];
+    }
+
+    return (data || []).map(u => ({
+        id: u.id,
+        full_name: u.full_name || "Unknown",
+        avatar_url: u.avatar_url,
+        role: u.role || "member"
+    }));
+}

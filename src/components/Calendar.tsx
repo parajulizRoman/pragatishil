@@ -9,6 +9,7 @@ import { toNepaliNumerals } from '@/lib/bsDateFormat';
 import { cn } from '@/lib/utils';
 import NepaliDate from 'nepali-date-converter';
 import { getMoonCycle, isSpecialLunarDay } from '@/lib/moonCycle';
+import DayDetailsModal from './DayDetailsModal';
 
 export interface CalendarEvent {
     id: string;
@@ -42,6 +43,7 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
     const [currentDate, setCurrentDate] = useState(new Date());
     const [viewMode, setViewMode] = useState<'month' | 'week' | 'day'>('month');
     const [festivals, setFestivals] = useState<Festival[]>([]);
+    const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
     // Get current BS date
     //     const currentBS = getCurrentBSDate();
@@ -83,6 +85,12 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
     // Helper: Get festival for a specific BS date
     const getFestivalForDate = (bsDay: number): Festival | null => {
         return festivals.find(f => f.bs_month === currentBSMonth && f.bs_day === bsDay) || null;
+    };
+
+    // Handle day click
+    const handleDayClick = (date: Date) => {
+        setSelectedDate(date);
+        onDateClick?.(date);
     };
 
     // Navigate months
@@ -166,6 +174,20 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
     const monthName = language === 'ne' ? nepaliMonths[currentBSMonth] : englishMonths[currentBSMonth];
     const yearDisplay = language === 'ne' ? toNepaliNumerals(currentBSYear) : currentBSYear.toString();
 
+    // Get corresponding AD months for this BS month
+    const getADMonths = (): string => {
+        const firstDay = new NepaliDate(currentBSYear, currentBSMonth, 1).toJsDate();
+        const lastDay = new NepaliDate(currentBSYear, currentBSMonth, getDaysInBSMonth(currentBSYear, currentBSMonth)).toJsDate();
+
+        const firstMonth = firstDay.toLocaleString('en', { month: 'short' }).toUpperCase();
+        const lastMonth = lastDay.toLocaleString('en', { month: 'short' }).toUpperCase();
+
+        if (firstMonth === lastMonth) {
+            return firstMonth;
+        }
+        return `${firstMonth}/${lastMonth}`;
+    };
+
     return (
         <Card className="w-full">
             <CardContent className="p-4">
@@ -173,9 +195,14 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
                 <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                         <CalendarIcon className="w-5 h-5 text-brand-blue" />
-                        <h2 className="text-lg font-bold text-slate-800">
-                            {monthName} {yearDisplay}
-                        </h2>
+                        <div className="flex flex-col">
+                            <h2 className="text-lg font-bold text-slate-800">
+                                {monthName} {yearDisplay}
+                            </h2>
+                            <span className="text-xs text-slate-500">
+                                [{getADMonths()}]
+                            </span>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -260,7 +287,7 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
                                 return (
                                     <button
                                         key={index}
-                                        onClick={() => date && onDateClick?.(date)}
+                                        onClick={() => date && handleDayClick(date)}
                                         disabled={!date}
                                         className={cn(
                                             "min-h-[100px] p-2 rounded-lg border transition-all relative",
@@ -354,6 +381,16 @@ export default function Calendar({ events = [], onEventClick, onDateClick }: Cal
                     </div>
                 )}
             </CardContent>
+
+            {/* Day Details Modal */}
+            {selectedDate && (
+                <DayDetailsModal
+                    date={selectedDate}
+                    events={getEventsForDate(selectedDate)}
+                    festival={getFestivalForDate(new NepaliDate(selectedDate).getDate())}
+                    onClose={() => setSelectedDate(null)}
+                />
+            )}
         </Card>
     );
 }

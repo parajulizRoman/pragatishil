@@ -26,7 +26,7 @@ export default function MyPosts({ userId }: { userId: string }) {
             if (activeTab === 'threads') {
                 const { data, error } = await supabase
                     .from('discussion_threads')
-                    .select('*, channel:discussion_channels(slug, name)')
+                    .select('*, channel:discussion_channels!channel_id(slug, name)')
                     .eq('created_by', userId)
                     .order('created_at', { ascending: false });
 

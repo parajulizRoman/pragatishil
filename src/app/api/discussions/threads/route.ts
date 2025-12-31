@@ -28,7 +28,7 @@ export async function GET(request: Request) {
                 .from('discussion_threads')
                 .select(`
                     *,
-                    channel:discussion_channels(id, name, slug, allow_anonymous_posts),
+                    channel:discussion_channels!channel_id(id, name, slug, allow_anonymous_posts),
                     author:profiles!fk_thread_author_profile(id, full_name, avatar_url, role)
                 `)
                 .eq('id', id)
@@ -60,21 +60,36 @@ export async function GET(request: Request) {
         }
 
         // Fetch List of Threads
+        // If filtering by slug, we need to first get the channel ID
+        let effectiveChannelId = channelId;
+
+        if (!channelId && channelSlug) {
+            const { data: channelData } = await supabase
+                .from('discussion_channels')
+                .select('id')
+                .eq('slug', channelSlug)
+                .single();
+
+            if (channelData) {
+                effectiveChannelId = channelData.id;
+            } else {
+                // Channel not found by slug
+                return NextResponse.json({ threads: [] });
+            }
+        }
+
         let query = supabase
             .from('discussion_threads')
             .select(`
                 *,
-                channel:discussion_channels!inner(id, name, slug),
-
+                channel:discussion_channels!channel_id(id, name, slug),
                 author:profiles!fk_thread_author_profile(id, full_name, role)
             `)
             .order('created_at', { ascending: false })
             .limit(limit);
 
-        if (channelId) {
-            query = query.eq('channel_id', channelId);
-        } else if (channelSlug) {
-            query = query.eq('channel.slug', channelSlug);
+        if (effectiveChannelId) {
+            query = query.eq('channel_id', effectiveChannelId);
         }
 
         const { data: threads, error } = await supabase.auth.getUser().then(async ({ data: { user } }) => {

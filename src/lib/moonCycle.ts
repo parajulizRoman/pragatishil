@@ -79,7 +79,6 @@ export function getMoonCycle(bsDate: NepaliDate): MoonCycle {
 
     // Shukla Paksha (Waxing - Days 2-14)
     if (tithi >= 2 && tithi <= 14) {
-        const phase = tithi <= 7 ? 'waxing_crescent' : 'waxing_gibbous';
         return {
             name_en: 'Shukla Paksha',
             name_ne: 'शुक्ल पक्ष',
@@ -91,7 +90,6 @@ export function getMoonCycle(bsDate: NepaliDate): MoonCycle {
 
     // Krishna Paksha (Waning - Days 16-29)
     if (tithi >= 16 && tithi <= 29) {
-        const phase = tithi <= 22 ? 'waning_gibbous' : 'waning_crescent';
         return {
             name_en: 'Krishna Paksha',
             name_ne: 'कृष्ण पक्ष',

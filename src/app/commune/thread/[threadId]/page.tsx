@@ -9,7 +9,7 @@ import { createBrowserClient } from "@supabase/ssr";
 import { flagContent, votePost, toggleThreadInteraction, toggleReaction } from "@/app/commune/actions";
 import Link from "next/link";
 import Image from "next/image";
-import { X, Shield, User, Crown, Paperclip, FileText, Image as ImageIcon, Loader2, MessageSquare, Heart, Bookmark, EyeOff, Flag, ArrowLeft, ArrowUp, ArrowDown, Trash2, Edit2 } from "lucide-react";
+import { X, Shield, User, Crown, Paperclip, FileText, Image as ImageIcon, Loader2, MessageSquare, Heart, Bookmark, EyeOff, Flag, ArrowLeft, ArrowUp, ArrowDown, Trash2, Edit2, ArrowRightLeft } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import PostActions from "@/components/PostActions";
 import RichTextEditor from "@/components/RichTextEditor";
@@ -22,6 +22,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { RichTextWithVideos } from "@/components/ui/VideoEmbed";
 import { getRoleLabel, getRoleBadgeVariant } from "@/lib/roleDisplay";
 import PollDisplay from "@/components/PollDisplay";
+import MoveThreadModal from "../MoveThreadModal";
 
 // Helpers
 const PLACEHOLDERS = [
@@ -93,6 +94,10 @@ export default function ThreadPage() {
     const [editTitleValue, setEditTitleValue] = useState("");
     const [isSavingTitle, setIsSavingTitle] = useState(false);
 
+    // Move Thread Modal
+    const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+    const [userRole, setUserRole] = useState<string | null>(null);
+
     const handleSaveTitleSave = async () => {
         if (!editTitleValue.trim() || !thread) return;
         setIsSavingTitle(true);
@@ -156,8 +161,11 @@ export default function ThreadPage() {
                     .eq('id', data.user.id)
                     .single();
 
-                if (profile && (profile.role === 'admin_party' || profile.role === 'yantrik')) {
-                    setCanGenerateSummary(true);
+                if (profile) {
+                    setUserRole(profile.role);
+                    if (profile.role === 'admin_party' || profile.role === 'yantrik' || profile.role === 'admin') {
+                        setCanGenerateSummary(true);
+                    }
                 }
             }
         });
@@ -368,11 +376,34 @@ export default function ThreadPage() {
                                 {t("मेटाउनुहोस्", "Delete")}
                             </Button>
                         )}
+
+                        {/* Move Thread - Only for moderators */}
+                        {userRole && ['admin', 'yantrik', 'admin_party', 'board', 'central_committee'].includes(userRole) && (
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setIsMoveModalOpen(true)}
+                                className="gap-2 text-purple-600 border-purple-200 hover:bg-purple-50"
+                            >
+                                <ArrowRightLeft size={16} />
+                                {t("सार्नुहोस्", "Move")}
+                            </Button>
+                        )}
                     </div>
                 </div>
 
                 <div className="space-y-4">
-                    <Badge variant="secondary" className="bg-slate-100 text-slate-600">{thread.channel?.name}</Badge>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="secondary" className="bg-slate-100 text-slate-600">{thread.channel?.name}</Badge>
+
+                        {/* Moved indicator */}
+                        {(thread as any).moved_from_channel_id && (
+                            <Badge variant="outline" className="text-purple-600 border-purple-200 bg-purple-50 text-xs">
+                                <ArrowRightLeft size={10} className="mr-1" />
+                                {t("अर्को च्यानलबाट सारियो", "Moved from another channel")}
+                            </Badge>
+                        )}
+                    </div>
 
                     {/* Header Image from First Post */}
                     {posts.length > 0 && posts[0].attachments && posts[0].attachments.some(a => a.type === 'image') && (
@@ -703,6 +734,22 @@ export default function ThreadPage() {
                     </div>
                 )
             }
+
+            {/* Move Thread Modal */}
+            {thread && thread.channel && (
+                <MoveThreadModal
+                    isOpen={isMoveModalOpen}
+                    onClose={() => setIsMoveModalOpen(false)}
+                    onSuccess={(newChannelId, newChannelName) => {
+                        // Navigate to the thread in the new channel
+                        router.push(`/commune/${newChannelId}`);
+                    }}
+                    threadId={threadId}
+                    threadTitle={thread.title}
+                    currentChannelId={thread.channel.id}
+                    currentChannelName={thread.channel.name}
+                />
+            )}
         </div>
     );
 }

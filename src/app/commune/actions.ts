@@ -356,3 +356,112 @@ export async function getChannelHierarchy() {
     return rootChannels;
 }
 
+// Move thread to a different channel (like Stack Overflow migration)
+export async function moveThread(
+    threadId: string,
+    targetChannelId: string,
+    reason?: string
+) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        throw new Error("You must be logged in to move threads.");
+    }
+
+    // Check user role - only moderators can move threads
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+    const allowedRoles = ['admin', 'yantrik', 'admin_party', 'board', 'central_committee'];
+    if (!profile || !allowedRoles.includes(profile.role)) {
+        throw new Error("You don't have permission to move threads.");
+    }
+
+    // Get the current thread
+    const { data: thread, error: threadError } = await supabase
+        .from('discussion_threads')
+        .select('id, channel_id, title')
+        .eq('id', threadId)
+        .single();
+
+    if (threadError || !thread) {
+        throw new Error("Thread not found.");
+    }
+
+    // Validate target channel exists
+    const { data: targetChannel, error: channelError } = await supabase
+        .from('discussion_channels')
+        .select('id, name')
+        .eq('id', targetChannelId)
+        .single();
+
+    if (channelError || !targetChannel) {
+        throw new Error("Target channel not found.");
+    }
+
+    // Can't move to same channel
+    if (thread.channel_id === targetChannelId) {
+        throw new Error("Thread is already in this channel.");
+    }
+
+    const fromChannelId = thread.channel_id;
+
+    // 1. Update the thread
+    const { error: updateError } = await supabase
+        .from('discussion_threads')
+        .update({
+            channel_id: targetChannelId,
+            moved_from_channel_id: fromChannelId,
+            moved_at: new Date().toISOString(),
+            moved_by: user.id,
+            move_reason: reason || null
+        })
+        .eq('id', threadId);
+
+    if (updateError) {
+        console.error("Move thread update error:", updateError);
+        throw new Error("Failed to move thread.");
+    }
+
+    // 2. Record in move history
+    await supabase.from('thread_move_history').insert({
+        thread_id: threadId,
+        from_channel_id: fromChannelId,
+        to_channel_id: targetChannelId,
+        moved_by: user.id,
+        move_reason: reason || null
+    });
+
+    // Revalidate both channels
+    revalidatePath("/commune");
+
+    return {
+        success: true,
+        fromChannel: fromChannelId,
+        toChannel: targetChannelId,
+        targetChannelName: targetChannel.name
+    };
+}
+
+// Get available channels for move (for the move modal)
+export async function getChannelsForMove(currentChannelId: string) {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return [];
+
+    // Get all channels except current
+    const { data: channels } = await supabase
+        .from('discussion_channels')
+        .select('id, name, name_ne, slug, category, location_type, visibility')
+        .neq('id', currentChannelId)
+        .order('category')
+        .order('name');
+
+    return channels || [];
+}
+

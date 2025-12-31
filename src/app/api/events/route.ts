@@ -70,6 +70,7 @@ export async function GET(request: NextRequest) {
 
         if (error) throw error;
         return NextResponse.json({ events });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         console.error('Events GET error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -137,6 +138,7 @@ export async function POST(request: NextRequest) {
 
         if (error) throw error;
         return NextResponse.json({ event }, { status: 201 });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         console.error('Events POST error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -181,6 +183,7 @@ export async function PUT(request: NextRequest) {
 
         if (error) throw error;
         return NextResponse.json({ event });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         console.error('Events PUT error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });
@@ -221,6 +224,7 @@ export async function DELETE(request: NextRequest) {
 
         if (error) throw error;
         return NextResponse.json({ success: true });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
         console.error('Events DELETE error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });

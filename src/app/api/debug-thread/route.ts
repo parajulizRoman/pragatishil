@@ -18,7 +18,7 @@ export async function GET(request: Request) {
         .from("discussion_threads")
         .select(`
             *,
-            channel:discussion_channels(*),
+            channel:discussion_channels!channel_id(*),
             author:profiles!created_by(full_name, role, avatar_url)
         `)
         .eq("id", id)
