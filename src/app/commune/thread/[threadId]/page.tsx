@@ -369,7 +369,7 @@ export default function ThreadPage() {
                         </Button>
 
                         {/* Delete Thread - Only for creator or moderators */}
-                        {isAuthenticated && (currentUserId === thread.created_by || (userRole && ['admin', 'yantrik', 'admin_party'].includes(userRole))) && (
+                        {isAuthenticated && ((currentUserId && thread.created_by && currentUserId === thread.created_by) || (userRole && ['admin', 'yantrik', 'admin_party'].includes(userRole))) && (
                             <Button
                                 variant="outline"
                                 size="sm"
