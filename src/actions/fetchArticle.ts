@@ -1,7 +1,35 @@
 'use server';
 
 import * as cheerio from 'cheerio';
-import DOMPurify from 'isomorphic-dompurify';
+
+// Simple HTML sanitizer that works on server-side without browser dependencies
+function sanitizeHtml(html: string): string {
+    const $ = cheerio.load(html);
+
+    // Remove dangerous elements
+    $('script, style, iframe, object, embed, form, input, button').remove();
+
+    // Remove event handlers and dangerous attributes
+    $('*').each((_, el) => {
+        const attribs = (el as unknown as { attribs?: Record<string, string> }).attribs || {};
+        for (const attr of Object.keys(attribs)) {
+            if (attr.startsWith('on') || attr === 'style') {
+                $(el).removeAttr(attr);
+            }
+        }
+    });
+
+    // Only allow safe tags
+    const allowedTags = ['p', 'b', 'i', 'em', 'strong', 'a', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'br', 'img', 'blockquote', 'figure', 'figcaption', 'div', 'span'];
+    $('*').each((_, el) => {
+        const tagName = (el as unknown as { tagName?: string }).tagName?.toLowerCase();
+        if (tagName && !allowedTags.includes(tagName)) {
+            $(el).replaceWith($(el).contents());
+        }
+    });
+
+    return $.html();
+}
 
 export interface ArticleData {
     title: string;
@@ -62,14 +90,11 @@ export async function fetchArticle(url: string): Promise<ArticleData> {
         // If content is too short, we might have missed the main container. 
         if (rawHtml.length < 200) {
             // Fallback: try p tags
-            rawHtml = $('p').map((i, el) => `<p>${$(el).html()}</p>`).get().join('');
+            rawHtml = $('p').map((_, el) => `<p>${$(el).html()}</p>`).get().join('');
         }
 
-        // --- Sanitize ---
-        const cleanHtml = DOMPurify.sanitize(rawHtml, {
-            ALLOWED_TAGS: ['p', 'b', 'i', 'em', 'strong', 'a', 'h2', 'h3', 'h4', 'ul', 'ol', 'li', 'br', 'img', 'blockquote', 'figure', 'figcaption'],
-            ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'target']
-        });
+        // --- Sanitize using cheerio-based sanitizer ---
+        const cleanHtml = sanitizeHtml(rawHtml);
 
         return {
             title,
