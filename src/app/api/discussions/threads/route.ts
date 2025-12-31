@@ -39,14 +39,25 @@ export async function GET(request: Request) {
             // Fetch Vote Status if logged in
             const { data: { user } } = await supabase.auth.getUser();
             let userVote = 0;
-            if (user && thread.first_post_id) {
-                const { data: vote } = await supabase
+            let upvotes = 0;
+            let downvotes = 0;
+
+            if (thread.first_post_id) {
+                // Fetch all votes for the first post
+                const { data: votes } = await supabase
                     .from('discussion_votes')
-                    .select('vote_type')
-                    .eq('post_id', thread.first_post_id)
-                    .eq('user_id', user.id)
-                    .single();
-                if (vote) userVote = vote.vote_type;
+                    .select('vote_type, user_id')
+                    .eq('post_id', thread.first_post_id);
+
+                if (votes && votes.length > 0) {
+                    upvotes = votes.filter(v => v.vote_type === 1).length;
+                    downvotes = votes.filter(v => v.vote_type === -1).length;
+
+                    if (user) {
+                        const myVote = votes.find(v => v.user_id === user.id);
+                        if (myVote) userVote = myVote.vote_type;
+                    }
+                }
             }
 
             // Get Reply Count
@@ -56,7 +67,7 @@ export async function GET(request: Request) {
                 .eq('thread_id', thread.id);
             const reply_count = count ? Math.max(0, count - 1) : 0;
 
-            return NextResponse.json({ thread: { ...thread, user_vote: userVote, reply_count } });
+            return NextResponse.json({ thread: { ...thread, user_vote: userVote, upvotes, downvotes, reply_count } });
         }
 
         // Fetch List of Threads
@@ -99,16 +110,27 @@ export async function GET(request: Request) {
             // Process votes and counts for list
             if (rawThreads && rawThreads.length > 0) {
                 const threadsWithDetails = await Promise.all(rawThreads.map(async (t) => {
-                    // 1. Get User Vote
+                    // 1. Get User Vote and Total Votes
                     let user_vote = 0;
-                    if (user && t.first_post_id) {
-                        const { data: vote } = await supabase
+                    let upvotes = 0;
+                    let downvotes = 0;
+
+                    if (t.first_post_id) {
+                        // Fetch all votes for this thread's first post
+                        const { data: votes } = await supabase
                             .from('discussion_votes')
-                            .select('vote_type')
-                            .eq('post_id', t.first_post_id)
-                            .eq('user_id', user.id)
-                            .single();
-                        if (vote) user_vote = vote.vote_type;
+                            .select('vote_type, user_id')
+                            .eq('post_id', t.first_post_id);
+
+                        if (votes && votes.length > 0) {
+                            upvotes = votes.filter(v => v.vote_type === 1).length;
+                            downvotes = votes.filter(v => v.vote_type === -1).length;
+
+                            if (user) {
+                                const myVote = votes.find(v => v.user_id === user.id);
+                                if (myVote) user_vote = myVote.vote_type;
+                            }
+                        }
                     }
 
                     // 2. Get Reply Count (Total posts - 1)
@@ -134,7 +156,7 @@ export async function GET(request: Request) {
                         }
                     }
 
-                    return { ...t, user_vote, reply_count, thumbnail_url };
+                    return { ...t, user_vote, upvotes, downvotes, reply_count, thumbnail_url };
                 }));
                 return { data: threadsWithDetails, error: null };
             }
