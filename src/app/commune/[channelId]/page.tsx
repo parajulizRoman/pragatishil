@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { DiscussionThread, DiscussionChannel } from "@/types";
 import { createBrowserClient } from "@supabase/ssr";
 import { flagContent, votePost } from "@/app/commune/actions";
@@ -25,6 +25,7 @@ import { canManageChannels } from "@/lib/permissions";
 
 export default function ChannelPage() {
     const params = useParams();
+    const router = useRouter();
     const channelId = params.channelId as string;
     const { t, language } = useLanguage();
 
@@ -183,8 +184,18 @@ export default function ChannelPage() {
     };
 
     // -- Voting Logic --
+    // Roles that can vote (party_member and above)
+    const canVote = userRole && ['party_member', 'volunteer', 'team_member', 'central_committee', 'board', 'admin_party', 'yantrik', 'admin'].includes(userRole);
+
     const handleVote = async (threadId: string, postId: string, voteType: number) => {
-        if (!isAuthenticated) return alert("Please sign in to vote!");
+        if (!isAuthenticated) {
+            router.push('/auth/login?redirect=' + encodeURIComponent(window.location.pathname));
+            return;
+        }
+        if (!canVote) {
+            alert(t("मतदान गर्न पार्टी सदस्य हुनुपर्छ।", "You must be a party member to vote."));
+            return;
+        }
 
         // Optimistic Update
         setThreads(prev => prev.map(t => {
@@ -215,6 +226,7 @@ export default function ChannelPage() {
             fetchData(); // Rollback/Refresh
         }
     };
+
 
 
     const handleCreateThread = async (e: React.FormEvent) => {

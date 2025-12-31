@@ -172,8 +172,18 @@ export default function ThreadPage() {
         fetchData();
     }, [fetchData]);
 
+    // Roles that can vote (party_member and above)
+    const canVote = userRole && ['party_member', 'volunteer', 'team_member', 'central_committee', 'board', 'admin_party', 'yantrik', 'admin'].includes(userRole);
+
     const handleVote = async (postId: string, voteType: number) => {
-        if (!isAuthenticated) return alert("Please sign in to vote!");
+        if (!isAuthenticated) {
+            router.push('/auth/login?redirect=' + encodeURIComponent(window.location.pathname));
+            return;
+        }
+        if (!canVote) {
+            alert(t("मतदान गर्न पार्टी सदस्य हुनुपर्छ।", "You must be a party member to vote."));
+            return;
+        }
 
         setPosts(prev => prev.map(p => {
             if (p.id !== postId) return p;
@@ -198,7 +208,10 @@ export default function ThreadPage() {
     };
 
     const handleThreadAction = async (action: 'follow' | 'save' | 'hide') => {
-        if (!isAuthenticated) return alert("Sign in required");
+        if (!isAuthenticated) {
+            router.push('/auth/login?redirect=' + encodeURIComponent(window.location.pathname));
+            return;
+        }
         try {
             const res = await toggleThreadInteraction(threadId, action);
             if (res.success) {
@@ -355,8 +368,8 @@ export default function ThreadPage() {
                             {isSaved ? t("सुरक्षित", "Saved") : t("सुरक्षित गर्नुहोस्", "Save")}
                         </Button>
 
-                        {/* Delete Thread - Only for creator or admin */}
-                        {(currentUserId === thread.created_by || ['admin', 'yantrik', 'admin_party'].includes(thread.author?.role || '')) && (
+                        {/* Delete Thread - Only for creator or moderators */}
+                        {isAuthenticated && (currentUserId === thread.created_by || (userRole && ['admin', 'yantrik', 'admin_party'].includes(userRole))) && (
                             <Button
                                 variant="outline"
                                 size="sm"
