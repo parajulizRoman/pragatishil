@@ -110,17 +110,32 @@ export async function GET(request: Request) {
             // Process votes and counts for list
             if (rawThreads && rawThreads.length > 0) {
                 const threadsWithDetails = await Promise.all(rawThreads.map(async (t) => {
-                    // 1. Get User Vote and Total Votes
+                    // 1. Ensure first_post_id exists (fallback: fetch from posts table)
+                    let first_post_id = t.first_post_id;
+                    if (!first_post_id) {
+                        const { data: firstPost } = await supabase
+                            .from('discussion_posts')
+                            .select('id')
+                            .eq('thread_id', t.id)
+                            .order('created_at', { ascending: true })
+                            .limit(1)
+                            .single();
+                        if (firstPost) {
+                            first_post_id = firstPost.id;
+                        }
+                    }
+
+                    // 2. Get User Vote and Total Votes
                     let user_vote = 0;
                     let upvotes = 0;
                     let downvotes = 0;
 
-                    if (t.first_post_id) {
+                    if (first_post_id) {
                         // Fetch all votes for this thread's first post
                         const { data: votes } = await supabase
                             .from('discussion_votes')
                             .select('vote_type, user_id')
-                            .eq('post_id', t.first_post_id);
+                            .eq('post_id', first_post_id);
 
                         if (votes && votes.length > 0) {
                             upvotes = votes.filter(v => v.vote_type === 1).length;
@@ -133,7 +148,7 @@ export async function GET(request: Request) {
                         }
                     }
 
-                    // 2. Get Reply Count (Total posts - 1)
+                    // 3. Get Reply Count (Total posts - 1)
                     const { count } = await supabase
                         .from('discussion_posts')
                         .select('*', { count: 'exact', head: true })
@@ -141,13 +156,13 @@ export async function GET(request: Request) {
 
                     const reply_count = count ? Math.max(0, count - 1) : 0;
 
-                    // 3. Get Thumbnail (first image attachment from first post)
+                    // 4. Get Thumbnail (first image attachment from first post)
                     let thumbnail_url: string | null = null;
-                    if (t.first_post_id) {
+                    if (first_post_id) {
                         const { data: attachments } = await supabase
                             .from('discussion_post_attachments')
                             .select('storage_path, type')
-                            .eq('post_id', t.first_post_id)
+                            .eq('post_id', first_post_id)
                             .eq('type', 'image')
                             .limit(1);
 
@@ -156,7 +171,7 @@ export async function GET(request: Request) {
                         }
                     }
 
-                    return { ...t, user_vote, upvotes, downvotes, reply_count, thumbnail_url };
+                    return { ...t, first_post_id, user_vote, upvotes, downvotes, reply_count, thumbnail_url };
                 }));
                 return { data: threadsWithDetails, error: null };
             }
@@ -187,7 +202,7 @@ export async function POST(request: Request) {
 
     // 1. Auth & Channel Check
     const body = await request.json();
-    const { channelId, title, content, isAnon } = body;
+    const { channelId, title, content, isAnon, meta } = body;
 
     // Use Admin Client to fetch Channel Config to bypass RLS issues for Anon User
     const { data: channel, error: cErr } = await supabaseAdmin
@@ -225,6 +240,7 @@ export async function POST(request: Request) {
                 title,
                 created_by: user?.id || null, // null for anon if simplified
                 is_anonymous: !!isAnon,
+                meta: meta || null, // Store media metadata
                 // last_activity_at is set by DB default or migration
             })
             .select()
