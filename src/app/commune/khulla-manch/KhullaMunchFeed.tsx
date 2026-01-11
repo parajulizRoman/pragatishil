@@ -211,15 +211,20 @@ export default function KhullaMunchFeed({
     );
 
     // Share handler
-    const handleShare = useCallback((thread: DiscussionThread) => {
-        if (navigator.share) {
-            navigator.share({
-                title: thread.title,
-                url: `${window.location.origin}/commune/thread/${thread.id}`,
-            });
-        } else {
-            navigator.clipboard.writeText(`${window.location.origin}/commune/thread/${thread.id}`);
-            alert("Link copied to clipboard!");
+    const handleShare = useCallback(async (thread: DiscussionThread) => {
+        try {
+            if (navigator.share) {
+                await navigator.share({
+                    title: thread.title,
+                    url: `${window.location.origin}/commune/thread/${thread.id}`,
+                });
+            } else {
+                await navigator.clipboard.writeText(`${window.location.origin}/commune/thread/${thread.id}`);
+                alert("Link copied to clipboard!");
+            }
+        } catch (err) {
+            // User cancelled share or clipboard failed
+            console.log('Share cancelled or failed:', err);
         }
     }, []);
 

@@ -89,17 +89,33 @@ export default function EditPostModal({ isOpen, onClose, thread, onSave, onDelet
                             {/* Content */}
                             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                                 {/* Media Preview (if exists) */}
-                                {thread.meta?.media_url && (
-                                    <div className="relative rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
-                                        <img
-                                            src={thread.meta.media_url}
-                                            alt="Post media"
-                                            className="w-full max-h-48 object-contain"
-                                        />
-                                        <div className="absolute top-2 right-2 bg-black/50 rounded-full px-2 py-1 text-xs text-white flex items-center gap-1">
-                                            <Image className="w-3 h-3" />
-                                            Media cannot be changed
+                                {(thread.meta?.media_urls?.length > 0 || thread.meta?.media_url) && (
+                                    <div className="space-y-2">
+                                        <div className="relative rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800">
+                                            {/* Show all images in a grid if multiple, or just one */}
+                                            {thread.meta?.media_urls?.length > 1 ? (
+                                                <div className="grid grid-cols-2 gap-2 p-2">
+                                                    {thread.meta.media_urls.map((url: string, index: number) => (
+                                                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-black/5">
+                                                            <img
+                                                                src={url}
+                                                                alt={`Post media ${index + 1}`}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <img
+                                                    src={thread.meta?.media_urls?.[0] || thread.meta?.media_url}
+                                                    alt="Post media"
+                                                    className="w-full max-h-48 object-contain"
+                                                />
+                                            )}
                                         </div>
+                                        <p className="text-xs text-slate-500 text-center">
+                                            Media cannot be edited directly. To change media, please delete this post and create a new one.
+                                        </p>
                                     </div>
                                 )}
 

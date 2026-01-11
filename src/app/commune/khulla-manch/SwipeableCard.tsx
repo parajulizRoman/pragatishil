@@ -76,6 +76,16 @@ export default function SwipeableCard({
         null;
     const isCarousel = mediaUrls.length > 1;
 
+    // Debug logging
+    console.log('[SwipeableCard] Carousel debug:', {
+        threadId: thread.id,
+        mediaUrls,
+        mediaUrlsLength: mediaUrls.length,
+        isCarousel,
+        carouselIndex,
+        currentImageUrl: imageUrl
+    });
+
 
 
 
@@ -99,7 +109,7 @@ export default function SwipeableCard({
         >
             {/* Background/Media */}
             {imageUrl ? (
-                <div className="absolute inset-0 bg-black flex items-center justify-center overflow-hidden">
+                <div className="absolute inset-0 bg-black flex items-center justify-center overflow-hidden group">
                     {/* Carousel or Single Image */}
                     <div className="relative w-full h-full flex items-center justify-center">
                         <AnimatePresence initial={false} mode="popLayout">
@@ -107,7 +117,10 @@ export default function SwipeableCard({
                                 key={imageUrl} // Key changes with index causing animation
                                 src={imageUrl}
                                 alt={thread.title}
-                                className="max-w-full max-h-full object-contain pointer-events-auto"
+                                className={cn(
+                                    "max-w-full max-h-full object-contain pointer-events-auto",
+                                    isCarousel && "cursor-grab active:cursor-grabbing"
+                                )}
                                 initial={{ x: 300, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
                                 exit={{ x: -300, opacity: 0 }}
@@ -115,17 +128,29 @@ export default function SwipeableCard({
                                 drag={isCarousel ? "x" : false}
                                 dragConstraints={{ left: 0, right: 0 }}
                                 dragElastic={0.2}
+                                onDragStart={(e) => {
+                                    console.log('[SwipeableCard] Drag started', { isCarousel });
+                                    if (isCarousel) {
+                                        e.stopPropagation();
+                                    }
+                                }}
                                 onDragEnd={(_, info) => {
+                                    console.log('[SwipeableCard] Drag ended', {
+                                        isCarousel,
+                                        offsetX: info.offset.x,
+                                        carouselIndex,
+                                        mediaUrlsLength: mediaUrls.length
+                                    });
                                     if (!isCarousel) return;
                                     const swipeThreshold = 50;
                                     if (info.offset.x > swipeThreshold && carouselIndex > 0) {
+                                        console.log('[SwipeableCard] Swiping to previous');
                                         setCarouselIndex(prev => prev - 1);
                                     } else if (info.offset.x < -swipeThreshold && carouselIndex < mediaUrls.length - 1) {
+                                        console.log('[SwipeableCard] Swiping to next');
                                         setCarouselIndex(prev => prev + 1);
                                     }
                                 }}
-                                // Prevent drag propagation to parent vertical feed
-                                onPointerDown={(e) => e.stopPropagation()}
                             />
                         </AnimatePresence>
                     </div>
@@ -133,20 +158,38 @@ export default function SwipeableCard({
                     {/* Gradient Overlays */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40 pointer-events-none" />
 
-                    {/* Carousel Dot Indicators */}
+                    {/* Navigation Arrows for Desktop */}
                     {isCarousel && (
-                        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex gap-1.5">
-                            {mediaUrls.map((_, idx) => (
+                        <>
+                            {carouselIndex > 0 && (
                                 <button
-                                    key={idx}
-                                    onClick={(e) => { e.stopPropagation(); setCarouselIndex(idx); }}
-                                    className={cn(
-                                        "w-2 h-2 rounded-full transition-all",
-                                        idx === carouselIndex ? "bg-white w-4" : "bg-white/50"
-                                    )}
-                                />
-                            ))}
-                        </div>
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCarouselIndex(prev => prev - 1);
+                                    }}
+                                    className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center text-white transition-all opacity-0 group-hover:opacity-100 pointer-events-auto"
+                                    aria-label="Previous image"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                            )}
+                            {carouselIndex < mediaUrls.length - 1 && (
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCarouselIndex(prev => prev + 1);
+                                    }}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center text-white transition-all opacity-0 group-hover:opacity-100 pointer-events-auto"
+                                    aria-label="Next image"
+                                >
+                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            )}
+                        </>
                     )}
                 </div>
             ) : (
@@ -170,6 +213,22 @@ export default function SwipeableCard({
 
             {/* Content Overlay - Bottom */}
             <div className="absolute bottom-0 left-0 right-16 p-6 z-20 pointer-events-none">
+                {/* Carousel Dot Indicators */}
+                {isCarousel && (
+                    <div className="flex justify-center gap-1.5 mb-3 pointer-events-auto">
+                        {mediaUrls.map((_, idx) => (
+                            <button
+                                key={idx}
+                                onClick={(e) => { e.stopPropagation(); setCarouselIndex(idx); }}
+                                className={cn(
+                                    "w-2 h-2 rounded-full transition-all",
+                                    idx === carouselIndex ? "bg-white w-4" : "bg-white/50"
+                                )}
+                            />
+                        ))}
+                    </div>
+                )}
+
                 {/* Author Info */}
                 <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center overflow-hidden border-2 border-white/50">
