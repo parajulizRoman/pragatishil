@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Heart, MessageCircle, Bookmark, Share2, User, Edit2 } from "lucide-react";
 import { DiscussionThread } from "@/types";
 import HeartAnimation from "./HeartAnimation";
@@ -36,8 +36,6 @@ export default function SwipeableCard({
     const [showHeartAnimation, setShowHeartAnimation] = useState(false);
     const [carouselIndex, setCarouselIndex] = useState(0);
     const lastTapRef = useRef<number>(0);
-    const touchStartX = useRef<number>(0);
-    const touchEndX = useRef<number>(0);
 
     // Check if current user is the author
     const isAuthor = !!(currentUserId && thread.created_by && currentUserId === thread.created_by);
@@ -78,33 +76,7 @@ export default function SwipeableCard({
         null;
     const isCarousel = mediaUrls.length > 1;
 
-    // Carousel swipe handlers
-    const handleTouchStart = (e: React.TouchEvent) => {
-        touchStartX.current = e.touches[0].clientX;
-    };
 
-    const handleTouchMove = (e: React.TouchEvent) => {
-        touchEndX.current = e.touches[0].clientX;
-    };
-
-    const handleTouchEnd = () => {
-        if (!isCarousel) return;
-
-        const swipeDistance = touchStartX.current - touchEndX.current;
-        const minSwipeDistance = 50; // Minimum distance for a swipe
-
-        if (swipeDistance > minSwipeDistance && carouselIndex < mediaUrls.length - 1) {
-            // Swiped left - go to next
-            setCarouselIndex(prev => prev + 1);
-        } else if (swipeDistance < -minSwipeDistance && carouselIndex > 0) {
-            // Swiped right - go to previous
-            setCarouselIndex(prev => prev - 1);
-        }
-
-        // Reset
-        touchStartX.current = 0;
-        touchEndX.current = 0;
-    };
 
 
     // Get author info
@@ -127,17 +99,37 @@ export default function SwipeableCard({
         >
             {/* Background/Media */}
             {imageUrl ? (
-                <div
-                    className="absolute inset-0 flex items-center justify-center bg-black"
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                >
-                    <img
-                        src={imageUrl}
-                        alt={thread.title}
-                        className="max-w-full max-h-full object-contain pointer-events-none"
-                    />
+                <div className="absolute inset-0 bg-black flex items-center justify-center overflow-hidden">
+                    {/* Carousel or Single Image */}
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        <AnimatePresence initial={false} mode="popLayout">
+                            <motion.img
+                                key={imageUrl} // Key changes with index causing animation
+                                src={imageUrl}
+                                alt={thread.title}
+                                className="max-w-full max-h-full object-contain pointer-events-auto"
+                                initial={{ x: 300, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: -300, opacity: 0 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                drag={isCarousel ? "x" : false}
+                                dragConstraints={{ left: 0, right: 0 }}
+                                dragElastic={0.2}
+                                onDragEnd={(_, info) => {
+                                    if (!isCarousel) return;
+                                    const swipeThreshold = 50;
+                                    if (info.offset.x > swipeThreshold && carouselIndex > 0) {
+                                        setCarouselIndex(prev => prev - 1);
+                                    } else if (info.offset.x < -swipeThreshold && carouselIndex < mediaUrls.length - 1) {
+                                        setCarouselIndex(prev => prev + 1);
+                                    }
+                                }}
+                                // Prevent drag propagation to parent vertical feed
+                                onPointerDown={(e) => e.stopPropagation()}
+                            />
+                        </AnimatePresence>
+                    </div>
+
                     {/* Gradient Overlays */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/40 pointer-events-none" />
 
