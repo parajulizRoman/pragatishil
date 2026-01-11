@@ -70,7 +70,7 @@ export default function Navbar() {
                                 {t(nav?.members?.en || "Members", nav?.members?.ne || "सदस्यहरू")}
                             </Link>
                             <Link
-                                href="/commune"
+                                href="/commune/khulla-manch"
                                 className="text-slate-700 hover:text-brand-blue px-3 py-2 rounded-md text-sm font-medium transition-colors"
                             >
                                 {t("Community", "समुदाय")}
@@ -163,7 +163,7 @@ export default function Navbar() {
                             {t(nav?.members?.en || "Members", nav?.members?.ne || "सदस्यहरू")}
                         </Link>
                         <Link
-                            href="/commune"
+                            href="/commune/khulla-manch"
                             className="text-slate-700 hover:text-brand-blue block px-3 py-2 rounded-md text-base font-medium"
                             onClick={() => setIsOpen(false)}
                         >

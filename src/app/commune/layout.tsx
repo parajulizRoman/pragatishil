@@ -471,6 +471,12 @@ export default function CommuneLayout({
         return t(label.ne, label.en);
     };
 
+    // Bypass sidebar for immersive full-screen routes (TikTok-style feed)
+    const isImmersiveRoute = pathname === '/commune' || pathname === '/commune/khulla-manch' || pathname.startsWith('/commune?');
+    if (isImmersiveRoute) {
+        return <>{children}</>;
+    }
+
     return (
         <div className="flex min-h-screen bg-slate-50 pt-16">
             {/* Sidebar - Desktop */}

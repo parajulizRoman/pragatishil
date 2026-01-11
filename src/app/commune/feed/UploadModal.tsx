@@ -105,7 +105,7 @@ export default function UploadModal({ isOpen, onClose, channelId, onSuccess }: U
                 throw new Error(errData.error || "Failed to get upload URL");
             }
 
-            const { uploadUrl, storagePath, token } = await signRes.json();
+            const { uploadUrl, storagePath } = await signRes.json();
 
             // Step 2: Upload file directly to Supabase Storage using signed URL
             const uploadRes = await fetch(uploadUrl, {

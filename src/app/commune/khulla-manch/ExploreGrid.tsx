@@ -39,7 +39,7 @@ export default function ExploreGrid({ channelId, threads: initialThreads, onSele
     // Get thumbnail URL for a thread
     const getThumbnail = (thread: DiscussionThread): string | null => {
         return (
-            (thread as any).thumbnail_url ||
+            (thread as { thumbnail_url?: string }).thumbnail_url ||
             thread.meta?.thumbnail_url ||
             thread.meta?.media_url ||
             thread.meta?.image_url ||

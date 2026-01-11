@@ -3,7 +3,7 @@
 
 import React, { useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Heart, MessageCircle, Bookmark, Share2, User, MoreHorizontal, Edit2, Trash2 } from "lucide-react";
+import { Heart, MessageCircle, Bookmark, Share2, User, Edit2 } from "lucide-react";
 import { DiscussionThread } from "@/types";
 import HeartAnimation from "./HeartAnimation";
 import { cn } from "@/lib/utils";
@@ -34,9 +34,8 @@ export default function SwipeableCard({
     onEdit,
 }: SwipeableCardProps) {
     const [showHeartAnimation, setShowHeartAnimation] = useState(false);
-    const [showMenu, setShowMenu] = useState(false);
+
     const lastTapRef = useRef<number>(0);
-    const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Check if current user is the author
     const isAuthor = currentUserId && thread.created_by === currentUserId;
@@ -65,8 +64,7 @@ export default function SwipeableCard({
         null;
 
     // Check if this is a media post (photo/video/audio)
-    const mediaType = thread.meta?.media_type;
-    const hasMedia = !!imageUrl || !!thread.meta?.media_url;
+    // Check if this is a media post (photo/video/audio)
 
     // Get author info
     const authorName = thread.is_anonymous

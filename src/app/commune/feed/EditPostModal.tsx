@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Loader2, Camera, Image, Trash2 } from "lucide-react";
+import { X, Loader2, Image, Trash2 } from "lucide-react";
 import { DiscussionThread } from "@/types";
 import { cn } from "@/lib/utils";
 

@@ -18,18 +18,24 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Missing file metadata" }, { status: 400 });
         }
 
-        // Limit size (e.g., 20MB)
-        const MAX_SIZE = 20 * 1024 * 1024;
+        // Limit size (100MB for videos, smaller for other content)
+        const MAX_SIZE = 100 * 1024 * 1024;
         if (sizeBytes > MAX_SIZE) {
-            return NextResponse.json({ error: "File too large (Max 20MB)" }, { status: 400 });
+            return NextResponse.json({ error: "File too large (Max 100MB)" }, { status: 400 });
         }
 
-        // Limit types
+        // Allowed types (images, documents, videos, audio for Khulla Manch)
         const ALLOWED_TYPES = [
+            // Images
             'image/jpeg', 'image/png', 'image/webp', 'image/gif',
+            // Documents
             'application/pdf', 'application/msword',
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // docx
-            'text/plain'
+            'text/plain',
+            // Video (for Khulla Manch)
+            'video/mp4', 'video/webm', 'video/quicktime',
+            // Audio (for Khulla Manch)
+            'audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/x-m4a', 'audio/aac'
         ];
 
         // Looping check for wildcard safety or exact match
