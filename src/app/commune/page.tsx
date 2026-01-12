@@ -2,14 +2,14 @@
 
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
-import { Loader2 } from "lucide-react";
+import EyeLoadingAnimation from "@/components/EyeLoadingAnimation";
 
-// Dynamically import FeedPage to avoid SSR issues with framer-motion
-const FeedPage = dynamic(() => import("./feed/FeedPage"), {
+// Dynamically import ChannelListingPage
+const ChannelListingPage = dynamic(() => import("./ChannelListingPage"), {
     ssr: false,
     loading: () => (
-        <div className="fixed inset-0 bg-black flex items-center justify-center">
-            <Loader2 className="w-10 h-10 animate-spin text-white" />
+        <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-black flex flex-col items-center justify-center">
+            <EyeLoadingAnimation />
         </div>
     ),
 });
@@ -18,12 +18,12 @@ export default function CommunePage() {
     return (
         <Suspense
             fallback={
-                <div className="fixed inset-0 bg-black flex items-center justify-center">
-                    <Loader2 className="w-10 h-10 animate-spin text-white" />
+                <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-black flex flex-col items-center justify-center">
+                    <EyeLoadingAnimation />
                 </div>
             }
         >
-            <FeedPage />
+            <ChannelListingPage />
         </Suspense>
     );
 }

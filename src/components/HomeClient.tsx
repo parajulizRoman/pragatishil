@@ -11,6 +11,8 @@ import { MediaItem } from "@/types";
 import { siteContent as fallbackContent } from "@/config/siteContent";
 import { cn } from "@/lib/utils";
 import { FileText } from "lucide-react";
+import { useEffect, useState } from "react";
+import { createBrowserClient } from "@supabase/ssr";
 
 interface HomeClientProps {
     content: SiteSettings;
@@ -21,6 +23,22 @@ interface HomeClientProps {
 
 export default function HomeClient({ content, news, videos, documents = [] }: HomeClientProps) {
     const { t } = useLanguage();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    // Check auth status
+    useEffect(() => {
+        const checkAuth = async () => {
+            const supabase = createBrowserClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+            );
+            const { data: { user } } = await supabase.auth.getUser();
+            setIsAuthenticated(!!user);
+            setLoading(false);
+        };
+        checkAuth();
+    }, []);
 
     // Defensive Merge: Ensure every section has defaults even if DB returns partial objects
     const c = {
@@ -92,11 +110,13 @@ export default function HomeClient({ content, news, videos, documents = [] }: Ho
 
                     {/* Buttons */}
                     <div className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto">
-                        <Button asChild size="lg" className="px-10 py-7 text-lg shadow-xl shadow-brand-red/20 bg-brand-red hover:bg-brand-red/90 rounded-full transition-transform hover:-translate-y-1">
-                            <Link href="/join">
-                                {t(c.hero.ctaPrimary, c.nav.join.ne)}
-                            </Link>
-                        </Button>
+                        {!loading && (
+                            <Button asChild size="lg" className="px-10 py-7 text-lg shadow-xl shadow-brand-red/20 bg-brand-red hover:bg-brand-red/90 rounded-full transition-transform hover:-translate-y-1">
+                                <Link href={isAuthenticated ? "/commune" : "/join"}>
+                                    {isAuthenticated ? t("Commune", "कम्युन") : t(c.hero.ctaPrimary, c.nav.join.ne)}
+                                </Link>
+                            </Button>
+                        )}
                         <Button asChild variant="outline" size="lg" className="px-10 py-7 text-lg border-brand-navy/20 text-brand-navy hover:bg-white/80 backdrop-blur-sm rounded-full transition-transform hover:-translate-y-1">
                             <Link href="/members">
                                 {t(c.hero.ctaSecondary, c.nav.members.ne)}
