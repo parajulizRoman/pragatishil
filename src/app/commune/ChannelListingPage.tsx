@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { Loader2, MessageSquare, Users, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import EyeLoadingAnimation from "@/components/EyeLoadingAnimation";
-import FlagVariation from "@/components/FlagVariation";
+import Image from "next/image";
 
 interface ChannelWithThreads extends DiscussionChannel {
     recentThreads?: DiscussionThread[];
@@ -152,97 +152,59 @@ export default function ChannelListingPage() {
                     </p>
                 </div>
 
-                {/* Channel Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {channels.map((channel) => {
-                        const thumbnails = getThumbnails(channel.recentThreads);
-                        const icon = channel.icon_emoji || "💬";
+                {/* Group channels by parent */}
+                {(() => {
+                    // Separate channels into groups
+                    const topLevelChannels = channels.filter(ch => !ch.parent_channel_id);
+                    const childChannels = channels.filter(ch => ch.parent_channel_id);
 
-                        return (
-                            <div
-                                key={channel.id}
-                                onClick={() => router.push(`/commune?channel=${channel.slug || channel.id}`)}
-                                className="group cursor-pointer"
-                            >
-                                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200 dark:border-slate-700 hover:border-brand-red dark:hover:border-brand-red">
-                                    {/* Thumbnail Stack */}
-                                    <div className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 overflow-hidden">
-                                        {thumbnails.length > 0 ? (
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                {thumbnails.map((thumb, idx) => (
-                                                    <div
-                                                        key={idx}
-                                                        className={cn(
-                                                            "absolute w-32 h-32 rounded-xl shadow-lg transition-all duration-300 group-hover:scale-105",
-                                                            idx === 0 && "z-30 rotate-0 group-hover:rotate-3",
-                                                            idx === 1 && "z-20 -rotate-6 translate-x-8 group-hover:translate-x-12",
-                                                            idx === 2 && "z-10 rotate-6 -translate-x-8 group-hover:-translate-x-12"
-                                                        )}
-                                                        style={{
-                                                            transform: `${idx === 0 ? 'rotate(0deg)' : idx === 1 ? 'rotate(-6deg) translateX(2rem)' : 'rotate(6deg) translateX(-2rem)'}`
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={thumb}
-                                                            alt=""
-                                                            className="w-full h-full object-cover rounded-xl"
-                                                        />
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        ) : (
-                                            <div className="absolute inset-0">
-                                                <FlagVariation channelId={channel.id} />
-                                            </div>
-                                        )}
+                    // Group children by parent
+                    const channelsByParent = new Map<string, typeof channels>();
+                    childChannels.forEach(ch => {
+                        const parentId = ch.parent_channel_id!;
+                        if (!channelsByParent.has(parentId)) {
+                            channelsByParent.set(parentId, []);
+                        }
+                        channelsByParent.get(parentId)!.push(ch);
+                    });
 
-                                        {/* Trending Badge */}
-                                        {(channel.thread_count || 0) > 10 && (
-                                            <div className="absolute top-3 right-3 bg-brand-red text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                                                <TrendingUp className="w-3 h-3" />
-                                                Active
-                                            </div>
-                                        )}
+                    return (
+                        <>
+                            {/* Top-level channels */}
+                            {topLevelChannels.length > 0 && (
+                                <div className="mb-12">
+                                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
+                                        Main Channels
+                                    </h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                        {topLevelChannels.map((channel) => renderChannelCard(channel))}
                                     </div>
 
-                                    {/* Channel Info */}
-                                    <div className="p-4">
-                                        <div className="flex items-start gap-3 mb-3">
-                                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-red to-brand-blue flex items-center justify-center text-xl flex-shrink-0">
-                                                {icon}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="font-bold text-lg text-slate-900 dark:text-white line-clamp-2 group-hover:text-brand-red transition-colors">
-                                                    {channel.name}
+                                    {/* Render children of each top-level channel */}
+                                    {topLevelChannels.map(parent => {
+                                        const children = channelsByParent.get(parent.id);
+                                        if (!children || children.length === 0) return null;
+
+                                        return (
+                                            <div key={`group-${parent.id}`} className="mt-12">
+                                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                                    <span className="text-2xl">{parent.icon_emoji || "📁"}</span>
+                                                    {parent.name}
+                                                    <span className="text-sm font-normal text-slate-500">
+                                                        ({children.length})
+                                                    </span>
                                                 </h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                                    {children.map((channel) => renderChannelCard(channel))}
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        {channel.description && (
-                                            <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-3">
-                                                {channel.description}
-                                            </p>
-                                        )}
-
-                                        {/* Stats */}
-                                        <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
-                                            <span className="flex items-center gap-1">
-                                                <MessageSquare className="w-3.5 h-3.5" />
-                                                {channel.thread_count || 0}
-                                            </span>
-                                            {channel.member_count !== undefined && (
-                                                <span className="flex items-center gap-1">
-                                                    <Users className="w-3.5 h-3.5" />
-                                                    {channel.member_count}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
+                                        );
+                                    })}
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            )}
+                        </>
+                    );
+                })()}
 
                 {/* Infinite Scroll Observer Target */}
                 {hasMore && (
@@ -280,4 +242,100 @@ export default function ChannelListingPage() {
             </div>
         </div>
     );
+
+    // Helper function to render a channel card
+    function renderChannelCard(channel: ChannelWithThreads) {
+        const thumbnails = getThumbnails(channel.recentThreads);
+        const icon = channel.icon_emoji || "💬";
+
+        return (
+            <div
+                key={channel.id}
+                onClick={() => router.push(`/commune?channel=${channel.slug || channel.id}`)}
+                className="group cursor-pointer"
+            >
+                <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200 dark:border-slate-700 hover:border-brand-red dark:hover:border-brand-red">
+                    {/* Thumbnail Stack */}
+                    <div className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 overflow-hidden">
+                        {thumbnails.length > 0 ? (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                {thumbnails.map((thumb, idx) => (
+                                    <div
+                                        key={idx}
+                                        className={cn(
+                                            "absolute w-32 h-32 rounded-xl shadow-lg transition-all duration-300 group-hover:scale-105",
+                                            idx === 0 && "z-30 rotate-0 group-hover:rotate-3",
+                                            idx === 1 && "z-20 -rotate-6 translate-x-8 group-hover:translate-x-12",
+                                            idx === 2 && "z-10 rotate-6 -translate-x-8 group-hover:-translate-x-12"
+                                        )}
+                                        style={{
+                                            transform: `${idx === 0 ? 'rotate(0deg)' : idx === 1 ? 'rotate(-6deg) translateX(2rem)' : 'rotate(6deg) translateX(-2rem)'}`
+                                        }}
+                                    >
+                                        <img
+                                            src={thumb}
+                                            alt=""
+                                            className="w-full h-full object-cover rounded-xl"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="absolute inset-0 flex items-center justify-center p-8">
+                                <Image
+                                    src="/favicon.png"
+                                    alt={channel.name}
+                                    width={120}
+                                    height={120}
+                                    className="object-contain opacity-40 group-hover:opacity-60 transition-opacity"
+                                />
+                            </div>
+                        )}
+
+                        {/* Trending Badge */}
+                        {(channel.thread_count || 0) > 10 && (
+                            <div className="absolute top-3 right-3 bg-brand-red text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                                <TrendingUp className="w-3 h-3" />
+                                Active
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Channel Info */}
+                    <div className="p-4">
+                        <div className="flex items-start gap-3 mb-3">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-red to-brand-blue flex items-center justify-center text-xl flex-shrink-0">
+                                {icon}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-bold text-lg text-slate-900 dark:text-white line-clamp-2 group-hover:text-brand-red transition-colors">
+                                    {channel.name}
+                                </h3>
+                            </div>
+                        </div>
+
+                        {channel.description && (
+                            <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-3">
+                                {channel.description}
+                            </p>
+                        )}
+
+                        {/* Stats */}
+                        <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+                            <span className="flex items-center gap-1">
+                                <MessageSquare className="w-3.5 h-3.5" />
+                                {channel.thread_count || 0}
+                            </span>
+                            {channel.member_count !== undefined && (
+                                <span className="flex items-center gap-1">
+                                    <Users className="w-3.5 h-3.5" />
+                                    {channel.member_count}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 }
